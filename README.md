@@ -1,54 +1,5 @@
 server-side-dependency-solving
 ==============================
 
-Work-Breakdown-structure
-========================
-- define protocol for communcation between client <-> server propably over https for security reasons. AI by (mruprich) XML, text base, ...
-  - protocol has to provide to server
-    - repo list
-    - installed packages on client side
-    - package(s) to install
-    - metadata for check against server
-    - failover status
-      - return codes dnf and other programs
-      - network issues
-  - protocol will get
-    - update packages
-    - metadata for check on client side and solve errors
-    - failover status
-      - return codes from dnfand other programs
-      - network issues on server side
-    - previous tasks (task solved by another client) ????
-- create a basic client <-> server(daemon) application (for first testing) based on HTTPS propably
-  - initialize a communication
-  - failover statuses during communication mostly network issues
-- client part
-  - check metadata from server
-  - gather data from client system
-    - repo list on client side
-    - packages to install
-    - packages installed on client side
-    - failover for network issues during communication with server
-  - check whether previous task from client was solved successful and inform user.
-- server part
-  - add repo to repository
-    - get repo list from client
-    - check whether repo already exists
-    - create repo
-  - dependency solving
-    - usage of libsolve and libhawkey
-    - basic solving by libsolve library
-  - information returns to client
-    - packages to update
-    - packages to install
-    - failover issues
-      - network issues
-      - dependency issues
-  - remember task for future usage
-    - define structure how to remember a tasks already solved
-    - db???
-  - resolving problems:
-    - if client is disconnected. Can be packages update after reconnection?
-- test suite for server-side-dependency project
-- server part and clustering (AI to phracek)
-- implemented ssds to dnf via optional parameter 
+Description
+===========
