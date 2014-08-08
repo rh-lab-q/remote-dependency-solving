@@ -1,0 +1,4 @@
+The protocol between client and server has following XML structure
+
+<ssds>
+</ssds>
