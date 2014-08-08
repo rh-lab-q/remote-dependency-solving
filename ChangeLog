@@ -1,0 +1,6 @@
+new version 0.1.0
+- protocol definition
+- client class
+- server class
+- Class for parsing XML
+- Class for logging
