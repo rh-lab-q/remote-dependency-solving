@@ -1,4 +1,69 @@
-The protocol between client and server has following XML structure
+This file describes simple structure of network protocol used by SSDS. 
+Right now there are only few tags but in time we will add more tags to support additional functionality.
 
+The protocol between client and server has following simple XML structure:
+
+<?xml version="1.0" encoding="utf-8"?>
 <ssds>
+  <code> <!--Code of the message identifying type of message-->
+    0-199 <!--000-099 are codes of regular commands, 100-199 are error codes-->
+  </code>
+  
+  <data>
+    <!--The tags that are present here depend on code above-->
+  </data>
 </ssds>
+
+
+<!--=========================================================================-->
+
+possible child tags of <data> sent from client side:
+
+  packages requested by client to be installed, upgraded etc.:
+    <requested_pkgs>
+      <package></package>
+      .
+      .
+    <requested_pkgs>
+    
+  whether client wants to install, update, upgrade etc.:
+    <requested_operation>
+    </requested_operation>
+
+  known repos on client side:
+  <repolist>
+    <repo></repo>
+    .
+    .
+  </repolist>
+  
+  values from dnf.conf from client to be considered on server side when dealing with dependencies
+    <dnf_conf>
+    </dnf_conf>
+    
+  installed packages on client side - two options here:
+    -send @System.solv as a seperate file
+    -send @System.solv inside xml
+    
+    
+  <!--======================================================================-->
+  
+  possible child tags of <data> sent from server side:
+  
+    result of dependency solving - packages to install:
+      <install_pkgs>
+        <package></package>
+        .
+        .
+      </install_pkgs>
+    
+    
+  <!--======================================================================-->
+  
+  possible error messages from client side:
+  
+  
+  
+  <!--======================================================================-->
+  
+  possible error messages from server side:
