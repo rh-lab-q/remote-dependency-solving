@@ -6,7 +6,7 @@ The protocol between client and server has following simple XML structure:
 <?xml version="1.0" encoding="utf-8"?>
 <ssds>
   <code> <!--Code of the message identifying type of message-->
-    0-199 <!--000-099 are codes of regular commands, 100-199 are error codes-->
+    0-299 <!--codes will be explained in detail later-->
   </code>
   
   <data>
@@ -67,3 +67,11 @@ possible child tags of <data> sent from client side:
   <!--======================================================================-->
   
   possible error messages from server side:
+
+  <!--======================================================================-->
+
+	<!--Possible error codes-->
+
+		000-099 are regular commands or info
+		100-199 are ssds error messages (mostly about dependency solving errors etc.)
+		200-299 are internal server errors
