@@ -3,16 +3,24 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <ctime>
+#include <execinfo.h>
 
-//udelat nekolik trid logovani: INFO, WARNING, ERROR
+//todo
+//udelat nekolik trid logovani: INFO, DEBUG, WARNING, ERROR
 //pridat info o akci ktera se provadela
+//logovat odchyceny vyjimky??
 //log file ve /var/log/ ?
+//================================================================
 
-enum LogClass{logINFO, logWARNING, logERROR};
+//Needs to be compiled with following attributes:
+//-g -rdynamic -finstrument-functions
+//================================================================
+
+enum LogClass{logINFO, logDEBUG, logWARNING, logERROR};
+const char* log_lvl_msg[4] = {"INFO", "DEBUG", "WARNING", "ERROR"};
 //enum LogOper{};
-
-const char* log_lvl_msg[3] = {"INFO", "WARNING", "ERROR"};
 
 namespace logger
 {
@@ -20,20 +28,25 @@ namespace logger
 	class log
 	{
 		public:
-			log(){}
+			log()
+			{
+				add_log(logINFO, "Logging inicialized");
+			}
 
-			/*
+			
 			//recieves message and prints it along with time and other info
-			void add_log(std::string message)
+			void add_log(int logLvl, std::string message)
 			{
-				get_info();
-				output << message << std::endl;
+				get_time();
+				output << log_lvl_msg[logLvl] << message << std::endl;
 				std::cout << output.str();
-			}*/
+			}
 
+			
 			//creates beginning of log message
-			std::ostringstream& get_info(int logLvl)
+			std::ostringstream& get_time()
 			{
+				//time information for logger
 				time_t curr_time;
 				struct tm* timeinfo;
 				char buffer[80];
@@ -42,31 +55,34 @@ namespace logger
 				timeinfo = localtime(&curr_time);
 				strftime(buffer,80,"%a %d %T",timeinfo);
 
+				//time is added to output stream
 				output << buffer << " ";
-				output << log_lvl_msg[logLvl] << " ";
 
 				return output;
 			}
 
-			//print output when ending operations
-			~log(){std::cout<<output.str();}	
+			//function for getting backtrace info for logging purposes
+			std::ostringstream& trace_class()
+			{
+				//backtrace info for logger
+				std::stringstream s;
+				void* array[10]; // nevim proc 10???
+				size_t size;
+
+				size = backtrace(array, 10);
+				char** arr = backtrace_symbols(array, size);
+
+				for(unsigned int i=4; i<size; i++) //nevim proc 4??
+				{
+					output << arr[i] << std::endl;
+				}
+				free(arr);
+
+				return output;
+			}
 
 		protected:
 			std::ostringstream output;
 	};
-	
-
-	/*
-	//logging class for server side
-	class server_log
-	{
-		public:
-			server_log()
-			{
-				std::cout << "Starting server logger" << std::endl;
-			}
-	};*/
-
-	//gathers info from logging class and print along with time etc.
 }
 #endif //LOGGER_H
