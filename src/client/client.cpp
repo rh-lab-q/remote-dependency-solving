@@ -9,8 +9,6 @@ using namespace boost::asio;
 
 int main(int argc, const char* argv[]){
 	//pouzit libxml
-	
-	
 	logger::log my_log;
 
 	//io_service object is needed to access socket
@@ -42,10 +40,7 @@ int main(int argc, const char* argv[]){
 		std::cout.write(buf.data(), len);
 	}	
 
-	my_log.get_info(logINFO) << "message from client" << std::endl;
-	my_log.get_info(logINFO) << "message from client" << std::endl;
-	my_log.get_info(logINFO) << "message from client" << std::endl;
-	my_log.get_info(logINFO) << "message from client" << std::endl;
+	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");
 
 	return 0;
