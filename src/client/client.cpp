@@ -1,7 +1,6 @@
 #include <iostream>
 //needs to be compiled with -lboost_system option
-#include <boost/asio.hpp>
-#include <boost/array.hpp>
+#include "client.hpp"
 #include "../common/logger.hpp"
 #include <string>
 
@@ -9,22 +8,33 @@ using namespace boost::asio;
 
 int main(int argc, const char* argv[]){
 	//pouzit libxml
+	ssds_client::client client;
 	logger::log my_log;
 
-	//io_service object is needed to access socket
-	io_service io_service;
+	//static const ip::resolver_query_base::flags numeric_service = AI_NUMERICSERV;
 
 	//resolver for dns query
-	ip::tcp::resolver resolver(io_service);
-	ip::tcp::resolver::query query("tik.cesnet.cz", "daytime");
+	ip::tcp::resolver resolver(client.io_service_object);
+	ip::tcp::resolver::query query("localhost", "40002");
 	
 	//a list of responses is returned
-	ip::tcp::resolver::iterator dns_return_list = resolver.resolve(query);
-	ip::tcp::socket my_socket(io_service);
+	ip::tcp::resolver::iterator iter = resolver.resolve(query);
+	ip::tcp::resolver::iterator end;
+	ip::tcp::endpoint endpoint;
+	
+	//try to connect to any of the returned endpoints
+	while(iter != end)
+	{
+		endpoint = *iter++;
+		std::cout << endpoint << std::endl;
+	}
+
+
+	ip::tcp::socket my_socket(client.io_service_object);
+	my_socket.connect(endpoint);
 
 	//openning a connection through the created socket
-	connect(my_socket, dns_return_list);
-
+	//connect(my_socket, resolver.resolve(query));
 	//read the answer from server
 	for (;;) {
 		boost::array<char, 128> buf;
@@ -39,7 +49,6 @@ int main(int argc, const char* argv[]){
 
 		std::cout.write(buf.data(), len);
 	}	
-
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");
 
