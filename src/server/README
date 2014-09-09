@@ -1,1 +1,7 @@
 This part of code is used for server side
+
+Implemented up until now:
+	1.	
+	>> start of synchronous connection based on boost.asio library
+	>> server class (&methods)
+	>>first preparation of handling errors 	and exceptions: 	demonstration of exception for future development
