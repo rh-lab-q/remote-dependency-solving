@@ -1,5 +1,5 @@
 # !!! all files have to be in one local testing folder for this temporary makefile
-# make, server, make client, make clean ("make" only builds server)
+# make server, make client, make clean ("make" only builds server)
 
 TARGETS = server #name of the program && target file 
 OBJS = Server.o
