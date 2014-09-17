@@ -1,0 +1,5 @@
+*CMakeFiles
+*.cmake
+*Cache.txt
+*.o
+*ssds-client
