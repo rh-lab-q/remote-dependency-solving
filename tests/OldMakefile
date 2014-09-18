@@ -1,4 +1,8 @@
+<<<<<<< HEAD:tests/Makefile
 # !!! all files have to be in one local testing folder for this temporary makefile
+=======
+# !!! all files have to be in one local testing folder for this temporary Makefile
+>>>>>>> 0342c1b5cf9b1b15aec5f618be917ab8f817e120:tests/OldMakefile
 # make server, make client, make clean ("make" only builds server)
 
 TARGETS = server #name of the program && target file 
