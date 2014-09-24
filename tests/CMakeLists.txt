@@ -1,6 +1,5 @@
-#CMAKE BUILD 1.1
+#CMAKE BUILD 1.3
 #Usage in CLI: "cd build", "cmake ..","make"; executables are in "/build" folder
-#NEXT: support of LibXML++ in different platforms
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -12,17 +11,35 @@ SET(ssds_VERSION_MAJOR 0)
 SET(ssds_VERSION_MINOR 0)
 SET(ssds_VERSION_BUILD 1)
 SET(ssds_VERSION
-    "${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
+   	"${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
 SET(PACKAGE_VERSION
-    "${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
+	"${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
 
 
 include_directories ("../${PROJECT_SOURCE_DIR}/src/common/")
 include_directories ("../${PROJECT_SOURCE_DIR}/src/client/")
 include_directories ("../${PROJECT_SOURCE_DIR}/src/server/")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/../cmake/Modules/")
+
+#BOOST
 find_package(Boost REQUIRED thread system filesystem)
-include_directories(${Boost_INCLUDE_DIR})
+if (NOT Boost_FOUND)
+	message(FATAL_ERROR "Library Boost required, but not found!")
+else(NOT Boost_FOUND)
+	include_directories(${Boost_INCLUDE_DIRS})
+endif(NOT Boost_FOUND)
+
+#LIBXML++
+find_package(LibXML++ REQUIRED)
+if (NOT LIBXML++_FOUND)
+	message(FATAL_ERROR "Library LibXML++ required, but not found!")
+else(NOT LIBXMLPP_FOUND)
+	include_directories(${LIBXML++_INCLUDE_DIRS})
+	#include_directories( "${LIBXMLPP_SOURCE_DIR}/include" "${CMAKE_INSTALL_PREFIX}/include")
+	#LINK_DIRECTORIES("${CMAKE_INSTALL_PREFIX}/lib")
+	set(LIBS ${LIBS} ${LIBXML++_LIBRARIES})
+endif(NOT LIBXML++_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCXX) 
 	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0")
@@ -36,16 +53,18 @@ PROJECT(ssds-server)
 set(SERVSRC "../src/server/Server.cpp")
 add_executable(ssds-server ${SERVSRC})
 target_link_libraries(
-    ssds-server
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_FILESYSTEM_LIBRARY}
+	ssds-server
+	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
+	${Boost_FILESYSTEM_LIBRARY}
+	${LIBS}
 )
 
 PROJECT(ssds-client)
 set(CLISRC "../src/client/client.cpp")
 add_executable(ssds-client ${CLISRC})
 target_link_libraries(
-    ssds-client
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_FILESYSTEM_LIBRARY}
+	ssds-client
+	${Boost_SYSTEM_LIBRARY}
+	${Boost_FILESYSTEM_LIBRARY}
+	${LIBS}
 )
