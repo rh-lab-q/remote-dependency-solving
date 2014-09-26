@@ -14,25 +14,25 @@ int main(int argc, const char* argv[]){
 	ssds_client::client client;
 	logger::log my_log;
 
-	ssds_xml::read_xml xml_parser;
-	//xml_parser.read_xml_from_file("test.xml");
-	
-	//xml_parser.print_xml();
-	//int code = xml_parser.get_code();
-	//std::cout << code << std::endl;
-	
-	std::ifstream ifs("test.xml");
-	std::string xml_file,line;
-	
-	while(getline(ifs, line)){
-		xml_file += line;
+	ssds_xml::read_xml xml_object;
+	xml_object.read_xml_from_file("test.xml");
+	std::cout << xml_object.get_code() << std::endl;
+		
+		
+	xml_object.find_node("//repolist/repo");
+	for(xmlpp::NodeSet::iterator iter=xml_object.currNodes.begin(); iter!=xml_object.currNodes.end(); iter++)
+	{
+		std::cout << xml_object.get_node_attr((*iter));
+		std::cout << " -> " << xml_object.get_node_content((*iter)) << std::endl;
 	}
+		
+	std::cout << "\n\n";
 
-	xml_parser.read_xml_from_string(xml_file);
-	xml_parser.print_xml();
-	//static const ip::resolver_query_base::flags numeric_service = AI_NUMERICSERV;
+	ssds_xml::create_xml xml_obj_cr;
+	xml_obj_cr.insert_code(213);
+	xml_obj_cr.print_xml();
 
-	/*
+	
 	//resolver for dns query
 	ip::tcp::resolver resolver(client.io_service_object);
 	ip::tcp::resolver::query query("localhost", "40002");
@@ -71,6 +71,6 @@ int main(int argc, const char* argv[]){
 	}	
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");
-*/
+
 	return 0;
 }
