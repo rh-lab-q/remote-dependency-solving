@@ -11,6 +11,10 @@
 
 namespace ssds_xml
 {
+	/*
+	 * Class for debugging all xml documents
+	 * !!!!Important!!!!! Functions in this class are not optimized, they are used only for debugging and they shouldn't be used in running app
+	 */
 	class xml_debug{
 	public:
 		xml_debug()
@@ -18,12 +22,15 @@ namespace ssds_xml
 			
 		}
 	
+		/*
+		 * Prints whole xml from the xmlNode given as an argument. The output is structured for better 
+		 */
 		void flush_xml(xmlNode * a_node, int indent)
 		{
 			xmlNode *curr_node = NULL;
 			std::string tab = "";
 			
-			for(int i=0; i<indent; i++) {
+			for(int i=0; i<indent; i++) {//indentation
 				tab += "\t";
 			}
 
@@ -46,11 +53,10 @@ namespace ssds_xml
 				}
 				
 				
-				
-				if(curr_node->content != nullptr)
+				if(curr_node->content != nullptr)//content i.e. text between tags
 					std::cout << curr_node->content;
 				
-				flush_xml(curr_node->children, indent+1);
+				flush_xml(curr_node->children, indent+1);//recursion was the easiest way to do this
 				
 				if(curr_node->type == 1) {
 						std::cout<<tab;//the tab will be there even when it is not supposed to... but nevermind 
@@ -58,8 +64,8 @@ namespace ssds_xml
 				}
 			}
 			
-			
-			//std::cout << tab << "</" << curr_node->name << ">";
+			if(indent == 0)//indent int sent to function needs to be zero at the beginning
+				std::cout << std::endl;
 		}
 	};
 	
@@ -77,7 +83,9 @@ namespace ssds_xml
 			std::vector<xml_attr*> attributes;
 	};
 	
-
+	/*
+	 * Class for parsing XML document
+	 */
 	class read_xml 
 	{
 		public:
@@ -199,6 +207,9 @@ namespace ssds_xml
 				}*/
 			}
 			
+			/*
+			 * Function for adding new tags - but for creating new XML from scraps, use create_xml class below
+			 */
 			xmlNodePtr add_node_by_path(xmlChar* xpath)
 			{
 				xmlXPathContextPtr context;
@@ -242,37 +253,40 @@ namespace ssds_xml
 	
 	
 	
-	
+	/*
+	 * Class for creating new xml documents from blank page
+	 */
 	class create_xml
 	{
 		
 	public:
 		create_xml()
-		{
-			/*std::string contents;
-			writer = xmlNewTextWriterFilename("text_output.xml", 0);
-			
-			xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
-			xmlTextWriterStartElement(writer,BAD_CAST "ssds");
-			xmlTextWriterWriteElement(writer,BAD_CAST  "code",BAD_CAST  "123");
-			xmlTextWriterEndElement(writer);
-			
-			xmlTextWriterWriteElement(writer,BAD_CAST  "data",BAD_CAST  "ahoj");
-			xmlTextWriterEndElement(writer);
-			
-			
-			xmlTextWriterEndElement(writer);
-			xmlTextWriterEndDocument(writer);*/
-			
-			std::string base = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ssds><code></code><data></data></ssds>";
+		{			
+			std::string base = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ssds><code></code><data></data></ssds>";//basic structure
 			document = xmlParseMemory(base.c_str(), base.size());
 			
 			rootNodePtr = xmlDocGetRootElement(document);
 			currNodePtr = rootNodePtr;
+		}
+		
+		/*
+		 * Adds status code into the xml
+		 */
+		void add_code(xmlChar* code)
+		{
+			currNodePtr = rootNodePtr->xmlChildrenNode;
+							
+			while(currNodePtr != NULL)
+			{
+				if((!xmlStrcmp(currNodePtr->name, (const xmlChar *)"code")))
+				break;
+						
+				currNodePtr = currNodePtr->next;
+			}
 			
-			ssds_xml::xml_debug debug;
-			//debug.flush_xml(rootNodePtr, 0);
-		}	
+			xmlNodeSetContent(currNodePtr, code);
+		}
+		
 		
 		xmlNodePtr create_node_by_path(xmlChar* xpath)
 		{
