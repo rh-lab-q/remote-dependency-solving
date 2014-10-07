@@ -1,5 +1,5 @@
-//#ifndef XML_HANDLER
-//#define XML_HANDLER
+#ifndef XML_HANDLER
+#define XML_HANDLER
 
 /*
  * !!!! TODO !!!!
@@ -166,6 +166,8 @@ namespace ssds_xml
 			rootNode = document.create_root_node("ssds");
 			codeNode = rootNode->add_child("code");
 			rootNode->add_child(codeNode, "data");
+			xmlpp::NodeSet findSet(rootNode->find("data"));
+			dataNode = *findSet.begin();
 		}
 		
 		/*
@@ -188,7 +190,10 @@ namespace ssds_xml
 		/*
 		 * 
 		 */
-		
+		void add_node(std::string name)
+		{
+			
+		}	
 	
 	public:
 		xmlpp::Document document;
@@ -197,9 +202,9 @@ namespace ssds_xml
 	private:
 		xmlpp::Element* rootNode;
 		xmlpp::Element* codeNode;
-		xmlpp::Element* dataNode;
-		
+		xmlpp::Node* dataNode;
+		xmlpp::Node* currNode;
 	};
 
 }
-//#endif
+#endif

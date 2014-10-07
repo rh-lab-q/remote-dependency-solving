@@ -6,19 +6,29 @@
 #include <libxml/xpath.h>
 #include <iostream>
 #include <string>
+#include <vector>
 
-namespace ssds_xml 
+namespace ssds_xml
 {
+	//object representing xml attribute 
+	class xml_attr{
+		public:
+			std::string name;
+			std::string value;
+	};	
+
+	//object representing xml node
+	class xml_node{
+		public:
+			std::string value;
+			std::vector<xml_attr*> attributes;
+	};
+	
+
 	class read_xml 
 	{
 		public:
 			/*
-			 * For searching through the dataNode use this syntax:
-			 * xml_onject.find_node(//path/to/xml/node);
-			 * 
-			 * For going through the NodeSet we created earlier:
-			 * for(xmlpp::NodeSet::iterator iter=xml_object.currNodes.begin(); iter!=xml_object.currNodes.end(); iter++)
-			 * 
 			 * TODO - kontrola parsovani zda dobre probehlo
 			 * 		- kontrola root node
 			 */
@@ -74,9 +84,9 @@ namespace ssds_xml
 			}
 			
 			/*
-			 * 
+			 *TODO - tady to udelam asi tak ze se vrati int a zustane ukazatel kam ma, zbytek se udela primo v main 
 			 */
-			int find_node_by_path(xmlChar* path)
+			void find_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr)
 			{
 				xmlXPathContextPtr context;
 				xmlXPathObjectPtr result;
@@ -86,18 +96,41 @@ namespace ssds_xml
 				
 				if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
 					xmlXPathFreeObject(result);
-					return 0;
+					return;
 				}
 				
+				//std::vector<xml_node*> ret_vector;
 				xmlChar* keyword;
+				xmlAttrPtr attribute;
 				
 				for (int i=0; i < result->nodesetval->nodeNr; i++) {
 					keyword = xmlNodeListGetString(document, result->nodesetval->nodeTab[i]->xmlChildrenNode, 1);
-					printf("keyword: %s\n", keyword);
-				    xmlFree(keyword);
+					attribute = result->nodesetval->nodeTab[i]->properties;
+					
+					xml_node* new_node = new xml_node;//create new_node, this one will be added at the end of return vector
+					new_node->value=(char* )keyword;//value of the node extracted from xml will be added as a string
+					
+					while(attribute!=nullptr){//while for attributes extraction
+						xml_attr* new_attr = new xml_attr;
+						new_attr->value = (char* )xmlNodeListGetString(document, attribute->children, 1);//value of the attribute
+						new_attr->name = (char* )attribute->name;//name of attribute
+						
+						new_node->attributes.push_back(new_attr);//addding the extracted attribute to the node
+						attribute=attribute->next;//next attribute
+					}
+					
+					ret_vector_ptr->push_back(new_node);//here I put the whole node with attributes into the vector
+					xmlFree(keyword);
 				}
 				
-				
+				/*
+				for(std::vector<xml_node*>::iterator it = ret_vector_ptr->begin(); it != ret_vector_ptr->end(); it++){
+					std::cout << "value: " << (*it)->value << std::endl;
+					
+					for(std::vector<xml_attr*>::iterator itt = (*it)->attributes.begin(); itt != (*it)->attributes.end(); itt++){
+						std::cout << "\tattr_name: " << (*itt)->name << ", attr_value:" << (*itt)->value << std::endl;
+					}
+				}*/
 			}
 			
 		public:
@@ -115,7 +148,12 @@ namespace ssds_xml
 	public:
 		create_xml()
 		{
+			
 		}	
+		
+	public:
+		xmlDocPtr document;
+		xmlNodePtr rootNodePtr;
 	};
 
 }
