@@ -9,6 +9,12 @@
 #include <string>
 #include <vector>
 
+/*
+ * 
+ * TODO - pridat funkce na pridavani nodes a attributu at se to nemusi pres ty posrany ukazatele
+ */
+
+
 namespace ssds_xml
 {
 	/*
@@ -35,12 +41,12 @@ namespace ssds_xml
 			}
 
 			for (curr_node = a_node; curr_node; curr_node = curr_node->next) {
-				if(curr_node->type == 1)//classic node - just print the begginning of its name
+				if(curr_node->type == 1){//just for type 1
 					std::cout << tab << "<" << curr_node->name;
-				if(curr_node->type != 3){//if it has no attributes - ending >
-					if(curr_node->properties == nullptr)
+				
+					if(curr_node->properties == nullptr)//without any attributes - the tag can be closed
 						std::cout << ">";
-					else{//otherwise print all attributes
+					else{//attributes out
 						xmlAttrPtr attribute = curr_node->properties;
 						while(attribute!=nullptr){
 							std::cout << " " << attribute->name << "=\"";//name of attribute
@@ -48,24 +54,27 @@ namespace ssds_xml
 							
 							attribute = attribute->next;
 						}
-						std::cout << ">";//ending with attributes
+						std::cout << ">";//end bracket	
 					}
 				}
 				
-				
-				if(curr_node->content != nullptr)//content i.e. text between tags
-					std::cout << curr_node->content;
-				
-				flush_xml(curr_node->children, indent+1);//recursion was the easiest way to do this
-				
-				if(curr_node->type == 1) {
-						std::cout<<tab;//the tab will be there even when it is not supposed to... but nevermind 
-						std::cout  << "</" << curr_node->name << ">";
+				else if(curr_node->type == 3){
+					if(!xmlIsBlankNode(curr_node))
+						std::cout<<curr_node->content;
+					
+					if(curr_node->next!=nullptr && curr_node->next->type==1)
+						std::cout<<std::endl;
 				}
+				
+				flush_xml(curr_node->children, indent+1);
+				
+				
+				if(curr_node->type==1 && curr_node->next!=nullptr && !xmlIsBlankNode(curr_node->children))
+					std::cout << "</" << curr_node->name << ">";
+				
+				else if(curr_node->type == 1)
+					std::cout << tab << "</" << curr_node->name << ">" << std::endl;
 			}
-			
-			if(indent == 0)//indent int sent to function needs to be zero at the beginning
-				std::cout << std::endl;
 		}
 	};
 	
@@ -287,12 +296,40 @@ namespace ssds_xml
 			xmlNodeSetContent(currNodePtr, code);
 		}
 		
-		
-		xmlNodePtr create_node_by_path(xmlChar* xpath)
+		/*
+		 * Either returns nullptr if the node isn't there or currNodePtr points to node that was found
+		 */
+		xmlNodePtr find_node_by_path(xmlChar* xpath)
 		{
-			
-						
-						
+			xmlXPathContextPtr context;
+			xmlXPathObjectPtr result;
+													
+			context = xmlXPathNewContext(document);
+			result = xmlXPathEvalExpression(xpath, context);
+											
+			if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
+				xmlXPathFreeObject(result);
+				return nullptr;
+			}
+			else{
+				currNodePtr = result->nodesetval->nodeTab[0];
+			}
+		}
+		
+		/*
+		 * Adds new child element, currNodePtr will point to this new node
+		 */
+		void add_child(xmlChar* name, xmlChar* content)
+		{
+			currNodePtr = xmlNewChild(currNodePtr, nullptr, name, content);
+		}
+		
+		/*
+		 * Adds attribute pointed to by currNodePtr 
+		 */
+		void add_attr(xmlChar* name, xmlChar* value)
+		{
+			xmlNewProp(currNodePtr, name, value);
 		}
 		
 	public:
