@@ -9,8 +9,15 @@
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/array.hpp>
+#include <boost/thread/thread.hpp>
 #include <ctime>
+#include <cstdlib>
 #include "../common/logger.hpp"
+#include <thread>
+#include <utility>//for std::move()
+
+
+void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
 
 namespace ssds_server {
 
