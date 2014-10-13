@@ -35,48 +35,47 @@ namespace ssds_xml
 		{
 			xmlNode *curr_node = NULL;
 			std::string tab = "";
-			
+							
 			for(int i=0; i<indent; i++) {//indentation
 				tab += "\t";
 			}
-
-			for (curr_node = a_node; curr_node; curr_node = curr_node->next) {
-				if(curr_node->type == 1){//just for type 1
-					std::cout << tab << "<" << curr_node->name;
-				
-					if(curr_node->properties == nullptr)//without any attributes - the tag can be closed
-						std::cout << ">";
-					else{//attributes out
-						xmlAttrPtr attribute = curr_node->properties;
-						while(attribute!=nullptr){
-							std::cout << " " << attribute->name << "=\"";//name of attribute
-							std::cout << attribute->children->content << "\"";//value of the attribute
-							
-							attribute = attribute->next;
-						}
-						std::cout << ">";//end bracket	
+			
+			curr_node = a_node;
+			
+			if(curr_node->type == 1){
+				std::cout << tab << "<" << curr_node->name;
+				if(curr_node->properties == nullptr)//without any attributes - the tag can be closed
+					std::cout << ">" << std::endl;
+				else{//attributes out
+					xmlAttrPtr attribute = curr_node->properties;
+					while(attribute!=nullptr){
+						std::cout << " " << attribute->name << "=\"";//name of attribute
+						std::cout << attribute->children->content << "\"";//value of the attribute
+										
+						attribute = attribute->next;
 					}
+					std::cout << ">" << std::endl;//end bracket	
 				}
-				
-				else if(curr_node->type == 3){
-					if(!xmlIsBlankNode(curr_node))
-						std::cout<<curr_node->content;
-					
-					if(curr_node->next!=nullptr && curr_node->next->type==1)
-						std::cout<<std::endl;
-				}
-				
-				flush_xml(curr_node->children, indent+1);
-				
-				
-				if(curr_node->type==1 && curr_node->next!=nullptr && !xmlIsBlankNode(curr_node->children))
-					std::cout << "</" << curr_node->name << ">";
-				
-				else if(curr_node->type == 1)
-					std::cout << tab << "</" << curr_node->name << ">" << std::endl;
 			}
+			
+			else if(curr_node->type == 3){
+				if(!xmlIsBlankNode(curr_node))
+					std::cout<< tab<<curr_node->content<<std::endl;
+			}
+				
+			if(curr_node->type == 1)
+				flush_xml(curr_node->children, indent+1);
+			//for(curr_node)
+			
+			if(curr_node->type == 1)
+				std::cout << tab << "</" << curr_node->name << ">" << std::endl;
+			
+			if(curr_node->next != nullptr)
+				flush_xml(curr_node->next, indent);
 		}
 	};
+	
+	
 	
 	//object representing xml attribute 
 	class xml_attr{
@@ -119,8 +118,8 @@ namespace ssds_xml
 				rootNodePtr = xmlDocGetRootElement(document);
 				currNodePtr = rootNodePtr;
 				
-				ssds_xml::xml_debug debug;
-				debug.flush_xml(rootNodePtr, 0);
+				//ssds_xml::xml_debug debug;
+				//debug.flush_xml_new(rootNodePtr, 0);
 
 				while(currNodePtr != NULL)
 				{
@@ -321,7 +320,7 @@ namespace ssds_xml
 		 */
 		void add_child(xmlChar* name, xmlChar* content)
 		{
-			currNodePtr = xmlNewChild(currNodePtr, nullptr, name, content);
+			addedNodePtr = xmlNewChild(currNodePtr, nullptr, name, content);
 		}
 		
 		/*
@@ -329,7 +328,15 @@ namespace ssds_xml
 		 */
 		void add_attr(xmlChar* name, xmlChar* value)
 		{
-			xmlNewProp(currNodePtr, name, value);
+			xmlNewProp(addedNodePtr, name, value);
+		}
+		
+		/*
+		 * Adds node next to currNode
+		 */
+		void add_sibling()
+		{
+			
 		}
 		
 	public:
@@ -337,6 +344,7 @@ namespace ssds_xml
 		xmlDocPtr document;
 		xmlNodePtr rootNodePtr;
 		xmlNodePtr currNodePtr;
+		xmlNodePtr addedNodePtr;
 	};
 	
 	
