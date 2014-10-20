@@ -1,6 +1,10 @@
 #CMAKE BUILD 1.3
 #Usage in CLI: "cd build", "cmake ..","make"; executables are in "/build" folder
 
+#Upravy: 	Nechtela se mi tam nalinkovat libxml2 a nevedel jsem jak za kompilace pridat prikaz `xml2-config --libs --cflags`
+#		Tak jsem ten prikaz spustil mimo cmake a jeho vystup (-I/usr/include/libxml2 -lxml2 -lz -lm -ldl) jsem pridal do cflags
+#		Funguje to ale pokud bys mela lepsi reseni klido sem s nim :)
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_COLOR_MAKEFILE ON)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
@@ -30,6 +34,9 @@ else(NOT Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
 endif(NOT Boost_FOUND)
 
+#LIBXML2
+find_package(LibXML2 REQUIRED)
+
 #LIBXML++
 find_package(LibXML++ REQUIRED)
 if (NOT LIBXML++_FOUND)
@@ -42,7 +49,7 @@ else(NOT LIBXMLPP_FOUND)
 endif(NOT LIBXML++_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2 -lxml2 -lz -lm -ldl")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()

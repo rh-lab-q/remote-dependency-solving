@@ -38,7 +38,7 @@ namespace logger
 			void add_log(int logLvl, std::string message)
 			{
 				get_time();
-				output << log_lvl_msg[logLvl] << message << std::endl;
+				output << log_lvl_msg[logLvl] << " " << message << std::endl;
 				std::cout << output.str();
 			}
 

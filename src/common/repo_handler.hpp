@@ -8,6 +8,13 @@
 #include <string.h>
 #include "xml_handler.hpp"
 
+/*
+ * TODO - c++ neco co parsuje .repo soubory v yum?? zkusit jestli neni neco pro c++
+ * 
+ * 
+ * 
+ */
+
 namespace ssds_repo{
 	class parse_repo{
 	public:
@@ -38,7 +45,7 @@ namespace ssds_repo{
 		
 		
 		/*
-		 * Parses .repo files, creates nodes in xml representing repo name and url (metalink)
+		 * Parses .repo files, creates nodes in xml representing repo name and url (metalink | mirrorlist)
 		 */
 		void get_repo_url(ssds_xml::create_xml& xml)
 		{	

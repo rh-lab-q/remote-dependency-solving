@@ -11,7 +11,8 @@
 
 /*
  * 
- * TODO - pridat funkce na pridavani nodes a attributu at se to nemusi pres ty posrany ukazatele
+ * TODO - 
+ * 
  */
 
 
@@ -63,7 +64,7 @@ namespace ssds_xml
 					std::cout<< tab<<curr_node->content<<std::endl;
 			}
 				
-			if(curr_node->type == 1)
+			if(curr_node->type == 1 && curr_node->children != nullptr)
 				flush_xml(curr_node->children, indent+1);
 			//for(curr_node)
 			

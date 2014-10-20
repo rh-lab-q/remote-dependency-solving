@@ -1,38 +1,37 @@
 #include <iostream>
 //needs to be compiled with -lboost_system option
-#include "client.hpp"
+//#include "client.hpp"
 #include "../common/logger.hpp"
 #include "../common/xml_handler.hpp"
+#include "../common/repo_handler.hpp"
 #include <string>
 #include <exception>
 #include <fstream>
 
-using namespace boost::asio;
+//using namespace boost::asio;
 
 int main(int argc, const char* argv[]){
-	//pouzit libxml
-	ssds_client::client client;
-	logger::log my_log;
-
-	ssds_xml::read_xml xml_object;
-	xml_object.read_xml_from_file("test.xml");
-	std::cout << xml_object.get_code() << std::endl;
-		
-		
-	xml_object.find_node("//repolist/repo");
-	for(xmlpp::NodeSet::iterator iter=xml_object.currNodes.begin(); iter!=xml_object.currNodes.end(); iter++)
-	{
-		std::cout << xml_object.get_node_attr((*iter));
-		std::cout << " -> " << xml_object.get_node_content((*iter)) << std::endl;
-	}
-		
-	std::cout << "\n\n";
-
-	ssds_xml::create_xml xml_obj_cr;
-	xml_obj_cr.insert_code(213);
-	xml_obj_cr.print_xml();
-
+	//ssds_client::client client; //object for network handling
+	logger::log my_log; //logger init
+	ssds_xml::xml_debug debug;
+	ssds_repo::parse_repo repo;
 	
+	ssds_xml::create_xml xml;
+	xml.add_code((xmlChar* )"213");
+	
+	debug.flush_xml(xml.rootNodePtr, 0);
+	
+	if(xml.find_node_by_path((xmlChar*) "//data") == nullptr)
+		std::cout << "not found" << std::endl;
+	
+	//xml.add_child((xmlChar* ) "repolist", (xmlChar* ) "");
+	
+	//repo.get_repo_url(xml);
+	
+	//debug.flush_xml(xml.rootNodePtr, 0);
+	
+
+	/*
 	//resolver for dns query
 	ip::tcp::resolver resolver(client.io_service_object);
 	ip::tcp::resolver::query query("localhost", "40002");
@@ -70,7 +69,7 @@ int main(int argc, const char* argv[]){
 		std::cout.write(buf.data(), len);
 	}	
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
-	//log.add_log("This message is sent to client logger");
+	//log.add_log("This message is sent to client logger");*/
 
 	return 0;
 }
