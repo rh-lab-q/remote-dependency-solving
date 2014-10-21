@@ -1,88 +1,21 @@
-#ifndef LOGGER_H
-#define LOGGER_H
-
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <ctime>
-#include <execinfo.h>
-
-//todo
-//udelat nekolik trid logovani: INFO, DEBUG, WARNING, ERROR
-//pridat info o akci ktera se provadela
-//logovat odchyceny vyjimky??
-//log file ve /var/log/ ?
-//================================================================
-
-//Needs to be compiled with following attributes:
-//-g -rdynamic -finstrument-functions
-//================================================================
+#ifndef _LOGGER_HPP
+#define _LOGGER_HPP
 
 enum LogClass{logINFO, logDEBUG, logWARNING, logERROR};
-const char* log_lvl_msg[4] = {"INFO", "DEBUG", "WARNING", "ERROR"};
-//enum LogOper{};
+extern const char* log_lvl_msg[4];
 
-namespace logger
-{
-	//logging class for client side
-	class log
-	{
-		public:
-			log()
-			{
-				add_log(logINFO, "Logging inicialized");
-			}
-
-			
-			//recieves message and prints it along with time and other info
-			void add_log(int logLvl, std::string message)
-			{
-				get_time();
-				output << log_lvl_msg[logLvl] << " " << message << std::endl;
-				std::cout << output.str();
-			}
-
-			
-			//creates beginning of log message
-			std::ostringstream& get_time()
-			{
-				//time information for logger
-				time_t curr_time;
-				struct tm* timeinfo;
-				char buffer[80];
-
-				time(&curr_time);
-				timeinfo = localtime(&curr_time);
-				strftime(buffer,80,"%a %d %T",timeinfo);
-
-				//time is added to output stream
-				output << buffer << " ";
-
-				return output;
-			}
-
-			//function for getting backtrace info for logging purposes
-			std::ostringstream& trace_class()
-			{
-				//backtrace info for logger
-				std::stringstream s;
-				void* array[10]; // nevim proc 10???
-				size_t size;
-
-				size = backtrace(array, 10);
-				char** arr = backtrace_symbols(array, size);
-
-				for(unsigned int i=4; i<size; i++) //nevim proc 4??
-				{
-					output << arr[i] << std::endl;
-				}
-				free(arr);
-
-				return output;
-			}
-
-		protected:
-			std::ostringstream output;
+namespace logger{
+	class log{
+	public:
+		log();
+		void add_log(int logLvl, std::string message);
+		std::ostringstream& get_time();
+		std::ostringstream& trace_class();
+		
+	protected:
+		std::ostringstream output;
 	};
 }
-#endif //LOGGER_H
+
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef XML_HANDLER_H
-#define XML_HANDLER_H
+#ifndef _XML_HANDLER_H
+#define _XML_HANDLER_H
 
 #include <libxml/parser.h>
 #include <libxml/xmlmemory.h>

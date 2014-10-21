@@ -35,9 +35,6 @@ else(NOT Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
 endif(NOT Boost_FOUND)
 
-#LIBXML2
-find_package(LibXML2 REQUIRED)
-
 #LIBXML++
 find_package(LibXML++ REQUIRED)
 if (NOT LIBXML++_FOUND)
@@ -57,19 +54,22 @@ endif()
 
 file(GLOB SRCS *.cpp *.hpp)
 
-PROJECT(ssds-server)
-set(SERVSRC "../src/server/Server.cpp")
-add_executable(ssds-server ${SERVSRC})
-target_link_libraries(
-	ssds-server
-	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
-	${Boost_FILESYSTEM_LIBRARY}
-	${LIBS}
-)
+#PROJECT(ssds-server)
+#set(SERVSRC "../src/server/Server.cpp")
+#add_executable(ssds-server ${SERVSRC})
+#target_link_libraries(
+#	ssds-server
+#	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
+#	${Boost_FILESYSTEM_LIBRARY}
+#	${LIBS}
+#)
 
 PROJECT(ssds-client)
-set(CLISRC "../src/client/client.cpp")
-add_executable(ssds-client ${CLISRC})
+set(CLISRC "../src/client/client_main.cpp")
+#add_library("../src/client/client.cpp")
+add_executable(ssds-client ${CLISRC}
+		../src/client/client.cpp
+		../src/common/logger.cpp)
 target_link_libraries(
 	ssds-client
 	${Boost_SYSTEM_LIBRARY}

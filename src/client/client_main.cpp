@@ -30,7 +30,7 @@ int main(int argc, const char* argv[]){
 	params::notify(vm);
 
 	if(vm.count("help")){
-		std::cout << usage << std::endl;
+		std::cout << "tady ma byt usage" << std::endl;
 		return 1;
 	}
 	
