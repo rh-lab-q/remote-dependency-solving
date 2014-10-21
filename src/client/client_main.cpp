@@ -5,6 +5,16 @@
 #include <exception>
 #include <fstream>
 #include <vector>
+#include <libxml/parser.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/xpath.h>
+#include <libxml/xmlwriter.h>
+#include <boost/asio.hpp>
+#include <boost/array.hpp>
+#include <boost/program_options.hpp>
+#include "../common/logger.hpp"
+#include "../common/xml_handler.hpp"
+#include "../common/repo_handler.hpp"
 
 namespace params = boost::program_options;
 

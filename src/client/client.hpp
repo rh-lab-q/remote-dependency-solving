@@ -1,12 +1,8 @@
 #ifndef _CLIENT_HPP
 #define _CLIENT_HPP
-
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/program_options.hpp>
-#include "../common/logger.hpp"
-#include "../common/xml_handler.hpp"
-#include "../common/repo_handler.hpp"
 
 /*
 std::string usage = "Usage: ./ssds-client <command> [<args> ...]\n\n"
@@ -20,15 +16,12 @@ enum param_options{
 };*/
 
 namespace ssds_client{
-class client{
-	public:
-		client();
-		
-	public:
-		int command;
-		boost::asio::io_service io_service_object;//object that grants access to system I/O operations
-};
-
-
+  class client{
+  public:
+    client(){};
+    
+    int command;
+    boost::asio::io_service io_service_object;//object that grants access to system I/O operations
+  };
 }
 #endif
