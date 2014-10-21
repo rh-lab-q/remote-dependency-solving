@@ -50,8 +50,8 @@ namespace ssds_repo{
 		void get_repo_url(ssds_xml::create_xml& xml)
 		{	
 			if(xml.find_node_by_path((xmlChar* )"//data/repolist") == nullptr){//items will be added into this node
-				std::cerr << "error: get_repo_url - node does not exist in xml file" << std::endl;
-				return;
+				xml.add_child(xml.dataNodePtr, (xmlChar*) "repolist", (xmlChar*) "");//if it is not there I create it
+				xml.currNodePtr = xml.addedNodePtr;//addedNodePtr might be needed later co I use currNodePtr instead
 			}
 			
 			
@@ -83,7 +83,7 @@ namespace ssds_repo{
 						if(barch != std::string::npos)
 							url.replace(barch, barch+9, "x86_64");
 						
-						xml.add_child((xmlChar*) "repo", xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str()));
+						xml.add_child(xml.currNodePtr, (xmlChar*) "repo", xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str()));
 						
 						xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
 						enabled = 0;

@@ -275,7 +275,9 @@ namespace ssds_xml
 			document = xmlParseMemory(base.c_str(), base.size());
 			
 			rootNodePtr = xmlDocGetRootElement(document);
-			currNodePtr = rootNodePtr;
+			
+			find_node_by_path((xmlChar*) "//data");
+			dataNodePtr = currNodePtr;
 		}
 		
 		/*
@@ -319,9 +321,9 @@ namespace ssds_xml
 		/*
 		 * Adds new child element, currNodePtr will point to this new node
 		 */
-		void add_child(xmlChar* name, xmlChar* content)
+		void add_child(xmlNodePtr node, xmlChar* name, xmlChar* content)
 		{
-			addedNodePtr = xmlNewChild(currNodePtr, nullptr, name, content);
+			addedNodePtr = xmlNewChild(node, nullptr, name, content);
 		}
 		
 		/*
@@ -342,10 +344,11 @@ namespace ssds_xml
 		
 	public:
 		xmlTextWriterPtr writer;
-		xmlDocPtr document;
-		xmlNodePtr rootNodePtr;
-		xmlNodePtr currNodePtr;
-		xmlNodePtr addedNodePtr;
+		xmlDocPtr document;//whole xml document
+		xmlNodePtr rootNodePtr;//root node of xml document mainly for flush_xml
+		xmlNodePtr currNodePtr;//current working node, holds a pointer to the first node returned by find_node_by_path
+		xmlNodePtr dataNodePtr;//data node for adding new children
+		xmlNodePtr addedNodePtr;//pointer to node that was just added by add_child function - use for add attributes to new node (function add_attr)
 	};
 	
 	

@@ -12,9 +12,9 @@ int main(int argc, const char* argv[]){
 	logger::log my_log; //logger init
 	ssds_client::client client; //object for network handling
 	
-	/*
-	 * Parsing arguments using boost library
-	 */
+	/********************************************************/
+	/* Parsing arguments using boost library*/
+	/********************************************************/
 	std::vector<std::string> files;//vector of packages to download
 	
 	params::options_description desc("Allowed parameters");
@@ -44,30 +44,25 @@ int main(int argc, const char* argv[]){
 		return 1;
 	}
 
-	
+	/*******************************************************************/
+	/* Creating xml with all the info*/
+	/*******************************************************************/
 	ssds_xml::xml_debug debug; //for xml flushing
 	ssds_repo::parse_repo repo; //for parsing .repo files
 	ssds_xml::create_xml xml; //for creating xml
 	
-	
 	xml.add_code((xmlChar* )"001");
-	debug.flush_xml(xml.rootNodePtr, 0);
 	
-	if(xml.find_node_by_path((xmlChar*) "//data") == nullptr)
-		std::cout << "not found" << std::endl;
-	
-	xml.add_child((xmlChar* ) "repolist", (xmlChar* ) "");
-	repo.get_repo_url(xml);
-	
-	xml.add_child((xmlChar* ) "req_packages", (xmlChar* ) "");
+	repo.get_repo_url(xml);//get all repo info
+	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_packages", (xmlChar* ) "");
+	xml.currNodePtr = xml.addedNodePtr;//addedNodePtr may change in the iteration so I use currNodePtr instead 
 	
 	for(std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++){
-		std::cout << *it << std::endl;
+		xml.add_child(xml.currNodePtr, (xmlChar*) "package", (xmlChar*) (*it).c_str());
 	}
 	
+	debug.flush_xml(xml.rootNodePtr, 0);
 	
-	
-	//debug.flush_xml(xml.rootNodePtr, 0);
 	
 
 	/*
