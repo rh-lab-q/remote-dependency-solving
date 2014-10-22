@@ -15,17 +15,21 @@
 #include "../common/logger.hpp"
 #include "../common/xml_handler.hpp"
 #include "../common/repo_handler.hpp"
+#include "../common/params.hpp"
 
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
 	logger::log my_log; //logger init
 	ssds_client::client client; //object for network handling
+	ssds_params::params parameters;
+	
+	parameters.parse_params(argc, argv);
 	
 	/********************************************************/
 	/* Parsing arguments using boost library*/
 	/********************************************************/
-	std::vector<std::string> files;//vector of packages to download
+	/*std::vector<std::string> files;//vector of packages to download
 	
 	params::options_description desc("Allowed parameters");
 	desc.add_options()
@@ -52,7 +56,7 @@ int main(int argc, const char* argv[]){
 	if(files.size() == 0){
 		std::cout << "No packages were provided" << std::endl;
 		return 1;
-	}
+	}*/
 
 	/*******************************************************************/
 	/* Creating xml with all the info*/
@@ -67,11 +71,11 @@ int main(int argc, const char* argv[]){
 	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_packages", (xmlChar* ) "");
 	xml.currNodePtr = xml.addedNodePtr;//addedNodePtr may change in the iteration so I use currNodePtr instead 
 	
-	for(std::vector<std::string>::iterator it = files.begin(); it != files.end(); it++){
+	for(std::vector<std::string>::iterator it = parameters.packages.begin(); it != parameters.packages.end(); it++){
 		xml.add_child(xml.currNodePtr, (xmlChar*) "package", (xmlChar*) (*it).c_str());
 	}
 	
-	debug.flush_xml(xml.rootNodePtr, 0);
+	//debug.flush_xml(xml.rootNodePtr, 0);
 	
 	
 

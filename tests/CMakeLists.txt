@@ -72,7 +72,8 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/repo_handler.cpp
 		../src/common/xml_debug.cpp
 		../src/common/create_xml.cpp
-		../src/common/read_xml.cpp)
+		../src/common/read_xml.cpp
+		../src/common/params.cpp)
 target_link_libraries(
 	ssds-client
 	${Boost_SYSTEM_LIBRARY}
