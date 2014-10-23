@@ -32,7 +32,9 @@ namespace logger{
 	{
 		get_time();
 		output << log_lvl_msg[logLvl] << " " << message << std::endl;
-	std::cout << output.str();
+		std::cout << output.str();
+		output.str("");
+		output.clear();
 	}
 	
 				
@@ -73,4 +75,8 @@ namespace logger{
 	
 		return output;
 	}
+	
+	//log::~log(){
+	 // std::cout << output.str();
+	//}
 }

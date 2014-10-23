@@ -79,4 +79,16 @@ namespace ssds_xml{
   {
 
   }
+  
+  void create_xml::doc_to_str()
+  {
+    xmlChar* buff;
+    int buffsize;
+    
+    xmlDocDumpFormatMemory(document, &buff, &buffsize, 1);
+    str_output = (char* )buff;
+    
+    //std::cout << buff << std::endl;
+    
+  }
 }

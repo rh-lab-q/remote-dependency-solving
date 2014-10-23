@@ -75,11 +75,17 @@ int main(int argc, const char* argv[]){
 		xml.add_child(xml.currNodePtr, (xmlChar*) "package", (xmlChar*) (*it).c_str());
 	}
 	
-	//debug.flush_xml(xml.rootNodePtr, 0);
+	xml.doc_to_str();
+	xml.str_output += "\n";
+	
+	//debug.flush_xml(xml.rootNodePtr, 0);*/
 	
 	
-
-	/*
+	/**************************************************************/
+	/* Networking part - sending data to server and recieving*/
+	/***************************************************************/
+	using namespace boost::asio;
+	
 	//resolver for dns query
 	ip::tcp::resolver resolver(client.io_service_object);
 	ip::tcp::resolver::query query("localhost", "40002");
@@ -93,9 +99,8 @@ int main(int argc, const char* argv[]){
 	while(iter != end)
 	{
 		endpoint = *iter++;
-		std::cout << endpoint << std::endl;
+		//std::cout << endpoint << std::endl;
 	}
-
 
 	ip::tcp::socket my_socket(client.io_service_object);
 	my_socket.connect(endpoint);
@@ -107,14 +112,19 @@ int main(int argc, const char* argv[]){
 		boost::array<char, 128> buf;
 		boost::system::error_code error;
 
+		std::string msg = "pokus z klienta\n";
+		//size_t len = my_socket.read_some(buffer(buf), error);
+		write(my_socket, boost::asio::buffer(xml.str_output));
+		
 		size_t len = my_socket.read_some(buffer(buf), error);
+		std::cout.write(buf.data(), len);
 
 		if(error==error::eof)
 			break;
 		else if (error)
 			throw boost::system::system_error(error);
 
-		std::cout.write(buf.data(), len);
+		
 	}	
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");*/

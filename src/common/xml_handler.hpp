@@ -37,10 +37,12 @@ namespace ssds_xml{
    void get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr);
    xmlNodePtr add_node_by_path(xmlChar* xpath);
    
+   
    xmlDocPtr document;
    xmlNodePtr currNodePtr;
    xmlNodePtr rootNodePtr;
    xmlNodePtr dataNodePtr;
+
  };
  
   /*
@@ -54,6 +56,7 @@ namespace ssds_xml{
    void add_child(xmlNodePtr node, xmlChar* name, xmlChar* content);
    void add_attr(xmlChar* name, xmlChar* value);
    void add_sibling();
+   void doc_to_str();
    
    xmlTextWriterPtr writer;
    xmlDocPtr document;//whole xml document
@@ -61,6 +64,7 @@ namespace ssds_xml{
    xmlNodePtr currNodePtr;//current working node, holds a pointer to the first node returned by find_node_by_path
    xmlNodePtr dataNodePtr;//data node for adding new children
    xmlNodePtr addedNodePtr;//pointer to node that was just added by add_child function - use for add attributes to new node (function add_attr)
+   std::string str_output;
  };
 }
 

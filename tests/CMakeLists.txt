@@ -54,15 +54,19 @@ endif()
 
 file(GLOB SRCS *.cpp *.hpp)
 
-#PROJECT(ssds-server)
-#set(SERVSRC "../src/server/Server.cpp")
-#add_executable(ssds-server ${SERVSRC})
-#target_link_libraries(
-#	ssds-server
-#	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
-#	${Boost_FILESYSTEM_LIBRARY}
-#	${LIBS}
-#)
+PROJECT(ssds-server)
+set(SERVSRC "../src/server/Server.cpp")
+add_executable(ssds-server ${SERVSRC}
+		../src/common/logger.cpp
+		../src/common/xml_debug.cpp
+		../src/common/read_xml.cpp
+		../src/common/create_xml.cpp)
+target_link_libraries(
+	ssds-server
+	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
+	${Boost_FILESYSTEM_LIBRARY}
+	${LIBS}
+)
 
 PROJECT(ssds-client)
 set(CLISRC "../src/client/client_main.cpp")

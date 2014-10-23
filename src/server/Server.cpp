@@ -60,27 +60,37 @@ int main() {
 	logger::log my_log;
 	int portnum = 40002;
 	portnum = mainserver.newPort(portnum);
-	boost::asio::io_service &ios = mainserver.getIo();
+	boost::asio::io_service &ios = mainserver.getIo();	
 	ip::tcp::endpoint endpoint_(ip::tcp::v4(),portnum);
 	ip::tcp::acceptor acceptor_(ios,endpoint_);  //listener
 	std::cout << "Server is ready..." << "\n";
 	boost::system::error_code ec;
-	ip::tcp::socket sock(ios);
+	//ip::tcp::socket sock(ios);
 
 	try {
 			//ip::tcp::iostream streams("");
 		while(42) {
+  			ip::tcp::socket sock(ios);
 			acceptor_.accept(sock); //second argument can be error handler
+			
+			std::cout<<"some connection was accepted" << std::endl;
+			boost::array<char, 10000> buf;
+			size_t len = sock.read_some(buffer(buf), ec);
+			std::cout.write(buf.data(), len);
+			
 			std::string message = "Server says hello!\n";
+			
 			write(sock, buffer(message), ec);
+			//size_t len = sock.read_some(buffer(buf), ec);
+			//std::cout.write(buf.data(), len);
 		    //std::thread(session, std::move(sock).std::move(ec)).detach();
 
 		}
 	} /*handling exceptions*/
 	catch (std::exception& e){
-		std::ostringstream os;
-		os << "Server: "<< e.what();
-		/*std::cerr*/my_log.add_log(logERROR,os.str());
+		//std::ostringstream os;
+		//os << "Server: "<< e.what();
+		/*std::cerr*/my_log.add_log(logERROR,e.what());
 	}
 
 
