@@ -22,7 +22,7 @@ namespace ssds_xml {
     document = xmlParseFile(path.c_str());
 
     if(document == NULL)
-      std::cout << "neco se podelalo" << std::endl;
+      std::cout << "Interni error - document v xml" << std::endl;
 
     rootNodePtr = xmlDocGetRootElement(document);
     currNodePtr = rootNodePtr;
@@ -111,6 +111,8 @@ namespace ssds_xml {
       ret_vector_ptr->push_back(new_node);//here I put the whole node with attributes into the vector
       xmlFree(keyword);
     }
+    
+    xmlXPathFreeObject(result);
   }
 
   /*
@@ -138,5 +140,13 @@ namespace ssds_xml {
     std::cout << "probehlo" << std::endl;
 
     //std::cout << result->nodesetval->nodeTab[0]->name << std::endl;
+  }
+  
+  /*
+   * All structures used for parsing XML need to be freed in the end
+   */
+  void read_xml::free_resources()
+  {
+    xmlFreeDoc(document);
   }
 }

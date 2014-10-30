@@ -8,6 +8,7 @@ namespace ssds_repo{
   public:
     parse_repo();
     void get_repo_url(ssds_xml::create_xml& xml);
+    void free_resources();
     
   public:
     std::vector<std::ifstream*> repolist;

@@ -21,4 +21,13 @@ namespace ssds_params
 	packages.push_back(argv[i]);
     }
   }
+  
+  void params::free_resources()
+  {
+//     for(std::vector<std::string>::iterator it = packages.begin(); it != packages.end(); it++){
+
+//     }
+    packages.clear();
+  }
+
 }

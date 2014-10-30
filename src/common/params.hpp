@@ -8,6 +8,7 @@ namespace ssds_params{
  public:
   params();
   void parse_params(int argc,const char** argv);
+  void free_resources();
   
   std::vector<std::string> packages;
 

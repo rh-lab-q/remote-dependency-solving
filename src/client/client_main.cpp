@@ -67,7 +67,7 @@ int main(int argc, const char* argv[]){
 	
 	xml.add_code((xmlChar* )"001");
 	
-	repo.get_repo_url(xml);//get all repo info
+	//repo.get_repo_url(xml);//get all repo info
 	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_packages", (xmlChar* ) "");
 	xml.currNodePtr = xml.addedNodePtr;//addedNodePtr may change in the iteration so I use currNodePtr instead 
 	
@@ -128,6 +128,7 @@ int main(int argc, const char* argv[]){
 	}	
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");*/
-
+	xml.free_resources();
+	repo.free_resources();
 	return 0;
 }

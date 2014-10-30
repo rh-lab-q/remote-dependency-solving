@@ -36,6 +36,7 @@ namespace ssds_xml{
    int get_code();
    void get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr);
    xmlNodePtr add_node_by_path(xmlChar* xpath);
+   void free_resources();
    
    
    xmlDocPtr document;
@@ -57,6 +58,7 @@ namespace ssds_xml{
    void add_attr(xmlChar* name, xmlChar* value);
    void add_sibling();
    void doc_to_str();
+   void free_resources();
    
    xmlTextWriterPtr writer;
    xmlDocPtr document;//whole xml document

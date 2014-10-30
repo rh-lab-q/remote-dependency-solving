@@ -49,11 +49,15 @@ namespace ssds_xml{
 
     if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
       xmlXPathFreeObject(result);
+      xmlXPathFreeContext(context);
       return nullptr;
     }
     else{
       currNodePtr = result->nodesetval->nodeTab[0];
     }
+    
+    xmlXPathFreeObject(result);
+    xmlXPathFreeContext(context);
   }
 
   /*
@@ -88,7 +92,14 @@ namespace ssds_xml{
     xmlDocDumpFormatMemory(document, &buff, &buffsize, 1);
     str_output = (char* )buff;
     
+    free(buff);
+    
     //std::cout << buff << std::endl;
     
+  }
+  
+  void create_xml::free_resources()
+  {
+    xmlFreeDoc(document);
   }
 }
