@@ -1,2 +1,13 @@
-cmake
+## required libraries and packages: 
+
 boost
+libsolv
+libxml2-devel
+xml2
+## maybe even - libxml - will be requred
+
+## packages for setting up development enviroment
+
+git
+gcc-c++
+cmake 
