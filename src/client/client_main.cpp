@@ -83,7 +83,7 @@ int main(int argc, const char* argv[]){
 	  std::cout << "wrong xml" << std::endl;
 	}
 	
-#if 0	
+	
 	/**************************************************************/
 	/* Networking part - sending data to server and recieving*/
 	/***************************************************************/
@@ -131,7 +131,7 @@ int main(int argc, const char* argv[]){
 	}	
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");*/
-#endif
+
 	xml.free_resources();
 	repo.free_resources();
 	return 0;
