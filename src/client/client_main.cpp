@@ -68,18 +68,20 @@ int main(int argc, const char* argv[]){
 	xml.add_code((xmlChar* )"001");
 	
 	//repo.get_repo_url(xml);//get all repo info
-	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_packages", (xmlChar* ) "");
+	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_pks", (xmlChar* ) "");
 	xml.currNodePtr = xml.addedNodePtr;//addedNodePtr may change in the iteration so I use currNodePtr instead 
 	
 	for(std::vector<std::string>::iterator it = parameters.packages.begin(); it != parameters.packages.end(); it++){
-		xml.add_child(xml.currNodePtr, (xmlChar*) "package", (xmlChar*) (*it).c_str());
+		xml.add_child(xml.currNodePtr, (xmlChar*) "pkg", (xmlChar*) (*it).c_str());
 	}
 	
 	xml.doc_to_str();
 	xml.str_output += "\n";
 	
-	//debug.flush_xml(xml.rootNodePtr, 0);*/
-	
+	debug.flush_xml(xml.rootNodePtr, 0);
+	if(!debug.validate_xml(xml.document)){
+		std::cout << "wrong xml" << std::endl;
+	}
 	
 	/**************************************************************/
 	/* Networking part - sending data to server and recieving*/
