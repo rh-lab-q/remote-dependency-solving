@@ -1,0 +1,14 @@
+<!-- Root element ssds -->
+<!ELEMENT ssds (code,data)>
+
+<!-- Two basic element inside root element - code and data -->
+<!ELEMENT code (#PCDATA)>
+<!ELEMENT data (requested_pkgs, repolist, requested_operation, install_pkgs)>
+
+<!-- Direct children of data element - level 3 -->
+<!ELEMENT requested_pkgs (pkg)>
+<!ELEMENT repolist (repo)>
+
+<!-- Nodes on level 4 - usually containing actual data -->
+<!ELEMENT repo (#PCDATA)>
+<!ATTLIST repo name CDATA #REQUIRED>
