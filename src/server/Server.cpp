@@ -1,9 +1,10 @@
 //============================================================================
-// Name        : Server.cpp
-// Author      : brumlablo
-// Version     :
-// Copyright   : GNU GPL
-// Description : Hello World in C, Ansi-style
+// Name		: Server.cpp
+// Author	: brumlablo
+// Editor	: Jozkar	
+// Version	: 0.2
+// Copyright	: GNU GPL
+// Description	: Server side of SSDS
 //============================================================================
 
 /*BUILDED WITH THESE FLAGS: -O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0*/
@@ -74,16 +75,26 @@ int main() {
 			acceptor_.accept(sock); //second argument can be error handler
 			
 			std::cout<<"some connection was accepted" << std::endl;
-			boost::array<char, 10000> buf;
-			size_t len = sock.read_some(buffer(buf), ec);
-			std::cout.write(buf.data(), len);
+
+			int64_t size;
+			boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
 			
-			std::string message = "Server says hello!\n";
+			std::vector<char> buf(size);
+			//boost::array<char, 10000> buf;			
+			size_t len = sock.read_some(buffer(buf), ec);
+
+			//control prints
+			std::cout<<size<<std::endl;
+			std::cout.write(buf.data(), len);
+
+			//acceptation print			
+			std::string message = "connection accepted\n";//Solving::Solve(buf.data());
 			
 			write(sock, buffer(message), ec);
-			//size_t len = sock.read_some(buffer(buf), ec);
-			//std::cout.write(buf.data(), len);
-		    //std::thread(session, std::move(sock).std::move(ec)).detach();
+			sock.close();
+
+			//far future		    
+			//std::thread(session, std::move(sock).std::move(ec)).detach();
 
 		}
 	} /*handling exceptions*/
