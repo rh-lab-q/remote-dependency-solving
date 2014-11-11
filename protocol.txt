@@ -20,15 +20,15 @@ The protocol between client and server has following simple XML structure:
 possible child tags of <data> sent from client side:
 
   packages requested by client to be installed, upgraded etc.:
-    <requested_pkgs>
+    <req_pkgs>
       <pkg></pkg>
       .
       .
-    <requested_pkgs>
+    <req_pkgs>
     
   whether client wants to install, update, upgrade etc.:
-    <requested_operation>
-    </requested_operation>
+    <req_operation>
+    </req_operation>
 
   known repos on client side:
   <repolist>

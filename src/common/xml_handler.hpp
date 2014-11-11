@@ -14,7 +14,7 @@ namespace ssds_xml{
  public:
    xml_debug();
    void flush_xml(xmlNode * a_node, int indent);
-   
+   int validate_xml(xmlDocPtr doc);
  };
  
  class xml_attr{

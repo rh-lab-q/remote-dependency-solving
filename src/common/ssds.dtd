@@ -3,12 +3,16 @@
 
 <!-- Two basic element inside root element - code and data -->
 <!ELEMENT code (#PCDATA)>
-<!ELEMENT data (requested_pkgs, repolist, requested_operation, install_pkgs)>
+<!ELEMENT data (req_pkgs?, repolist?)>
 
 <!-- Direct children of data element - level 3 -->
-<!ELEMENT requested_pkgs (pkg)>
+<!ELEMENT req_pkgs (pkg)>
 <!ELEMENT repolist (repo)>
+<!--<!ELEMENT req_operation ()>-->
+<!--<!ELEMENT install_pkgs ()>-->
 
 <!-- Nodes on level 4 - usually containing actual data -->
 <!ELEMENT repo (#PCDATA)>
 <!ATTLIST repo name CDATA #REQUIRED>
+
+<!ELEMENT pkg (#PCDATA)>
