@@ -21,7 +21,7 @@ possible child tags of <data> sent from client side:
 
   packages requested by client to be installed, upgraded etc.:
     <requested_pkgs>
-      <package></package>
+      <pkg></pkg>
       .
       .
     <requested_pkgs>
@@ -32,7 +32,7 @@ possible child tags of <data> sent from client side:
 
   known repos on client side:
   <repolist>
-    <repo></repo>
+    <repo name="REPO_NAME"></repo>
     .
     .
   </repolist>
@@ -52,7 +52,7 @@ possible child tags of <data> sent from client side:
   
     result of dependency solving - packages to install:
       <install_pkgs>
-        <package></package>
+        <pkg></pkg>
         .
         .
       </install_pkgs>

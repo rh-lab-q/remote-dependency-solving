@@ -10,6 +10,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/xpath.h>
 #include <libxml/xmlwriter.h>
+#include <boost/program_options.hpp>
 
 /*
  * TODO - c++ neco co parsuje .repo soubory v yum?? zkusit jestli neni neco pro c++
@@ -55,6 +56,8 @@ namespace ssds_repo{
       xml.add_child(xml.dataNodePtr, (xmlChar*) "repolist", (xmlChar*) "");//if it is not there I create it
       xml.currNodePtr = xml.addedNodePtr;//addedNodePtr might be needed later co I use currNodePtr instead
     }
+    
+    
 
 
     for(std::vector<std::ifstream*>::iterator it = repolist.begin(); it != repolist.end(); it++){
