@@ -13,7 +13,7 @@ namespace ssds_xml {
   int xml_debug::validate_xml(xmlDocPtr doc)
   {
     xmlValidCtxtPtr dtd_context = xmlNewValidCtxt();
-    xmlDtdPtr dtd_file = xmlParseDTD(NULL, (xmlChar *)"../../src/common/ssds.dtd");
+    xmlDtdPtr dtd_file = xmlParseDTD(NULL, (xmlChar *)"../src/common/ssds.dtd");
     int ret = xmlValidateDtd(dtd_context, doc, dtd_file);
     
     xmlFreeValidCtxt(dtd_context);

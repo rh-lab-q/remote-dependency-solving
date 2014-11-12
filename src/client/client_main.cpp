@@ -68,7 +68,7 @@ int main(int argc, const char* argv[]){
 	xml.add_code((xmlChar* )"001");
 	
 	//repo.get_repo_url(xml);//get all repo info
-	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_pks", (xmlChar* ) "");
+	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_pkgs", (xmlChar* ) "");
 	xml.currNodePtr = xml.addedNodePtr;//addedNodePtr may change in the iteration so I use currNodePtr instead 
 	
 	for(std::vector<std::string>::iterator it = parameters.packages.begin(); it != parameters.packages.end(); it++){
