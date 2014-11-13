@@ -61,7 +61,8 @@ add_executable(ssds-server ${SERVSRC}
 		../src/common/xml_debug.cpp
 		../src/common/read_xml.cpp
 		../src/common/create_xml.cpp
-		../src/server/server.cpp)
+		../src/server/server.cpp
+		../src/server/solving.cpp)
 target_link_libraries(
 	ssds-server
 	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
