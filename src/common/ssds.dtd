@@ -3,11 +3,11 @@
 
 <!-- Two basic element inside root element - code and data -->
 <!ELEMENT code (#PCDATA)>
-<!ELEMENT data (req_pkgs?, repolist?)>
+<!ELEMENT data (repolist?, req_pkgs?)>
 
 <!-- Direct children of data element - level 3 -->
-<!ELEMENT req_pkgs (pkg)>
-<!ELEMENT repolist (repo)>
+<!ELEMENT repolist (repo+)>
+<!ELEMENT req_pkgs (pkg+)>
 <!--<!ELEMENT req_operation ()>-->
 <!--<!ELEMENT install_pkgs ()>-->
 
