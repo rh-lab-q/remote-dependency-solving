@@ -3,6 +3,11 @@
 
 #include <string>
 #include <iostream>
+#include <libxml/parser.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/xpath.h>
+#include <libxml/xmlwriter.h>
+#include "../common/xml_handler.hpp"
 
 namespace ssds_solving {
 
@@ -11,7 +16,8 @@ namespace ssds_solving {
 		
 		solve(/* repos class instance with all enabled repos handlers */); 
 	        ~solve();
-	    	void parseMessage(std::string message);
+	    	xmlDocPtr parseMessage(std::string message);
+		void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
 		std::string answer(std::string message);
 	    private:
 		/* repos class instance with all enabled repos handlers */
