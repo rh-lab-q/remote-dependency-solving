@@ -11,7 +11,6 @@
 /*synchronous start of server based on boost.asio library*/
 
 #include "server.hpp"
-#include "solving.hpp"
 
 
 
@@ -42,7 +41,6 @@ void session(ip::tcp::socket sock,boost::system::error_code ec){
 int main() {
 
 	ssds_server::server mainserver;
-	ssds_solving::solve solvePoint;
 	logger::log my_log;
 	int portnum = 40002;
 	portnum = mainserver.newPort(portnum);
@@ -65,13 +63,15 @@ int main() {
 			boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
 			
 			std::vector<char> buf(size);
+			//boost::array<char, 10000> buf;			
 			size_t len = sock.read_some(buffer(buf), ec);
-			std::string input_message = std::string(buf.begin(), buf.end());
 
-			std::cout<< "Message has " << len << " characters." << std::endl;
-		
-			//solving
-			std::string message = solvePoint.answer(input_message);
+			//control prints
+			std::cout<<size<<std::endl;
+			std::cout.write(buf.data(), len);
+
+			//acceptation print			
+			std::string message = "connection accepted\n";//Solving::Solve(buf.data());
 			
 			write(sock, buffer(message), ec);
 			sock.close();

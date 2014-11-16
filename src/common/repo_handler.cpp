@@ -11,6 +11,7 @@
 #include <libxml/xpath.h>
 #include <libxml/xmlwriter.h>
 #include <boost/program_options.hpp>
+#include <librepo/librepo.h>
 
 /*
  * TODO - c++ neco co parsuje .repo soubory v yum?? zkusit jestli neni neco pro c++
