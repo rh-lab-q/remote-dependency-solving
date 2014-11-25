@@ -1,3 +1,11 @@
+//============================================================================
+// Name		: server.hpp
+// Author	: mruprich
+// Version	: 0.2
+// Copyright	: GNU GPL
+// Description	: Server side of SSDS
+//============================================================================
+
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -15,6 +23,7 @@
 #include "../common/logger.hpp"
 #include <thread>
 #include <utility>//for std::move()
+#include "solving.hpp"
 
 
 //void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
@@ -23,10 +32,11 @@ namespace ssds_server {
 
 	class server : private boost::noncopyable {
 	public:
-		server();
+	    server();
 	    /*Server(const Server&other);*/
 	    ~server();
 	    boost::asio::io_service& getIo();
+	    int process_connection(boost::asio::ip::tcp::socket& sock);
 	    int newPort(int);
 		//void handle_accept(const boost::system::error_code& ec);
 		void listen();
@@ -36,8 +46,8 @@ namespace ssds_server {
 		void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
 		
 	private:
-		boost::asio::io_service io_service_;         /*basic object for boost operations*/
-		int port = 4242;
+	  boost::asio::io_service io_service_;         /*basic object for boost operations*/
+	  int port = 4242;
 	};
 }//ssds_ server
 #endif

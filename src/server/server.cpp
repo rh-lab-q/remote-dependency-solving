@@ -1,7 +1,7 @@
 //============================================================================
-// Name		: Server.cpp
+// Name		: server.cpp
 // Author	: brumlablo
-// Editor	: Jozkar	
+// Editor	: Jozkar, mruprich	
 // Version	: 0.2
 // Copyright	: GNU GPL
 // Description	: Server side of SSDS
@@ -35,6 +35,24 @@ namespace ssds_server {
   }
 
   
+  int server::process_connection(boost::asio::ip::tcp::socket& sock)
+  {
+    ssds_solving::solve solvePoint;
+    boost::system::error_code ec;
+    int64_t size;
+    
+    boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
+    
+    std::vector<char> buf(size);
+    size_t len = sock.read_some(buffer(buf), ec);
+    std::string input_message = std::string(buf.begin(), buf.end());
+    
+    std::cout<< "Message has " << len << " characters." << std::endl;
+    
+    std::string message = solvePoint.answer(input_message);
+    write(sock, buffer(message), ec);
+  
+  }
 
 
   void server::session(ip::tcp::socket sock,boost::system::error_code ec){

@@ -1,7 +1,7 @@
 //============================================================================
-// Name		: Server.cpp
+// Name		: server_main.cpp
 // Author	: brumlablo
-// Editor	: Jozkar	
+// Editor	: Jozkar, mruprich
 // Version	: 0.2
 // Copyright	: GNU GPL
 // Description	: Server side of SSDS
@@ -42,7 +42,7 @@ void session(ip::tcp::socket sock,boost::system::error_code ec){
 int main() {
 
 	ssds_server::server mainserver;
-	ssds_solving::solve solvePoint;
+	
 	logger::log my_log;
 	int portnum = 40002;
 	portnum = mainserver.newPort(portnum);
@@ -60,7 +60,9 @@ int main() {
 			acceptor_.accept(sock); //second argument can be error handler
 			
 			std::cout<<"some connection was accepted" << std::endl;
-
+			
+			mainserver.process_connection(sock);
+#if 0
 			int64_t size;
 			boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
 			
@@ -72,8 +74,8 @@ int main() {
 		
 			//solving
 			std::string message = solvePoint.answer(input_message);
+		#endif	
 			
-			write(sock, buffer(message), ec);
 			sock.close();
 
 			//far future		    
