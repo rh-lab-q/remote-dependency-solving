@@ -6,6 +6,10 @@ libxml2-devel
 xml2
 ## maybe even - libxml - will be requred
 
+## librepo package
+librepo-devel.(version) e.g.: librepo-devel.x86_64, librepo-devel.i686
+glib2.0-devel
+
 ## packages for setting up development enviroment
 
 git
