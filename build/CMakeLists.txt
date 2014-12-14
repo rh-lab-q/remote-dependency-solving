@@ -6,6 +6,11 @@
 #		   Funguje to ale pokud bys mela lepsi reseni klido sem s nim :)
 #		2. Potreboval jsem dalsi cast boost knihovny tak jsem pridal -lboost_program_options
 
+#Used compile parameters:
+#for libxml:	-I/usr/include/libxml2 -lxml2 -lz -lm -ldl
+#for glib.h:	-I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
+#for librepo.h:	-L/usr/include/librepo/ -lrepo
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_COLOR_MAKEFILE ON)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
@@ -47,7 +52,7 @@ endif(NOT Boost_FOUND)
 # endif(NOT LIBXML++_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2 -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/ -lxml2 -lz -lm -ldl -lboost_program_options -lpthread")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2 -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()

@@ -4,6 +4,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
 #include <libxml/parser.h>
@@ -11,7 +13,12 @@
 #include <libxml/xpath.h>
 #include <libxml/xmlwriter.h>
 #include <boost/program_options.hpp>
+
+#include <glib.h>
+//#include <handle.h>
 #include <librepo/librepo.h>
+//#include <librepo/handle.h>
+//#include <librepo/result.h>
 
 /*
  * TODO - c++ neco co parsuje .repo soubory v yum?? zkusit jestli neni neco pro c++
@@ -52,15 +59,43 @@ namespace ssds_repo{
   * Parses .repo files, creates nodes in xml representing repo name and url (metalink | mirrorlist)
   */
   void parse_repo::get_repo_url(ssds_xml::create_xml& xml)
-  {	
+  {
+    //object representing xml that will be sent to the server
     if(xml.find_node_by_path((xmlChar* )"//data/repolist") == nullptr){//items will be added into this node
       xml.add_child(xml.dataNodePtr, (xmlChar*) "repolist", (xmlChar*) "");//if it is not there I create it
       xml.currNodePtr = xml.addedNodePtr;//addedNodePtr might be needed later co I use currNodePtr instead
     }
     
+    int rc = EXIT_SUCCESS;
+    gboolean ret;
+    LrHandle *h;
+    LrResult *r;
+    LrYumRepoMd *repo;
+    char *download_list[] = LR_YUM_HAWKEY;
+    GError *tmp_err = NULL;
+
+    
+    h = lr_handle_init();
+    r = lr_result_init();
+    
+    ret = lr_yum_use_local(h, r, tmp_err);//this function is in new librepo library in yum.h file but it is not included in my version
+    
+    
+//std::cout << "pred setopt" << std::endl;
+    //lr_handle_setopt(h, NULL, LRO_URLS);
+    //std::cout << "pred perform" << std::endl;
+   // ret = lr_handle_perform(h, r, &tmp_err);
+    
+    /*
+     if (!ret) {
+	fprintf(stderr, "Error encountered: %d: %s\n",
+	tmp_err->code, tmp_err->message);
+	//g_error_free(tmp_err);
+	rc = EXIT_FAILURE;
+     }*/
     
 
-
+/*
     for(std::vector<std::ifstream*>::iterator it = repolist.begin(); it != repolist.end(); it++){
       std::string line;
       std::string url;
@@ -98,8 +133,9 @@ namespace ssds_repo{
 	  enabled = 0;
 	}
       }
-    }
+    }*/
   }
+ 
   
   void parse_repo::free_resources()
   {

@@ -1,7 +1,7 @@
 #ifndef _REPO_HANDLER_HPP
 #define _REPO_HANDLER_HPP
 #include <string>
-
+#include <librepo/librepo.h>
 
 namespace ssds_repo{
   class parse_repo{
