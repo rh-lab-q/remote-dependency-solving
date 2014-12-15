@@ -65,7 +65,7 @@ namespace ssds_repo{
       xml.add_child(xml.dataNodePtr, (xmlChar*) "repolist", (xmlChar*) "");//if it is not there I create it
       xml.currNodePtr = xml.addedNodePtr;//addedNodePtr might be needed later co I use currNodePtr instead
     }
-    
+    /*
     int rc = EXIT_SUCCESS;
     gboolean ret;
     LrHandle *h;
@@ -78,8 +78,8 @@ namespace ssds_repo{
     h = lr_handle_init();
     r = lr_result_init();
     
-    ret = lr_yum_use_local(h, r, tmp_err);//this function is in new librepo library in yum.h file but it is not included in my version
-    
+    ret = lr_yum_use_local(h, r, tmp_err);//this function is in newak j librepo library in yum.h file but it is not included in my version
+    */
     
 //std::cout << "pred setopt" << std::endl;
     //lr_handle_setopt(h, NULL, LRO_URLS);
@@ -95,7 +95,7 @@ namespace ssds_repo{
      }*/
     
 
-/*
+
     for(std::vector<std::ifstream*>::iterator it = repolist.begin(); it != repolist.end(); it++){
       std::string line;
       std::string url;
@@ -133,7 +133,7 @@ namespace ssds_repo{
 	  enabled = 0;
 	}
       }
-    }*/
+    }
   }
  
   
