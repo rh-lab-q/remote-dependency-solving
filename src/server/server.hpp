@@ -32,12 +32,12 @@ namespace ssds_server {
 
 	class server : private boost::noncopyable {
 	public:
-	    server();
-	    /*Server(const Server&other);*/
-	    ~server();
-	    boost::asio::io_service& getIo();
-	    int process_connection(boost::asio::ip::tcp::socket& sock);
-	    int newPort(int);
+		server();
+		/*Server(const Server&other);*/
+		~server();
+		boost::asio::io_service& getIo();
+		void process_connection(boost::asio::ip::tcp::socket& sock);
+		int newPort(int);
 		//void handle_accept(const boost::system::error_code& ec);
 		void listen();
 		void connect();

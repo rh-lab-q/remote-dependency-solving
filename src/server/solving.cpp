@@ -98,6 +98,7 @@ namespace ssds_solving {
   std::string solve::answer(std::string message){
 	// local variables (int64_t used for multiplaform using)
 	int64_t countRequest = 0, countRepos = 0;	
+	unsigned int i;
 	std::vector<std::string> request;
 	std::vector<std::string> repos;
 
@@ -108,11 +109,11 @@ namespace ssds_solving {
 	// controll prints
 	std::cout << "Control print (references)" << std::endl << countRequest << " " << countRepos << std::endl;
 
-	for(int i=0; i<request.size();i++){
+	for(i=0; i<request.size();i++){
 		std::cout << request[i] << std::endl;
 	}
 
-	for(int i=0; i<repos.size();i++){
+	for(i=0; i<repos.size();i++){
 		std::cout << repos[i] << std::endl;
 	}
 	return "Connection accepted. In future, server will tell you what to do.\n";

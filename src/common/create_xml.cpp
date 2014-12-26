@@ -58,6 +58,8 @@ namespace ssds_xml{
     
     xmlXPathFreeObject(result);
     xmlXPathFreeContext(context);
+ 
+    return currNodePtr;
   }
 
   /*
