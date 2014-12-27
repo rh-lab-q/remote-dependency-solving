@@ -1,12 +1,10 @@
-#include "../common/hawkey_handler.hpp"
-#include <iostream>
-//#include "../../../hawkey/hawkey/src/sack.h"
-#include <solv/testcase.h>
-
-using namespace std;
+extern "C"{
+  #include "hawkey_ex.h"
+}
 
 int main(){
-  
-  cout << "Hello World!!!" << endl;
-  return 1;
+ //HySack sack;
+ 
+ return 1; 
 }
+  

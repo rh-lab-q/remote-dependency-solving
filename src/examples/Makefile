@@ -1,10 +1,18 @@
 #soubor: Makefile
 # Michal Ruprich, xrupri00, RedHat, SSDS - hawkey example
 
-CC=g++
-CFLAGS=-O2 -g -Wall -Wextra -pedantic  -std=c++11 -fPIC
-INCLUDE=/usr/include/hawkey
+PP=g++
+CPPFLAGS= -std=c++11
+CC=gcc
+CFLAGS= -std=c11
+INCLUDE=/usr/include/
 all: hawkey_ex
 
-readerWriter: havkey_ex.cpp
-	$(CC) $(CFLAGS) -I$(INCLUDE) -o hawkey_ex hawkey_ex.cpp
+hawkey_ex: hawkey_ex_c.o hawkey_ex_cpp.o
+	$(PP) $(CPPFLAGS) -I$(INCLUDE) hawkey_ex_c.o hawkey_ex_cpp.o -o hawkey_ex
+hawkey_ex_c.o: hawkey_ex_c.o
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c hawkey_ex.c -o hawkey_ex_c.o
+hawkey_ex_cpp.o: hawkey_ex_cpp.o
+	$(PP) $(CPPFLAGS) -I$(INCLUDE) -c hawkey_ex.cpp -o hawkey_ex_cpp.o
+clean:
+	rm -rf *o hawkey_ex
