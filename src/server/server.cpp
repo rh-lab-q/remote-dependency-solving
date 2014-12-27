@@ -35,7 +35,7 @@ namespace ssds_server {
   }
 
   
-  int server::process_connection(boost::asio::ip::tcp::socket& sock)
+  void server::process_connection(boost::asio::ip::tcp::socket& sock)
   {
     ssds_solving::solve solvePoint;
     boost::system::error_code ec;
@@ -51,7 +51,6 @@ namespace ssds_server {
     
     std::string message = solvePoint.answer(input_message);
     write(sock, buffer(message), ec);
-  
   }
 
 

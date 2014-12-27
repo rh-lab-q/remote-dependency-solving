@@ -138,7 +138,7 @@ namespace ssds_xml {
     }
 
     std::cout << "probehlo" << std::endl;
-
+    return currNodePtr;
     //std::cout << result->nodesetval->nodeTab[0]->name << std::endl;
   }
   
