@@ -14,9 +14,9 @@
   #include "../../../hawkey/hawkey/src/sack.h" //this doesn't seem to work
 }/*/
 //this has to work somehow!!!!
-
+//#include <hawkey/subject.h>
+//#include <hawkey/types.h>
 //#include <hawkey/sack.h>
-#include "../../../hawkey/hawkey/src/types.h"
-#include "../../../hawkey/hawkey/src/sack_internal.h"
+
 
 void example_func();

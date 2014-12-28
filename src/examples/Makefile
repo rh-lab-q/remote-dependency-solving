@@ -8,11 +8,15 @@ CFLAGS= -std=c11
 INCLUDE=/usr/include/
 all: hawkey_ex
 
-hawkey_ex: hawkey_ex_c.o hawkey_ex_cpp.o
-	$(PP) $(CPPFLAGS) -I$(INCLUDE) hawkey_ex_c.o hawkey_ex_cpp.o -o hawkey_ex
+hawkey_ex: hawkey_ex_c.o hawkey_ex_cpp.o sack.o util.o
+	$(PP) $(CPPFLAGS) -I$(INCLUDE) hawkey_ex_c.o hawkey_ex_cpp.o sack.o util.o -o hawkey_ex
 hawkey_ex_c.o: hawkey_ex_c.o
 	$(CC) $(CFLAGS) -I$(INCLUDE) -c hawkey_ex.c -o hawkey_ex_c.o
 hawkey_ex_cpp.o: hawkey_ex_cpp.o
 	$(PP) $(CPPFLAGS) -I$(INCLUDE) -c hawkey_ex.cpp -o hawkey_ex_cpp.o
+sack.o: sack.o
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c ../../../hawkey/hawkey/src/sack.c -o sack.o
+util.o: util.o
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c ../../../hawkey/hawkey/src/util.c -o util.o
 clean:
 	rm -rf *o hawkey_ex
