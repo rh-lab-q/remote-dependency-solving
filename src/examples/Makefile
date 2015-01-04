@@ -5,18 +5,12 @@ PP=g++
 CPPFLAGS= -std=c++11
 CC=gcc
 CFLAGS= -std=c11
-INCLUDE=/usr/include/
+INCLUDE=-I/usr/include/solv -I/usr/include/hawkey
 all: hawkey_ex
 
-hawkey_ex: hawkey_ex_c.o hawkey_ex_cpp.o sack.o util.o
-	$(PP) $(CPPFLAGS) -I$(INCLUDE) hawkey_ex_c.o hawkey_ex_cpp.o sack.o util.o -o hawkey_ex
+hawkey_ex: hawkey_ex_c.o
+	$(PP) $(CPPFLAGS) $(INCLUDE) -l hawkey hawkey_ex.cpp hawkey_ex_c.o -o hawkey_ex
 hawkey_ex_c.o: hawkey_ex_c.o
-	$(CC) $(CFLAGS) -I$(INCLUDE) -c hawkey_ex.c -o hawkey_ex_c.o
-hawkey_ex_cpp.o: hawkey_ex_cpp.o
-	$(PP) $(CPPFLAGS) -I$(INCLUDE) -c hawkey_ex.cpp -o hawkey_ex_cpp.o
-sack.o: sack.o
-	$(CC) $(CFLAGS) -I$(INCLUDE) -c ../../../hawkey/hawkey/src/sack.c -o sack.o
-util.o: util.o
-	$(CC) $(CFLAGS) -I$(INCLUDE) -c ../../../hawkey/hawkey/src/util.c -o util.o
+	$(CC) $(CFLAGS) $(INCLUDE) -l hawkey -c hawkey_ex.c -o hawkey_ex_c.o
 clean:
 	rm -rf *o hawkey_ex

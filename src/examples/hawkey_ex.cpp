@@ -1,6 +1,10 @@
 #ifdef __cplusplus
 extern "C"{
-  #include "hawkey_ex.h"
+#endif
+#include "hawkey_ex.h"
+  //#include <hawkey/sack.h>
+  
+#ifdef __cplusplus
 }
 #endif
 int main(){
