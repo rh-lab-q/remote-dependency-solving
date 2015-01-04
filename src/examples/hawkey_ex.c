@@ -9,8 +9,14 @@
 #include <solv/pool.h>
 #include <solv/dirpool.h>
 */
+#ifdef __cplusplus
+extern "C"{
+#endif
+  
 #include <hawkey/types.h>
 #include <hawkey/sack.h>
+#include "hawkey_ex.h"
+#include <stddef.h>
 // hawkey
 /*#include "../../../hawkey/hawkey/src/errno_internal.h"
 #include "../../../hawkey/hawkey/src/iutil.h"
@@ -28,3 +34,7 @@ void example_func(){
   
   
 }
+
+#ifdef __cplusplus
+}
+#endif
