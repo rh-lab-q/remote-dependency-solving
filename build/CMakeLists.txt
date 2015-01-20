@@ -52,7 +52,7 @@ endif(NOT Boost_FOUND)
 # endif(NOT LIBXML++_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2 -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2 -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread -lhawkey")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
@@ -66,8 +66,8 @@ add_executable(ssds-server ${SERVSRC}
 		../src/common/xml_debug.cpp
 		../src/common/read_xml.cpp
 		../src/common/create_xml.cpp
-		../src/server/server.cpp
-		../src/server/solving.cpp)
+		../src/common/solving.cpp
+		../src/server/server.cpp)
 target_link_libraries(
 	ssds-server
 	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
@@ -84,7 +84,8 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/xml_debug.cpp
 		../src/common/create_xml.cpp
 		../src/common/read_xml.cpp
-		../src/common/params.cpp)
+		../src/common/params.cpp
+		../src/common/solving.cpp)
 target_link_libraries(
 	ssds-client
 	${Boost_SYSTEM_LIBRARY}

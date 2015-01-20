@@ -9,14 +9,23 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/xpath.h>
 #include <libxml/xmlwriter.h>
+
+//BOOST
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/program_options.hpp>
+
+//SSDS
 #include "../common/logger.hpp"
 #include "../common/xml_handler.hpp"
 #include "../common/repo_handler.hpp"
 #include "../common/params.hpp"
 
+//LIBREPO
+
+
+//for debugging
+#define DEBUG
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
@@ -64,7 +73,7 @@ int main(int argc, const char* argv[]){
 	ssds_xml::xml_debug debug; //for xml flushing
 	ssds_repo::parse_repo repo; //for parsing .repo files
 	ssds_xml::create_xml xml; //for creating xml
-	
+#ifndef DEBUG
 	xml.add_code((xmlChar* )"001");
 	
 	repo.get_repo_url(xml);//get all repo info
@@ -141,7 +150,7 @@ int main(int argc, const char* argv[]){
 
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");*/
-	
+#endif	
 	xml.free_resources();
 	repo.free_resources();
 	

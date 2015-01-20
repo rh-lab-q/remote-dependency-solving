@@ -1,7 +1,8 @@
 #ifndef _REPO_HANDLER_HPP
 #define _REPO_HANDLER_HPP
 #include <string>
-#include <librepo/librepo.h>
+//#include <librepo/librepo.h>
+#include "../../../librepo/librepo/librepo/repoconf.h"
 
 namespace ssds_repo{
   class parse_repo{
@@ -12,6 +13,8 @@ namespace ssds_repo{
     
   public:
     std::vector<std::ifstream*> repolist;
+    LrYumRepoConfs * repoHandler;
+    LrYumRepoConf * singleRepo;
     
   };
 }

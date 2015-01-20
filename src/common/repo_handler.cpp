@@ -14,9 +14,18 @@
 #include <libxml/xmlwriter.h>
 #include <boost/program_options.hpp>
 
-#include <glib.h>
+//GLIB
+#include <glib-2.0/glib/gerror.h>
+#include <glib-2.0/glib/gtypes.h>
+#include <glib-2.0/glib/gslist.h>
+
+//LIBREPO
+#include "../../../librepo/librepo/librepo/repoconf.h"
+//#include "../../../librepo/librepo/librepo/librepo.h"
+
+
 //#include <handle.h>
-#include <librepo/librepo.h>
+//#include <librepo/librepo.h>
 //#include <librepo/handle.h>
 //#include <librepo/result.h>
 
@@ -30,6 +39,18 @@
 namespace ssds_repo{
   parse_repo::parse_repo()
   {
+    repoHandler = lr_yum_repoconfs_init();
+    GError **err;
+    
+    gboolean ret = lr_yum_repoconfs_load_dir(repoHandler, "/etc/yum.repos.d/", err);
+    
+    std::cout << "load dir vystup: " << ret << std::endl;
+    
+    GSList * list = lr_yum_repoconfs_get_list(repoHandler, err);
+    
+    std::cout << "pokus: " << ((LrYumRepoConf*)list->data)->name << std::endl;
+    
+    /*
     DIR *directory;
     struct dirent *entry;
 
@@ -50,8 +71,8 @@ namespace ssds_repo{
       }
     }
     
-    free(entry);
-
+    free(entry);*/
+    lr_yum_repoconfs_free(repoHandler);
   }
 
 

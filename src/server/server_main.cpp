@@ -11,8 +11,9 @@
 /*synchronous start of server based on boost.asio library*/
 
 #include "server.hpp"
-#include "solving.hpp"
+#include "../common/solving.hpp"
 
+//#include <hawkey/sack.h>
 
 
 using namespace boost::asio;

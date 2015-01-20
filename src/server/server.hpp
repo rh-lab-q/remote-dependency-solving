@@ -23,13 +23,14 @@
 #include "../common/logger.hpp"
 #include <thread>
 #include <utility>//for std::move()
-#include "solving.hpp"
+#include "../common/solving.hpp"
+
+
 
 
 //void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
 
 namespace ssds_server {
-
 	class server : private boost::noncopyable {
 	public:
 		server();
@@ -44,6 +45,8 @@ namespace ssds_server {
 		void close();
 		
 		void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
+		
+		
 		
 	private:
 	  boost::asio::io_service io_service_;         /*basic object for boost operations*/
