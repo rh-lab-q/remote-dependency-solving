@@ -23,7 +23,7 @@ namespace ssds_server {
   }*/
 
   server::~server() {
-
+    
   }
   
   int server::newPort(int newport){

@@ -12,6 +12,11 @@
 namespace ssds_solving {
   
   solve::solve(/* repos class instance */){
+    sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+    
+    std::cout << "check solve konstruktoru" << std::endl;
+    if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0)
+      std::cout << "load_system_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
   }
 
   solve::~solve() {

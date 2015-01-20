@@ -23,6 +23,9 @@ namespace ssds_solving {
 	    	xmlDocPtr parseMessage(std::string message);
 		void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
 		std::string answer(std::string message);
+		
+		//SOLVING
+		HySack sack;
 	    private:
 		/* repos class instance with all enabled repos handlers */
 	};

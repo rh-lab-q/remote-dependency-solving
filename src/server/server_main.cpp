@@ -53,7 +53,11 @@ int main() {
 	std::cout << "Server is ready..." << "\n";
 	boost::system::error_code ec;
 	//ip::tcp::socket sock(ios);
-
+	
+	ssds_solving::solve solveHandler;
+	
+	
+#if 0
 	try {
 			//ip::tcp::iostream streams("");
 		while(42) {
@@ -90,6 +94,6 @@ int main() {
 		/*std::cerr*/my_log.add_log(logERROR,e.what());
 	}
 
-
+#endif
 	return 0;
 }
