@@ -1,6 +1,7 @@
 //============================================================================
 // Name		: Solving.cpp
 // Author	: Jozkar
+// Editor	: mruprich
 // Version	: 0.1
 // Copyright	: GNU GPL
 // Description	: Solving class at server side of SSDS
@@ -11,12 +12,14 @@
 #include "solving.hpp"
 namespace ssds_solving {
   
+  //solve object loads all packages installed in current system
   solve::solve(/* repos class instance */){
     sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
     
-    std::cout << "check solve konstruktoru" << std::endl;
     if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0)
       std::cout << "load_system_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
+    
+    
   }
 
   solve::~solve() {

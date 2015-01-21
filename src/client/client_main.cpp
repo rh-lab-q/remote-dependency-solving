@@ -25,7 +25,7 @@
 
 
 //for debugging
-#define DEBUG
+//#define DEBUG
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){

@@ -57,7 +57,7 @@ int main() {
 	ssds_solving::solve solveHandler;
 	
 	
-#if 0
+#if 1
 	try {
 			//ip::tcp::iostream streams("");
 		while(42) {
