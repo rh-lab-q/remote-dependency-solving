@@ -79,7 +79,7 @@ int main() {
 		
 			//solving
 			std::string message = solvePoint.answer(input_message);
-		#endif	
+#endif	
 			
 			sock.close();
 

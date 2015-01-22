@@ -5,10 +5,10 @@
 #include <exception>
 #include <fstream>
 #include <vector>
-#include <libxml/parser.h>
-#include <libxml/xmlmemory.h>
-#include <libxml/xpath.h>
-#include <libxml/xmlwriter.h>
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/xmlmemory.h>
+#include <libxml2/libxml/xpath.h>
+#include <libxml2/libxml/xmlwriter.h>
 
 //BOOST
 #include <boost/asio.hpp>

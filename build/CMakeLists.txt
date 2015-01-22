@@ -52,7 +52,7 @@ endif(NOT Boost_FOUND)
 # endif(NOT LIBXML++_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2 -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lglib-2.0")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2/ -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lglib-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()

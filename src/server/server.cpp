@@ -35,7 +35,9 @@ namespace ssds_server {
 	  return io_service_;
   }
 
-  
+  /*
+   * This function processes incoming data - it will probably be forked later
+   */
   void server::process_connection(boost::asio::ip::tcp::socket& sock)
   {
     ssds_solving::solve solvePoint;
