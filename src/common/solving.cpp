@@ -10,6 +10,7 @@
 /*BUILDED WITH THESE FLAGS: -O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0*/
 
 #include "solving.hpp"
+
 namespace ssds_solving {
   
   //solve object loads all packages installed in current system
@@ -19,6 +20,17 @@ namespace ssds_solving {
     if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0)
       std::cout << "load_system_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
     
+    HySack sack_pokus = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+    HyRepo repo = hy_repo_create("pokus");
+    hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
+    hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
+    hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
+    
+    std::cout << "pred hy_sack_load_yum_repo" << std::endl;
+    if(hy_sack_load_yum_repo(sack_pokus, repo, 0) == 0){
+      std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack_pokus) << std::endl;
+      std::cout << "za hy_sack_load_yum_repo" << std::endl;
+    }
     
   }
 

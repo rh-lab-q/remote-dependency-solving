@@ -12,6 +12,7 @@
 
 #include "server.hpp"
 #include "../common/solving.hpp"
+#include <iostream>
 
 //#include <hawkey/sack.h>
 
@@ -57,7 +58,7 @@ int main() {
 	ssds_solving::solve solveHandler;
 	
 	
-#if 1
+#if 0
 	try {
 			//ip::tcp::iostream streams("");
 		while(42) {

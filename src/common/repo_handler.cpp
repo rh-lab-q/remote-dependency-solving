@@ -64,7 +64,6 @@ namespace ssds_repo{
 
     GSList * nextPtr = list;
     while(nextPtr->next != nullptr){
-      std::cout << "get_repo_url while" << std::endl;
       std::string url;
       std::string name;
       

@@ -12,6 +12,7 @@
 //SOLVING
 #include "../../../hawkey/hawkey/src/types.h"
 #include "../../../hawkey/hawkey/src/sack.h"
+#include "../../../hawkey/hawkey/src/repo.h"
 
 namespace ssds_solving {
 

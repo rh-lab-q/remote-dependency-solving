@@ -25,7 +25,7 @@
 
 
 //for debugging
-//#define DEBUG
+#define DEBUG
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
@@ -73,6 +73,7 @@ int main(int argc, const char* argv[]){
 	ssds_xml::xml_debug debug; //for xml flushing
 	ssds_repo::parse_repo repo; //for parsing .repo files
 	ssds_xml::create_xml xml; //for creating xml
+	
 #ifndef DEBUG
 	xml.add_code((xmlChar* )"001");
 	
