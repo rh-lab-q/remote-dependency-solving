@@ -1,0 +1,7 @@
+Sack object is an abstraction of package collection:
+  creating sack - HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+  for loading all repos in system - sack = hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE)
+  count loaded packages - hy_sack_count(sack)
+
+Also we can load repos that are not default by providing a path to dir:
+  
