@@ -3,5 +3,14 @@ Sack object is an abstraction of package collection:
   for loading all repos in system - sack = hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE)
   count loaded packages - hy_sack_count(sack)
 
-Also we can load repos that are not default by providing a path to dir:
+Also we can load repos that are not default by providing a path to dir, provided we have somehow obtained the repo metadata:
+  HySack sack_pokus = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+  HyRepo repo = hy_repo_create("pokus");
+  hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
+  hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
+  hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
   
+  hy_sack_load_yum_repo(sack_pokus, repo, 0)
+  
+  -but this approach load all the packages from particular repo, not only those installed on our system
+  -hawkey doesn't provide any means to obtain those metadata - this has to be achieved some other way
