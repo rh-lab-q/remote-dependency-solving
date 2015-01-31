@@ -13,6 +13,11 @@
 #include "../../../hawkey/hawkey/src/types.h"
 #include "../../../hawkey/hawkey/src/sack.h"
 #include "../../../hawkey/hawkey/src/repo.h"
+#include "../../../hawkey/hawkey/src/query.h"
+#include "../../../hawkey/hawkey/src/query_internal.h"
+#include "../../../hawkey/hawkey/src/packagelist.h"
+#include "../../../hawkey/hawkey/src/goal.h"
+#include "../../../hawkey/hawkey/src/goal_internal.h"
 
 namespace ssds_solving {
 

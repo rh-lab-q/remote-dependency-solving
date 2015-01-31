@@ -2,6 +2,8 @@
 
 boost
 libsolv
+librepo
+hawkey
 libxml2-devel
 xml2
 ## maybe even - libxml - will be requred

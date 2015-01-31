@@ -10,28 +10,52 @@
 /*BUILDED WITH THESE FLAGS: -O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0*/
 
 #include "solving.hpp"
+#include "../../../hawkey/hawkey/src/package_internal.h"
+
 
 namespace ssds_solving {
   
   //solve object loads all packages installed in current system
+  //NOTE!!! - right now, everything is only static to create first working example. Later it needs to be redone
   solve::solve(/* repos class instance */){
+    
+    /* Creating sack */
     sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
     
     if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0)
       std::cout << "load_system_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
     
-    HySack sack_pokus = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+    /* Loading repo metadata into sack */
     HyRepo repo = hy_repo_create("pokus");
     hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
     hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
     hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
     
-    std::cout << "pred hy_sack_load_yum_repo" << std::endl;
-    if(hy_sack_load_yum_repo(sack_pokus, repo, 0) == 0){
-      std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack_pokus) << std::endl;
-      std::cout << "za hy_sack_load_yum_repo" << std::endl;
-    }
+    if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
+      std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
     
+    /* QUERY */
+    HyQuery query = hy_query_create(sack);
+    hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, "abakus");
+    hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
+    hy_query_filter_latest_per_arch(query, 1);
+
+    /* Getting list of packages from the query */
+    HyPackageList plist = hy_packagelist_create();
+    plist = hy_query_run(query);
+    
+    std::cout << "pocet baliku nalezenych pomoci query: " << hy_packagelist_count(plist) << std::endl;
+    
+    HyPackage pkg;
+    pkg = hy_packagelist_get(plist, 0);
+    
+    std::cout << hy_package_get_name(pkg) << "-" << hy_package_get_version(pkg) << "-" << hy_package_get_release(pkg) << "-" << hy_package_get_arch(pkg) << std::endl;
+    
+    /* GOAL */
+    HyGoal goal = hy_goal_create(sack);
+    hy_goal_install(goal, pkg);
+    if(hy_goal_run(goal)==0)
+      std::cout << "Dependencies solving true = dependence v poradku" << std::endl;
   }
 
   solve::~solve() {
