@@ -20,7 +20,7 @@ namespace ssds_solving {
   solve::solve(/* repos class instance */){
     
     /* Creating sack */
-    sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+    this->sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
     
     if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0)
       std::cout << "load_system_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
@@ -33,13 +33,20 @@ namespace ssds_solving {
     
     if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
       std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
-    
+        
+  }
+
+  solve::~solve() {
+
+  }
+  
+  std::string solve::query(const char* request){
     /* QUERY */
-    HyQuery query = hy_query_create(sack);
-    hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, "abakus");
+    HyQuery query = hy_query_create(this->sack);
+    hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request);
     hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
     hy_query_filter_latest_per_arch(query, 1);
-
+    
     /* Getting list of packages from the query */
     HyPackageList plist = hy_packagelist_create();
     plist = hy_query_run(query);
@@ -49,26 +56,23 @@ namespace ssds_solving {
     HyPackage pkg;
     pkg = hy_packagelist_get(plist, 0);
     
-    std::cout << hy_package_get_name(pkg) << "-" << hy_package_get_version(pkg) << "-" << hy_package_get_release(pkg) << "-" << hy_package_get_arch(pkg) << std::endl;
-    
     /* GOAL */
     HyGoal goal = hy_goal_create(sack);
     hy_goal_install(goal, pkg);
     if(hy_goal_run(goal)==0)
       std::cout << "Dependencies solving true = dependence v poradku" << std::endl;
-  }
-
-  solve::~solve() {
-
+    
+    std::string answer = hy_package_get_name(pkg) + (std::string)"-" + hy_package_get_version(pkg) + (std::string)"-" + hy_package_get_release(pkg) + (std::string)"-" + hy_package_get_arch(pkg);
+    return answer;
   }
   
   // parsing message
- xmlDocPtr solve::parseMessage(std::string message){
+  xmlDocPtr solve::parseMessage(std::string message){
 	xmlDocPtr document = xmlParseMemory(message.c_str(), message.size());
 	return document;
   }
 
-  // findout, what user has and whot user wants
+  // findout, what user has and what user wants
   void solve::getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos){
 
 	// init
@@ -152,14 +156,20 @@ namespace ssds_solving {
 
 	// controll prints
 	std::cout << "Control print (references)" << std::endl << countRequest << " " << countRepos << std::endl;
+	std::string ret_msg;
 
 	for(i=0; i<request.size();i++){
 		std::cout << request[i] << std::endl;
+		ret_msg += query(request[i].c_str());
+		ret_msg += "; ";
 	}
 
 	for(i=0; i<repos.size();i++){
 		std::cout << repos[i] << std::endl;
 	}
-	return "Connection accepted. In future, server will tell you what to do.\n";
+	
+	ret_msg = "Connection accepted. Answer: "+ret_msg+"\n";
+	
+	return ret_msg;
   }
 }

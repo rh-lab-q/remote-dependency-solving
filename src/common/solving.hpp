@@ -26,6 +26,7 @@ namespace ssds_solving {
 		
 		solve(/* repos class instance with all enabled repos handlers */); 
 	        ~solve();
+		std::string query(const char* request);
 	    	xmlDocPtr parseMessage(std::string message);
 		void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
 		std::string answer(std::string message);

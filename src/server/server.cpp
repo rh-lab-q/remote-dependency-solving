@@ -18,10 +18,6 @@ namespace ssds_server {
   server::server(){
   }
 
-  /*ssds_server::Server::Server(const ssds_server::Server& other) {
-
-  }*/
-
   server::~server() {
     
   }
