@@ -116,7 +116,7 @@ namespace ssds_solving {
 	if(repoNode != NULL){
 		repoNode = repoNode->xmlChildrenNode;
 	}
-	std::cout << repoNode << std::endl;
+	std::cout << "reponode: " << repoNode << std::endl;
 	while(repoNode != NULL){
 
 		if((!xmlStrcmp(repoNode->name, (const xmlChar*)"repo"))){
@@ -169,6 +169,7 @@ namespace ssds_solving {
 	}
 	
 	ret_msg = "Connection accepted. Answer: "+ret_msg+"\n";
+	std::cout << "kontrola: " << ret_msg << std::endl;
 	
 	return ret_msg;
   }

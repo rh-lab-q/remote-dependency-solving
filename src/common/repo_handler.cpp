@@ -18,11 +18,17 @@
 #include <glib-2.0/glib/gerror.h>
 #include <glib-2.0/glib/gtypes.h>
 #include <glib-2.0/glib/gslist.h>
+#include <glib-2.0/glib.h>
 
 //LIBREPO
-#include "../../../librepo/librepo/librepo/repoconf.h"
+//#include "../../../librepo/librepo/librepo/repoconf.h"
 //#include "../../../librepo/librepo/librepo/librepo.h"
 
+#include <librepo/repoconf.h>
+//#include <librepo/types.h>
+//#include <librepo/librepo.h>
+
+//#include <typeinfo>
 
 //#include <handle.h>
 //#include <librepo/librepo.h>
@@ -40,10 +46,12 @@ namespace ssds_repo{
   parse_repo::parse_repo()
   {
     //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch
+    std::cout << "repo init" << std::endl;
     repoHandler = lr_yum_repoconfs_init();
     GError **err;
     
     gboolean ret = lr_yum_repoconfs_load_dir(repoHandler, "/etc/yum.repos.d/", err);
+    std::cout << "repo init end: " << ret << std::endl;
   }
 
 
@@ -55,19 +63,73 @@ namespace ssds_repo{
     //object representing xml that will be sent to the server
     if(xml.find_node_by_path((xmlChar* )"//data/repolist") == nullptr){		//items will be added into this node
       xml.add_child(xml.dataNodePtr, (xmlChar*) "repolist", (xmlChar*) "");	//if it is not there I create it
-      xml.currNodePtr = xml.addedNodePtr;					//addedNodePtr might be needed later co I use currNodePtr instead
+      xml.currNodePtr = xml.addedNodePtr;//addedNodePtr might be needed later co I use currNodePtr instead
+      std::cout << "repolist created" << std::endl;
     }
     
     
-    GError **err;
-    GSList * list = lr_yum_repoconfs_get_list(this->repoHandler, err);
-
-    GSList * nextPtr = list;
-    while(nextPtr->next != nullptr){
+    GError * err = nullptr;
+    GSList * list = lr_yum_repoconfs_get_list(repoHandler, &err);
+    
+    for(unsigned int i=0; i<g_slist_length(list); i++){
       std::string url;
       std::string name;
+      void * val;
       
-      if(((LrYumRepoConf*)nextPtr->data)->enabled == true){
+      LrYumRepoConf * conf = (LrYumRepoConf*)g_slist_nth_data(list, i);
+      
+      lr_yum_repoconf_getinfo(conf, &err, LR_YRC_ENABLED, &val);
+      
+      if(((long int)val)){
+	err = nullptr;
+	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_NAME, &val) != false){
+	  name = (char*)val;
+	}
+	
+	err = nullptr;
+	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_MIRRORLIST, &val) != false){
+	  url = (char*)val;
+	}
+	
+	err = nullptr;
+	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_METALINK, &val) != false){
+	  url = (char*)val;
+	}
+	
+	err = nullptr;
+	//void ** val2;
+	//if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
+	  //url = (char*)val;
+	//}
+	std::cout << "name: " << name << "\nurl: " << url << std::endl;
+	
+	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str());
+	  
+	xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
+	xmlFree(doc_str);
+
+	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
+      }
+    }
+    
+    /*
+    while(nextPtr != nullptr){
+      
+      std::cout << "while list" << std::endl;
+      std::string url;
+      std::string name;
+      */
+      
+#if 0
+      //std::cout << "repo name: " << ((LrYumRepoConf*)nextPtr->data)->name << std::endl;
+      //std::cout << std::endl;
+      void *ptr = nullptr;
+      //std::cout << "repo debug: " << ((LrYumRepoConf*)nextPtr->data)->name << std::endl;
+      lr_yum_repoconf_getinfo()
+      gboolean ret = lr_yum_repoconf_getinfo((LrYumRepoConf*)nextPtr->data, &err, LR_YRC_NAME, &ptr);
+      
+      if(((LrYumRepoConf*)nextPtr->data)->enabled == true){//chyba chyba chyba
+	std::cout << "repo enabled" << std::endl;
 	name = ((LrYumRepoConf*)nextPtr->data)->name;
 	
 	if(((LrYumRepoConf*)nextPtr->data)->baseurl != nullptr)
@@ -85,8 +147,9 @@ namespace ssds_repo{
 
 	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
       }
-      nextPtr = nextPtr->next;
-    }
+#endif
+      //nextPtr = nextPtr->next;
+    //}
   }
  
   /*

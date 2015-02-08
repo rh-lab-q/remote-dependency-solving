@@ -74,7 +74,7 @@ int main(int argc, const char* argv[]){
 	ssds_repo::parse_repo repo; //for parsing .repo files
 	ssds_xml::create_xml xml; //for creating xml
 	
-#ifndef DEBUG
+//#ifndef DEBUG
 	xml.add_code((xmlChar* )"001");
 	
 	repo.get_repo_url(xml);//get all repo info
@@ -88,7 +88,7 @@ int main(int argc, const char* argv[]){
 	xml.doc_to_str();
 	xml.str_output += "\n";
 	
-	//debug.flush_xml(xml.rootNodePtr, 0);
+	debug.flush_xml(xml.rootNodePtr, 0);
 	if(!debug.validate_xml(xml.document)){
 		std::cout << "wrong xml" << std::endl;
 		return 1;
@@ -151,7 +151,7 @@ int main(int argc, const char* argv[]){
 
 	//my_log.add_log(logINFO) << "message from client" << std::endl;
 	//log.add_log("This message is sent to client logger");*/
-#endif	
+//#endif	
 	xml.free_resources();
 	repo.free_resources();
 	
