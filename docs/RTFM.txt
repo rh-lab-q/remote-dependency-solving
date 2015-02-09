@@ -1,3 +1,4 @@
+<b>For using Hawkey library:</b>
 Sack object is an abstraction of package collection:
   creating sack - HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
   for loading all repos in system - sack = hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE)
@@ -32,3 +33,12 @@ Goal Object
   -goal serves for dependency solving - HyGoal goal = hy_goal_create(sack);
   -solve dependencies for installing the package pkg - hy_goal_install(goal, pkg);
   -if the return value is 0 - libsolv byl schopen nalezt reseni dependenci - if(hy_goal_run(goal)==0)
+
+<b>For using librepo:</b>
+  There is new module in librepo, but it is not among updates yet so this is what needs to be done to be able to use it:
+    -from http://koji.fedoraproject.org/koji/taskinfo?taskID=8831146 download these:
+      librepo, python-librepo, librepo-devel - all in the right architecture
+    -install these packages at the same time like this:
+      #sudo dnf update <pkg.rpm> <pkg.rpm> ... - put them all into the same command
+      
+Now I think you should have everything you need to run ssds :) enjoy
