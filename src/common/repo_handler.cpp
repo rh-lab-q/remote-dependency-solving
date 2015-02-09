@@ -46,12 +46,10 @@ namespace ssds_repo{
   parse_repo::parse_repo()
   {
     //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch
-    std::cout << "repo init" << std::endl;
     repoHandler = lr_yum_repoconfs_init();
     GError **err;
     
     gboolean ret = lr_yum_repoconfs_load_dir(repoHandler, "/etc/yum.repos.d/", err);
-    std::cout << "repo init end: " << ret << std::endl;
   }
 
 
@@ -64,7 +62,6 @@ namespace ssds_repo{
     if(xml.find_node_by_path((xmlChar* )"//data/repolist") == nullptr){		//items will be added into this node
       xml.add_child(xml.dataNodePtr, (xmlChar*) "repolist", (xmlChar*) "");	//if it is not there I create it
       xml.currNodePtr = xml.addedNodePtr;//addedNodePtr might be needed later co I use currNodePtr instead
-      std::cout << "repolist created" << std::endl;
     }
     
     
@@ -98,17 +95,18 @@ namespace ssds_repo{
 	
 	err = nullptr;
 	//void ** val2;
-	//if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
-	  //url = (char*)val;
-	//}
-	std::cout << "name: " << name << "\nurl: " << url << std::endl;
-	
-	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str());
+	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
+	  url = "";
+	}
+	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
+	if(url != ""){
+	  xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str());
 	  
-	xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
-	xmlFree(doc_str);
+	  xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
+	  xmlFree(doc_str);
 
-	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
+	  xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
+	}
       }
     }
     
