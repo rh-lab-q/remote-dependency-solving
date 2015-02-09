@@ -1,28 +1,9 @@
 #include <iostream>
-//needs to be compiled with -lboost_system option
 #include "client.hpp"
 #include <string>
 #include <exception>
 #include <fstream>
 #include <vector>
-#include <libxml2/libxml/parser.h>
-#include <libxml2/libxml/xmlmemory.h>
-#include <libxml2/libxml/xpath.h>
-#include <libxml2/libxml/xmlwriter.h>
-
-//BOOST
-#include <boost/asio.hpp>
-#include <boost/array.hpp>
-#include <boost/program_options.hpp>
-
-//SSDS
-#include "../common/logger.hpp"
-#include "../common/xml_handler.hpp"
-#include "../common/repo_handler.hpp"
-#include "../common/params.hpp"
-
-//LIBREPO
-
 
 //for debugging
 //#define DEBUG
