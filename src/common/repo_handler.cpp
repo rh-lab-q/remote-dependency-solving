@@ -96,17 +96,16 @@ namespace ssds_repo{
 	err = nullptr;
 	//void ** val2;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
-	  url = "";
+	  url = ((char**)val)[0];
 	}
 	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
-	if(url != ""){
-	  xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str());
-	  
-	  xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
-	  xmlFree(doc_str);
+	
+	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str());
+	
+	xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
+	xmlFree(doc_str);
 
-	  xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
-	}
+	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
       }
     }
     
