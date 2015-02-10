@@ -15,25 +15,13 @@
 #include <boost/program_options.hpp>
 
 //GLIB
-#include <glib-2.0/glib/gerror.h>
-#include <glib-2.0/glib/gtypes.h>
-#include <glib-2.0/glib/gslist.h>
-#include <glib-2.0/glib.h>
+//#include <glib-2.0/glib/gerror.h>
+//#include <glib-2.0/glib/gtypes.h>
+//#include <glib-2.0/glib/gslist.h>
+//#include <glib-2.0/glib.h>
 
 //LIBREPO
-//#include "../../../librepo/librepo/librepo/repoconf.h"
-//#include "../../../librepo/librepo/librepo/librepo.h"
-
 #include <librepo/repoconf.h>
-//#include <librepo/types.h>
-//#include <librepo/librepo.h>
-
-//#include <typeinfo>
-
-//#include <handle.h>
-//#include <librepo/librepo.h>
-//#include <librepo/handle.h>
-//#include <librepo/result.h>
 
 /*
  * TODO - c++ neco co parsuje .repo soubory v yum?? zkusit jestli neni neco pro c++

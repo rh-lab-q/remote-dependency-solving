@@ -1,5 +1,5 @@
-#include <iostream>
 #include "client.hpp"
+#include <iostream>
 #include <string>
 #include <exception>
 #include <fstream>
@@ -10,11 +10,13 @@
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
+	ssds_params::params parameters;	
+	if(!parameters.parse_params(argc, argv))
+	  return 1;
+	
 	logger::log my_log; //logger init
 	ssds_client::client client; //object for network handling
-	ssds_params::params parameters;
 	
-	parameters.parse_params(argc, argv);
 	
 	/********************************************************/
 	/* Parsing arguments using boost library*/
