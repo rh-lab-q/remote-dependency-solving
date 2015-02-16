@@ -60,7 +60,9 @@ int main(int argc, const char* argv[]){
 #ifndef DEBUG
 	xml.add_code((xmlChar* )"001");
 	
-	repo.get_repo_url(xml);//get all repo info
+	repo.parse_default_repo();
+	repo.get_repo_url(xml);//get all client repo url
+	
 	xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_pkgs", (xmlChar* ) "");
 	xml.currNodePtr = xml.addedNodePtr;//addedNodePtr may change in the iteration so I use currNodePtr instead 
 	

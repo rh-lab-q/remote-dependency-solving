@@ -34,11 +34,18 @@ namespace ssds_repo{
   parse_repo::parse_repo()
   {
     //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch
-    repoHandler = lr_yum_repoconfs_init();
+    repoHandler = lr_yum_repoconfs_init(); 
+  }
+  
+  /*
+   * Parses .repo files in default location /etc/yum.repos.d
+   */
+  void parse_repo::parse_default_repo()
+  {
     GError **err;
-    
     gboolean ret = lr_yum_repoconfs_load_dir(repoHandler, "/etc/yum.repos.d/", err);
   }
+
 
 
   /*

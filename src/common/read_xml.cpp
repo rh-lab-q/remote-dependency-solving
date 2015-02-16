@@ -1,8 +1,8 @@
 #include "xml_handler.hpp"
-#include <libxml/parser.h>
-#include <libxml/xmlmemory.h>
-#include <libxml/xpath.h>
-#include <libxml/xmlwriter.h>
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/xmlmemory.h>
+#include <libxml2/libxml/xpath.h>
+#include <libxml2/libxml/xmlwriter.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -116,7 +116,7 @@ namespace ssds_xml {
   }
 
   /*
-  * Function for adding new tags - but for creating new XML from scraps, use create_xml class below
+  * Function for adding new tags - but for creating new XML from scraps, use create_xml class from creat_xml.cpp
   */
   xmlNodePtr read_xml::add_node_by_path(xmlChar* xpath)
   {
@@ -128,7 +128,7 @@ namespace ssds_xml {
 
     if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
       xmlXPathFreeObject(result);
-      std::cout << "nenaslo" << std::endl;
+      std::cout << "node not found" << std::endl;
       return nullptr;
     }
 
@@ -137,7 +137,7 @@ namespace ssds_xml {
       return nullptr;
     }
 
-    std::cout << "probehlo" << std::endl;
+    std::cout << "node created" << std::endl;
     return currNodePtr;
     //std::cout << result->nodesetval->nodeTab[0]->name << std::endl;
   }

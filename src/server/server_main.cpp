@@ -65,7 +65,7 @@ int main() {
   			ip::tcp::socket sock(ios);
 			acceptor_.accept(sock); //second argument can be error handler
 			
-			std::cout<<"some connection was accepted" << std::endl;
+			std::cout<<"Some connection was accepted" << std::endl;
 			
 			mainserver.process_connection(sock);
 #if 0
