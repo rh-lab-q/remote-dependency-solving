@@ -36,7 +36,7 @@ Goal Object
 
 For using librepo:
   There is new module in librepo, but it is not among updates yet so this is what needs to be done to be able to use it:
-    -from http://koji.fedoraproject.org/koji/taskinfo?taskID=8948701 download these:
+    -from http://koji.fedoraproject.org/koji/taskinfo?taskID=8948750 download these:
       librepo, python-librepo, librepo-devel - all in the right architecture
       these three should be ebough but just in case you can download also librepo-debuinfo and python3-librepo
       there is new version with some fixes - 1.7.13-4.fc21.x86_64
