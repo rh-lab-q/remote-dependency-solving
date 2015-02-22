@@ -67,10 +67,12 @@ namespace ssds_solving {
     return answer;
   }
   
+  
+  
   // parsing message
-  xmlDocPtr solve::parseMessage(std::string message){
-	xmlDocPtr document = xmlParseMemory(message.c_str(), message.size());
-	return document;
+  bool solve::parseMessage(std::string message){
+	this->xml_document = xmlParseMemory(message.c_str(), message.size());
+	return true;
   }
 
   // findout, what user has and what user wants
@@ -153,8 +155,8 @@ namespace ssds_solving {
 	std::vector<std::string> repos;
 
 	// convert income string to xml document	
-	xmlDoc *xml = parseMessage(message);
-	getRequest(xml, request, repos, countRequest, countRepos);
+	//xmlDoc *xml = parseMessage(message);
+	getRequest(this->xml_document, request, repos, countRequest, countRepos);
 
 	// controll prints
 	std::cout << "Control print (references)" << std::endl << countRequest << " " << countRepos << std::endl;

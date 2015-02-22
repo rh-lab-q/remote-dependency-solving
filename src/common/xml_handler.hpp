@@ -1,9 +1,9 @@
 #ifndef _XML_HANDLER_HPP
 #define _XML_HANDLER_HPP
-#include <libxml/parser.h>
-#include <libxml/xmlmemory.h>
-#include <libxml/xpath.h>
-#include <libxml/xmlwriter.h>
+#include <libxml2/libxml/parser.h>
+#include <libxml2/libxml/xmlmemory.h>
+#include <libxml2/libxml/xpath.h>
+#include <libxml2/libxml/xmlwriter.h>
 #include <string>
 #include <exception>
 #include <fstream>
@@ -33,8 +33,9 @@ namespace ssds_xml{
  public:
    read_xml();
    void parse_xml_file(std::string path);
+   void parse_xml_string(std::string message);
    int get_code();
-   void get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr);
+   bool get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr);
    xmlNodePtr add_node_by_path(xmlChar* xpath);
    void free_resources();
    

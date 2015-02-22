@@ -37,6 +37,9 @@ namespace ssds_server {
   void server::process_connection(boost::asio::ip::tcp::socket& sock)
   {
     ssds_solving::solve solvePoint;
+    ssds_xml::read_xml xml;
+    ssds_repo::repo_metadata metadata;
+    
     boost::system::error_code ec;
     int64_t size;
     
@@ -46,9 +49,22 @@ namespace ssds_server {
     size_t len = sock.read_some(buffer(buf), ec);
     std::string input_message = std::string(buf.begin(), buf.end());
     
-    std::cout<< "Message has " << len << " characters." << std::endl;
+    //solvePoint.parseMessage(input_message);
+    xml.parse_xml_string(input_message);
+    std::cout << "zde" <<std::endl;
+    xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
     
-    std::string message = solvePoint.answer(input_message);
+    //debug
+    for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){//result is of the same type as ret_vector_ptr
+      std::cout << (*it)->value << std::endl;
+    }
+    
+    std::cout<< "Message has " << len << " characters." << std::endl;
+    //std::cout << "Message:" << input_message << std::endl;
+    
+    //std::string message = solvePoint.answer(input_message);
+    
+    std::string message = "this is some random message from server";
     write(sock, buffer(message), ec);
   }
 

@@ -39,6 +39,14 @@ namespace ssds_xml {
 
       dataNodePtr = currNodePtr;
   }
+  
+  /*
+   * Parse xml from string
+   */
+  void read_xml::parse_xml_string(std::string message)
+  {
+    this->document = xmlParseMemory(message.c_str(), message.size());
+  }
 
   /*
   * Returns int value of the <code> tag
@@ -75,7 +83,7 @@ namespace ssds_xml {
   *	}
   *}
   */
-  void read_xml::get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr)
+  bool read_xml::get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr)
   {
     xmlXPathContextPtr context;
     xmlXPathObjectPtr result;
@@ -85,7 +93,7 @@ namespace ssds_xml {
 
     if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
       xmlXPathFreeObject(result);
-      return;
+      return false;
     }
 
     //std::vector<xml_node*> ret_vector;
@@ -113,6 +121,7 @@ namespace ssds_xml {
     }
     
     xmlXPathFreeObject(result);
+    return true;
   }
 
   /*

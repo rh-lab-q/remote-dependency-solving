@@ -73,7 +73,7 @@ int main(int argc, const char* argv[]){
 	xml.doc_to_str();
 	xml.str_output += "\n";
 	
-	//debug.flush_xml(xml.rootNodePtr, 0);
+	debug.flush_xml(xml.rootNodePtr, 0);
 	if(!debug.validate_xml(xml.document)){
 		std::cout << "wrong xml" << std::endl;
 		return 1;

@@ -16,15 +16,6 @@
 #include <hawkey/query.h>
 #include <hawkey/goal.h>
 #include <hawkey/repo.h>
-/*
-#include "../../../hawkey/hawkey/src/types.h"
-#include "../../../hawkey/hawkey/src/sack.h"
-#include "../../../hawkey/hawkey/src/repo.h"
-#include "../../../hawkey/hawkey/src/query.h"
-#include "../../../hawkey/hawkey/src/query_internal.h"
-#include "../../../hawkey/hawkey/src/packagelist.h"
-#include "../../../hawkey/hawkey/src/goal.h"
-#include "../../../hawkey/hawkey/src/goal_internal.h"*/
 
 namespace ssds_solving {
 
@@ -34,12 +25,15 @@ namespace ssds_solving {
 		solve(/* repos class instance with all enabled repos handlers */); 
 	        ~solve();
 		std::string query(const char* request);
-	    	xmlDocPtr parseMessage(std::string message);
+	    	bool parseMessage(std::string message);
 		void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
 		std::string answer(std::string message);
 		
 		//SOLVING
 		HySack sack;
+		
+		//XML
+		xmlDocPtr xml_document;
 	    private:
 		/* repos class instance with all enabled repos handlers */
 	};

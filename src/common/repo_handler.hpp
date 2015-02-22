@@ -2,6 +2,8 @@
 #define _REPO_HANDLER_HPP
 #include <string>
 #include <librepo/repoconf.h>
+#include <vector>
+#include "../common/xml_handler.hpp"
 
 namespace ssds_repo{
   class parse_repo{
@@ -15,6 +17,17 @@ namespace ssds_repo{
     std::vector<std::ifstream*> repolist;
     LrYumRepoConfs * repoHandler;
     LrYumRepoConf * singleRepo;
+    
+  };
+  
+  class repo_metadata{
+  public:
+    repo_metadata();
+    void by_url(std::string url);
+    
+    std::vector<ssds_xml::xml_node*>* urls;
+    
+  private:
     
   };
 }

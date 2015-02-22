@@ -14,11 +14,6 @@
 #include <libxml2/libxml/xmlwriter.h>
 #include <boost/program_options.hpp>
 
-//GLIB
-//#include <glib-2.0/glib/gerror.h>
-//#include <glib-2.0/glib/gtypes.h>
-//#include <glib-2.0/glib/gslist.h>
-//#include <glib-2.0/glib.h>
 
 //LIBREPO
 #include <librepo/repoconf.h>
@@ -45,9 +40,7 @@ namespace ssds_repo{
     GError **err;
     gboolean ret = lr_yum_repoconfs_load_dir(repoHandler, "/etc/yum.repos.d/", err);
   }
-
-
-
+  
   /*
   * Parses .repo files, creates nodes in xml representing repo name and url (baseurl | metalink | mirrorlist)
   */
@@ -152,5 +145,6 @@ namespace ssds_repo{
     lr_yum_repoconfs_free(this->repoHandler);
     repolist.erase(repolist.begin(), repolist.end());
   }
+
 
 }

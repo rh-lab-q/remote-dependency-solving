@@ -20,15 +20,14 @@
 #include <boost/thread/thread.hpp>
 #include <ctime>
 #include <cstdlib>
-#include "../common/logger.hpp"
 #include <thread>
 #include <utility>//for std::move()
+
+//SSDS
+#include "../common/logger.hpp"
 #include "../common/solving.hpp"
+#include "../common/repo_handler.hpp"
 
-
-
-
-//void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
 
 namespace ssds_server {
 	class server : private boost::noncopyable {

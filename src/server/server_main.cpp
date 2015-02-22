@@ -42,59 +42,63 @@ void session(ip::tcp::socket sock,boost::system::error_code ec){
 #endif
 
 int main() {
+  /*************************************************************************
+  * 
+  * 	Establishing port, socket etc for the communication
+  * 
+  *************************************************************************/
+  ssds_server::server mainserver;
 
-	ssds_server::server mainserver;
-	
-	logger::log my_log;
-	int portnum = 40002;
-	portnum = mainserver.newPort(portnum);
-	boost::asio::io_service &ios = mainserver.getIo();	
-	ip::tcp::endpoint endpoint_(ip::tcp::v4(),portnum);
-	ip::tcp::acceptor acceptor_(ios,endpoint_);  //listener
-	std::cout << "Server is ready..." << "\n";
-	boost::system::error_code ec;
-	//ip::tcp::socket sock(ios);
-	
-	//ssds_solving::solve solveHandler;
-	
-	
+  logger::log my_log;
+  int portnum = 40002;
+  //portnum = mainserver.newPort(portnum);
+  boost::asio::io_service &ios = mainserver.getIo();	
+  ip::tcp::endpoint endpoint_(ip::tcp::v4(),portnum);
+  ip::tcp::acceptor acceptor_(ios,endpoint_);  //listener
+  std::cout << "Server is ready..." << std::endl;
+  boost::system::error_code ec;
+  ip::tcp::socket sock(ios);
+
+  //ssds_solving::solve solveHandler;
+
+
 #if 1
-	try {
-			//ip::tcp::iostream streams("");
-		while(42) {
-  			ip::tcp::socket sock(ios);
-			acceptor_.accept(sock); //second argument can be error handler
-			
-			std::cout<<"Some connection was accepted" << std::endl;
-			
-			mainserver.process_connection(sock);
+  try {
+    ip::tcp::iostream streams("");
+    while(42) {
+      ip::tcp::socket sock(ios);
+      acceptor_.accept(sock); //second argument can be error handler
+
+      std::cout<<"Some connection was accepted" << std::endl;
+
+      mainserver.process_connection(sock);
 #if 0
-			int64_t size;
-			boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
-			
-			std::vector<char> buf(size);
-			size_t len = sock.read_some(buffer(buf), ec);
-			std::string input_message = std::string(buf.begin(), buf.end());
+      int64_t size;
+      boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
 
-			std::cout<< "Message has " << len << " characters." << std::endl;
-		
-			//solving
-			std::string message = solvePoint.answer(input_message);
+      std::vector<char> buf(size);
+      size_t len = sock.read_some(buffer(buf), ec);
+      std::string input_message = std::string(buf.begin(), buf.end());
+
+      std::cout<< "Message has " << len << " characters." << std::endl;
+
+      solving
+      std::string message = solvePoint.answer(input_message);
 #endif	
-			
-			sock.close();
 
-			//far future		    
-			//std::thread(session, std::move(sock).std::move(ec)).detach();
+      sock.close();
 
-		}
-	} /*handling exceptions*/
-	catch (std::exception& e){
-		//std::ostringstream os;
-		//os << "Server: "<< e.what();
-		/*std::cerr*/my_log.add_log(logERROR,e.what());
-	}
+      //far future		    
+      //std::thread(session, std::move(sock).std::move(ec)).detach();
+
+    }
+  } /*handling exceptions*/
+  catch (std::exception& e){
+    //std::ostringstream os;
+    //os << "Server: "<< e.what();
+    /*std::cerr*/my_log.add_log(logERROR,e.what());
+  }
 
 #endif
-	return 0;
+  return 0;
 }
