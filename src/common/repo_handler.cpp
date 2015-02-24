@@ -13,6 +13,7 @@
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xmlwriter.h>
 #include <boost/program_options.hpp>
+#include <librepo/url_substitution.h>
 
 
 //LIBREPO
@@ -88,7 +89,13 @@ namespace ssds_repo{
 	}
 	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
 	
-	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str());
+	
+	LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", "3.18.6-200.fc21");
+	lr_urlvars_set(list, "basearch", "x86_64");
+	char *url_subst = lr_url_substitute(url.c_str(), list);
+	
+	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url_subst);
+	
 	
 	xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
 	xmlFree(doc_str);
@@ -96,45 +103,6 @@ namespace ssds_repo{
 	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
       }
     }
-    
-    /*
-    while(nextPtr != nullptr){
-      
-      std::cout << "while list" << std::endl;
-      std::string url;
-      std::string name;
-      */
-      
-#if 0
-      //std::cout << "repo name: " << ((LrYumRepoConf*)nextPtr->data)->name << std::endl;
-      //std::cout << std::endl;
-      void *ptr = nullptr;
-      //std::cout << "repo debug: " << ((LrYumRepoConf*)nextPtr->data)->name << std::endl;
-      lr_yum_repoconf_getinfo()
-      gboolean ret = lr_yum_repoconf_getinfo((LrYumRepoConf*)nextPtr->data, &err, LR_YRC_NAME, &ptr);
-      
-      if(((LrYumRepoConf*)nextPtr->data)->enabled == true){//chyba chyba chyba
-	std::cout << "repo enabled" << std::endl;
-	name = ((LrYumRepoConf*)nextPtr->data)->name;
-	
-	if(((LrYumRepoConf*)nextPtr->data)->baseurl != nullptr)
-	  url = ((LrYumRepoConf*)nextPtr->data)->baseurl[0];
-	else if(((LrYumRepoConf*)nextPtr->data)->metalink != nullptr)
-	  url = ((LrYumRepoConf*)nextPtr->data)->metalink;
-	else if(((LrYumRepoConf*)nextPtr->data)->mirrorlist != nullptr)
-	  url = ((LrYumRepoConf*)nextPtr->data)->mirrorlist;
-	
-	
-	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url.c_str());
-	  
-	xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
-	xmlFree(doc_str);
-
-	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
-      }
-#endif
-      //nextPtr = nextPtr->next;
-    //}
   }
  
   /*

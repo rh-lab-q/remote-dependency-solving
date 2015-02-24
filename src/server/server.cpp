@@ -54,10 +54,12 @@ namespace ssds_server {
     std::cout << "zde" <<std::endl;
     xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
     
+    
+    
     //debug
-    for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){//result is of the same type as ret_vector_ptr
-      std::cout << (*it)->value << std::endl;
-    }
+//     for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){//result is of the same type as ret_vector_ptr
+//       std::cout << (*it)->value << std::endl;
+//     }
     
     std::cout<< "Message has " << len << " characters." << std::endl;
     //std::cout << "Message:" << input_message << std::endl;
