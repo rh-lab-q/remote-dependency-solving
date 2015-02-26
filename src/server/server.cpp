@@ -54,7 +54,7 @@ namespace ssds_server {
     std::cout << "zde" <<std::endl;
     xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
     
-    
+    //metadata.by_url((*metadata.urls).at(0)->value);
     
     //debug
 //     for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){//result is of the same type as ret_vector_ptr

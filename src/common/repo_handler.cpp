@@ -90,8 +90,8 @@ namespace ssds_repo{
 	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
 	
 	
-	LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", "3.18.6-200.fc21");
-	lr_urlvars_set(list, "basearch", "x86_64");
+	LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", "21"); //"3.18.6-200.fc21"
+	list = lr_urlvars_set(list, "basearch", "x86_64");
 	char *url_subst = lr_url_substitute(url.c_str(), list);
 	
 	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url_subst);

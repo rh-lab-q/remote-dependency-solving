@@ -2,7 +2,12 @@
 #define _REPO_HANDLER_HPP
 #include <string>
 #include <librepo/repoconf.h>
+#include <librepo/librepo.h>
 #include <vector>
+#include <iostream>
+#include <glib-2.0/glib/gerror.h>
+#include <glib-2.0/glib/gslist.h>
+#include <stdio.h>
 #include "../common/xml_handler.hpp"
 
 namespace ssds_repo{
