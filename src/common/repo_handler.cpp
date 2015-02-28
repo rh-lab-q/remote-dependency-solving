@@ -20,7 +20,7 @@
 #include <librepo/repoconf.h>
 
 /*
- * TODO - c++ neco co parsuje .repo soubory v yum?? zkusit jestli neni neco pro c++
+ 
  * 
  * 
  * 
@@ -60,6 +60,7 @@ namespace ssds_repo{
     for(unsigned int i=0; i<g_slist_length(list); i++){
       std::string url;
       std::string name;
+      short type = 0;
       void * val;
       
       LrYumRepoConf * conf = (LrYumRepoConf*)g_slist_nth_data(list, i);
@@ -75,17 +76,20 @@ namespace ssds_repo{
 	err = nullptr;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_MIRRORLIST, &val) != false){
 	  url = (char*)val;
+	  type = ssds_xml::url_type::SSDS_MIRRORLIST;
 	}
 	
 	err = nullptr;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_METALINK, &val) != false){
 	  url = (char*)val;
+	  type = ssds_xml::url_type::SSDS_METALINK;
 	}
 	
 	err = nullptr;
 	//void ** val2;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
 	  url = ((char**)val)[0];
+	  type = ssds_xml::url_type::SSDS_BASEURL;
 	}
 	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
 	
@@ -101,6 +105,15 @@ namespace ssds_repo{
 	xmlFree(doc_str);
 
 	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
+	
+	switch(type){
+	  case ssds_xml::url_type::SSDS_BASEURL: xml.add_attr((xmlChar *) "url_type", (xmlChar*) "1"); 
+						 break;
+	  case ssds_xml::url_type::SSDS_MIRRORLIST: xml.add_attr((xmlChar *) "url_type", (xmlChar*) "2");
+						    break;
+	  case ssds_xml::url_type::SSDS_METALINK: xml.add_attr((xmlChar *) "url_type", (xmlChar*) "3");
+						  break;
+	}
       }
     }
   }

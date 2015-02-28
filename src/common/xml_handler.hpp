@@ -10,12 +10,11 @@
 #include <vector>
 
 namespace ssds_xml{
- class xml_debug{
- public:
-   xml_debug();
-   void flush_xml(xmlNode * a_node, int indent);
-   int validate_xml(xmlDocPtr doc);
- };
+ enum url_type :short{
+      SSDS_BASEURL = 1,
+      SSDS_MIRRORLIST,
+      SSDS_METALINK
+ }; 
  
  class xml_attr{
   public:
@@ -29,6 +28,14 @@ namespace ssds_xml{
     std::vector<xml_attr*> attributes;
  };
  
+ class xml_debug{
+ public:
+   xml_debug();
+   void flush_xml(xmlNode * a_node, int indent);
+   int validate_xml(xmlDocPtr doc);
+   void flush_url_vector(std::vector<xml_node*>* urls);
+ };
+ 
  class read_xml{
  public:
    read_xml();
@@ -38,6 +45,7 @@ namespace ssds_xml{
    bool get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr);
    xmlNodePtr add_node_by_path(xmlChar* xpath);
    void free_resources();
+   void flush_url_vector(std::vector<xml_node*>* urls);
    
    
    xmlDocPtr document;

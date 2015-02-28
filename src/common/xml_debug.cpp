@@ -68,4 +68,18 @@ namespace ssds_xml {
     if(curr_node->next != nullptr)
       flush_xml(curr_node->next, indent);
   }
+  
+  /*
+   * For checking xml parsed into a vector structure
+   */
+  void xml_debug::flush_url_vector(std::vector<xml_node*>* urls){
+    for(std::vector<xml_node*>::iterator it = urls->begin(); it!=urls->end(); it++){
+      std::cout << "url" << ": " << (*it)->value << std::endl;
+      
+      for(std::vector<xml_attr*>::iterator itt = (*it)->attributes.begin(); itt != (*it)->attributes.end(); itt++){
+	std::cout << "\t" << "att name: " << (*itt)->name << ", att value: " << (*itt)->value << std::endl;
+      }
+    }
+    
+  }
 }

@@ -14,5 +14,6 @@
 <!-- Nodes on level 4 - usually containing actual data -->
 <!ELEMENT repo (#PCDATA)>
 <!ATTLIST repo name CDATA #REQUIRED>
+<!ATTLIST repo url_type CDATA #REQUIRED>
 
 <!ELEMENT pkg (#PCDATA)>

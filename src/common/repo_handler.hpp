@@ -1,6 +1,7 @@
 #ifndef _REPO_HANDLER_HPP
 #define _REPO_HANDLER_HPP
 #include <string>
+#include <string.h>
 #include <librepo/repoconf.h>
 #include <librepo/librepo.h>
 #include <vector>
@@ -28,7 +29,7 @@ namespace ssds_repo{
   class repo_metadata{
   public:
     repo_metadata();
-    void by_url(std::string url);
+    void by_url(ssds_xml::xml_node* repo_node);
     
     std::vector<ssds_xml::xml_node*>* urls;
     
