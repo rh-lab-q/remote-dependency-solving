@@ -11,6 +11,14 @@
 #include <stdio.h>
 #include "../common/xml_handler.hpp"
 
+//SOLVING
+#include <hawkey/types.h>
+#include <hawkey/sack.h>
+#include <hawkey/packagelist.h>
+#include <hawkey/query.h>
+#include <hawkey/goal.h>
+#include <hawkey/repo.h>
+
 namespace ssds_repo{
   class parse_repo{
   public:
@@ -29,7 +37,7 @@ namespace ssds_repo{
   class repo_metadata{
   public:
     repo_metadata();
-    void by_url(ssds_xml::xml_node* repo_node);
+    void by_url(ssds_xml::xml_node* repo_node, std::vector<LrYumRepo*>* repo_info);
     
     std::vector<ssds_xml::xml_node*>* urls;
     

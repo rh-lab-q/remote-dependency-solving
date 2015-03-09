@@ -52,24 +52,29 @@ namespace ssds_server {
     
     //solvePoint.parseMessage(input_message);
     xml.parse_xml_string(input_message);
-    std::cout << "zde" <<std::endl;
+    
     xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
     
-    debug.flush_url_vector(metadata.urls);
-    
+    //debug.flush_url_vector(metadata.urls);
+    //std::cout << "zde pred for v server.cpp" <<std::endl;
+    int count = 0;
     for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){
-      metadata.by_url((*it));
+      std::cout << "uvnitr for" << std::endl;
+      metadata.by_url((*it), solvePoint.repo_info);
+      count++;
+      if(count==2)
+	 break;
+      //std::cout << "uvnitr for" << std::endl;
     }
     
-    //debug
-//     for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){//result is of the same type as ret_vector_ptr
-//       std::cout << (*it)->value << std::endl;
-//     }
+
     
     std::cout<< "Message has " << len << " characters." << std::endl;
     //std::cout << "Message:" << input_message << std::endl;
     
     //std::string message = solvePoint.answer(input_message);
+    
+    solvePoint.fillSack();
     
     std::string message = "this is some random message from server";
     write(sock, buffer(message), ec);

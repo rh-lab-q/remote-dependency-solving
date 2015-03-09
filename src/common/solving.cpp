@@ -19,6 +19,8 @@ namespace ssds_solving {
   //solve object loads all packages installed in current system
   //NOTE!!! - right now, everything is only static to create first working example. Later it needs to be redone
   solve::solve(/* repos class instance */){
+    this->repo_info = new std::vector<LrYumRepo*>();
+    
     
     /* Creating sack */
     this->sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
@@ -40,6 +42,27 @@ namespace ssds_solving {
   solve::~solve() {
 
   }
+  
+  void solve::fillSack()
+  {
+    for(std::vector<LrYumRepo*>::iterator it = this->repo_info->begin(); it != this->repo_info->end(); it++){
+      HyRepo repo = hy_repo_create("pokus");
+      std::cout << "for v fillSack: " << repo_info->size()<< std::endl;
+      //const char* path = lr_yum_repo_path(*it, "primary");
+      
+      std::cout << lr_yum_repo_path(*it,"primary") << std::endl;
+//       std::string repomd = *it + "/repodata/repomd.xml";
+//       std::string primary = *it + "/repodata/";
+//       std::string filelist = *it + "/repodata/repomd.xml";
+//       
+//       hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
+//       hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
+//       hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
+//     
+//       
+    }
+  }
+
   
   std::string solve::query(const char* request){
     /* QUERY */

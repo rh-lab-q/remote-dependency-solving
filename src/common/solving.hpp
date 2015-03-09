@@ -17,6 +17,9 @@
 #include <hawkey/goal.h>
 #include <hawkey/repo.h>
 
+//LIBREPO
+#include <librepo/yum.h>
+
 namespace ssds_solving {
 
 	class solve{ 
@@ -24,6 +27,7 @@ namespace ssds_solving {
 		
 		solve(/* repos class instance with all enabled repos handlers */); 
 	        ~solve();
+		void fillSack();
 		std::string query(const char* request);
 	    	bool parseMessage(std::string message);
 		void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
@@ -34,6 +38,9 @@ namespace ssds_solving {
 		
 		//XML
 		xmlDocPtr xml_document;
+		
+		//METADATA
+		std::vector<LrYumRepo*> *repo_info;
 	    private:
 		/* repos class instance with all enabled repos handlers */
 	};
