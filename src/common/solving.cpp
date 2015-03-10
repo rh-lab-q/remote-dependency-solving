@@ -19,7 +19,7 @@ namespace ssds_solving {
   //solve object loads all packages installed in current system
   //NOTE!!! - right now, everything is only static to create first working example. Later it needs to be redone
   solve::solve(/* repos class instance */){
-    this->repo_info = new std::vector<LrYumRepo*>();
+    //repo_info = new std::vector<LrYumRepo*>();
     
     
     /* Creating sack */
@@ -45,12 +45,21 @@ namespace ssds_solving {
   
   void solve::fillSack()
   {
-    for(std::vector<LrYumRepo*>::iterator it = this->repo_info->begin(); it != this->repo_info->end(); it++){
-      HyRepo repo = hy_repo_create("pokus");
-      std::cout << "for v fillSack: " << repo_info->size()<< std::endl;
+    std::cout << "for v fillSack: " << repo_info.size() << std::endl;
+    
+    
+    
+    for(std::vector<LrYumRepo*>::iterator it = repo_info.begin(); it != repo_info.end(); it++){
+    
+      //       for(LrYumRepo*a : repo_info){
+// 	std::cout << "lr_yum_repo_path: " << lr_yum_repo_path(a,"filelists") << std::endl;
+//       }
+    
+      //HyRepo repo = hy_repo_create("pokus");
+      
       //const char* path = lr_yum_repo_path(*it, "primary");
       
-      std::cout << lr_yum_repo_path(*it,"primary") << std::endl;
+      std::cout << "lr_yum_repo_path: " << lr_yum_repo_path(*it,"primary") << std::endl;
 //       std::string repomd = *it + "/repodata/repomd.xml";
 //       std::string primary = *it + "/repodata/";
 //       std::string filelist = *it + "/repodata/repomd.xml";

@@ -58,8 +58,9 @@ namespace ssds_server {
     //debug.flush_url_vector(metadata.urls);
     //std::cout << "zde pred for v server.cpp" <<std::endl;
     int count = 0;
+    std::cout << "server pred for: " << metadata.urls->size() << std::endl;
+    
     for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){
-      std::cout << "uvnitr for" << std::endl;
       metadata.by_url((*it), solvePoint.repo_info);
       count++;
       if(count==2)

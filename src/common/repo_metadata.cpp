@@ -12,7 +12,7 @@ namespace ssds_repo {
   /*
    * 	Downloads repo metadata based on given url address
    */
-  void repo_metadata::by_url(ssds_xml::xml_node* repo_node, std::vector<LrYumRepo*>* repo_info)
+  void repo_metadata::by_url(ssds_xml::xml_node* repo_node, std::vector<LrYumRepo*> repo_info)
   {
     char * url_char = (char *)repo_node->value.c_str();
     LrHandleOption type;
@@ -39,7 +39,7 @@ namespace ssds_repo {
     //urlvars = lr_urlvars_set(urlvars, "basearch", "x86_64");
     
     // Download only this metadata
-    char *download_list[] = { "group_gz", "pkgtags", NULL };
+    char *download_list[] = { "primary", "filelists", "repomd",NULL };
     LrHandle *h = lr_handle_init();
     LrResult *r = lr_result_init();
     
@@ -60,13 +60,20 @@ namespace ssds_repo {
     std::cout << "pred print" << std::endl;
     if (ret) {
       printf("Download successfull (Destination dir: %s)\n", destdir);
-      //tmp_err = nullptr;
-      LrYumRepo *repo = lr_yum_repo_init();
-      lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, (LrYumRepo*)repo);
-    
-      repo_info->push_back(repo);
-      
-      std::cout << "path v get_url: " << lr_yum_repo_path(repo_info->at(0), "filelists") <<std::endl;
+      tmp_err = NULL;
+      LrYumRepo* repo = lr_yum_repo_init();
+      ret = lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &repo);
+
+      if(ret){
+	repo_info.push_back(repo);
+	std::cout << "za getinfo" << std::endl;
+	std::cout << "path filelists v get_url: " << lr_yum_repo_path(repo_info.at(0), "filelists") <<std::endl;
+	std::cout << "path primary v get_url: " << lr_yum_repo_path(repo, "primary") <<std::endl;
+      }
+      else{
+	std::cout << "Error encountered: " << tmp_err->message << std::endl;
+	
+      }
       
     } else {
       fprintf(stderr, "Error encountered: %s\n", tmp_err->message);

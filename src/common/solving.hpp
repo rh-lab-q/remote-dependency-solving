@@ -40,7 +40,7 @@ namespace ssds_solving {
 		xmlDocPtr xml_document;
 		
 		//METADATA
-		std::vector<LrYumRepo*> *repo_info;
+		std::vector<LrYumRepo*> repo_info;
 	    private:
 		/* repos class instance with all enabled repos handlers */
 	};
