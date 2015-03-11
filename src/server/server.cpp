@@ -62,9 +62,9 @@ namespace ssds_server {
     
     for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){
       metadata.by_url((*it), solvePoint.repo_info);
-      count++;
-      if(count==2)
-	 break;
+//       count++;
+//       if(count==2)
+// 	 break;
       //std::cout << "uvnitr for" << std::endl;
     }
     
@@ -72,10 +72,10 @@ namespace ssds_server {
     
     std::cout<< "Message has " << len << " characters." << std::endl;
     //std::cout << "Message:" << input_message << std::endl;
-    
+    solvePoint.fillSack();
     //std::string message = solvePoint.answer(input_message);
     
-    solvePoint.fillSack();
+    
     
     std::string message = "this is some random message from server";
     write(sock, buffer(message), ec);

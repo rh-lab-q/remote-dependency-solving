@@ -12,11 +12,10 @@ namespace ssds_repo {
   /*
    * 	Downloads repo metadata based on given url address
    */
-  void repo_metadata::by_url(ssds_xml::xml_node* repo_node, std::vector<LrYumRepo*> repo_info)
+  void repo_metadata::by_url(ssds_xml::xml_node* repo_node, std::vector<LrYumRepo*> &repo_info)
   {
     char * url_char = (char *)repo_node->value.c_str();
     LrHandleOption type;
-    std::cout << "na zacatku by_url" << std::endl;
     for(std::vector<ssds_xml::xml_attr*>::iterator it = repo_node->attributes.begin(); it != repo_node->attributes.end(); it++){
       if(strcmp("url_type", (*it)->name.c_str()) == 0){
 	  //if(strcmp("1", (*it)->value)==0)
@@ -29,7 +28,6 @@ namespace ssds_repo {
 	    return;
       }
     }
-    std::cout << "po for v by_url" << std::endl;
 #if 1
     GError *tmp_err = NULL;
 
@@ -43,32 +41,28 @@ namespace ssds_repo {
     LrHandle *h = lr_handle_init();
     LrResult *r = lr_result_init();
     
-    std::cout << "pred setopt" << std::endl;
     lr_handle_setopt(h, NULL, type, url_char);//"https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64");
     //"https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64");
     lr_handle_setopt(h, NULL, LRO_REPOTYPE, LR_YUMREPO);
     lr_handle_setopt(h, NULL, LRO_YUMDLIST, download_list);
     //lr_handle_setopt(h, NULL, LRO_VARSUB, urlvars);
     //lr_handle_setopt(h, NULL, LRO_PROGRESSCB, progress_callback);
-    std::cout << "pred perform" << std::endl;
+    
     gboolean ret = lr_handle_perform(h, r, &tmp_err); 	
     
-    std::cout << "pred get info" << std::endl;
     char *destdir;
     lr_handle_getinfo(h, NULL, LRI_DESTDIR, &destdir);
     
-    std::cout << "pred print" << std::endl;
     if (ret) {
       printf("Download successfull (Destination dir: %s)\n", destdir);
       tmp_err = NULL;
       LrYumRepo* repo = lr_yum_repo_init();
+      std::vector<LrYumRepo*>::iterator it = repo_info.end();
+      
       ret = lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &repo);
 
       if(ret){
-	repo_info.push_back(repo);
-	std::cout << "za getinfo" << std::endl;
-	std::cout << "path filelists v get_url: " << lr_yum_repo_path(repo_info.at(0), "filelists") <<std::endl;
-	std::cout << "path primary v get_url: " << lr_yum_repo_path(repo, "primary") <<std::endl;
+	repo_info.insert(it, repo);
       }
       else{
 	std::cout << "Error encountered: " << tmp_err->message << std::endl;
@@ -80,8 +74,8 @@ namespace ssds_repo {
       g_error_free(tmp_err);
     }
     
-    lr_result_free(r);
-    lr_handle_free(h);
+//     lr_result_free(r);
+//     lr_handle_free(h);
 #endif
 #if 0
     LrHandle *h = lr_handle_init();
@@ -138,6 +132,5 @@ namespace ssds_repo {
       //rc = EXIT_FAILURE;
     } 
 #endif
-    std::cout << "na konci metadat" << std::endl;
   }  
 }

@@ -12,7 +12,7 @@
 #include "solving.hpp"
 //#include "../../../hawkey/hawkey/src/package_internal.h"
 #include <hawkey/package.h>
-
+#include <typeinfo>
 
 namespace ssds_solving {
   
@@ -29,13 +29,13 @@ namespace ssds_solving {
       std::cout << "load_system_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
     
     /* Loading repo metadata into sack */
-    HyRepo repo = hy_repo_create("pokus");
-    hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
-    hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
-    hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
-    
-    if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
-      std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
+//     HyRepo repo = hy_repo_create("pokus");
+//     hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
+//     hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
+//     hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
+//     
+//     if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
+//       std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
         
   }
 
@@ -45,31 +45,19 @@ namespace ssds_solving {
   
   void solve::fillSack()
   {
-    std::cout << "for v fillSack: " << repo_info.size() << std::endl;
-    
-    
-    
-    for(std::vector<LrYumRepo*>::iterator it = repo_info.begin(); it != repo_info.end(); it++){
-    
-      //       for(LrYumRepo*a : repo_info){
-// 	std::cout << "lr_yum_repo_path: " << lr_yum_repo_path(a,"filelists") << std::endl;
-//       }
-    
-      //HyRepo repo = hy_repo_create("pokus");
+      for(LrYumRepo* a : repo_info){
+	//std::cout << "lr_yum_repo_path: " << lr_yum_repo_path(a,"filelists") << std::endl;
       
-      //const char* path = lr_yum_repo_path(*it, "primary");
-      
-      std::cout << "lr_yum_repo_path: " << lr_yum_repo_path(*it,"primary") << std::endl;
-//       std::string repomd = *it + "/repodata/repomd.xml";
-//       std::string primary = *it + "/repodata/";
-//       std::string filelist = *it + "/repodata/repomd.xml";
-//       
-//       hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
-//       hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
-//       hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
-//     
-//       
-    }
+    
+	HyRepo repo = hy_repo_create("pokus");
+	hy_repo_set_string(repo, HY_REPO_MD_FN, lr_yum_repo_path(a,"repomd"));
+	hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, lr_yum_repo_path(a,"primary"));
+	hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, lr_yum_repo_path(a,"filelists"));
+	
+	if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
+	  std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
+      }
+
   }
 
   
