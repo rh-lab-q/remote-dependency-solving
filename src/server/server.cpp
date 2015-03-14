@@ -77,7 +77,7 @@ namespace ssds_server {
     
     
     
-    std::string message = "this is some random message from server";
+    std::string message = "this is some random message from server\n";
     write(sock, buffer(message), ec);
   }
 

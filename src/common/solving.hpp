@@ -9,6 +9,10 @@
 #include <libxml2/libxml/xmlwriter.h>
 #include "xml_handler.hpp"
 
+//#include <glib-2.0/glib/gerror.h>
+//#include <glib-2.0/glib/gslist.h>
+#include <glib.h>
+
 //SOLVING
 #include <hawkey/types.h>
 #include <hawkey/sack.h>
@@ -19,6 +23,7 @@
 
 //LIBREPO
 #include <librepo/yum.h>
+#include <librepo/handle.h>
 
 namespace ssds_solving {
 
@@ -40,7 +45,7 @@ namespace ssds_solving {
 		xmlDocPtr xml_document;
 		
 		//METADATA
-		std::vector<LrYumRepo*> repo_info;
+		std::vector<LrResult*> repo_info;
 	    private:
 		/* repos class instance with all enabled repos handlers */
 	};

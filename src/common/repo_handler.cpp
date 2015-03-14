@@ -13,12 +13,14 @@
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xmlwriter.h>
 #include <boost/program_options.hpp>
-#include <librepo/url_substitution.h>
+
+#include <glib-2.0/glib/gerror.h>
+#include <glib-2.0/glib/gslist.h>
 
 
 //LIBREPO
 #include <librepo/repoconf.h>
-
+#include <librepo/url_substitution.h>
 /*
  
  * 

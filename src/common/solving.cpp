@@ -12,7 +12,6 @@
 #include "solving.hpp"
 //#include "../../../hawkey/hawkey/src/package_internal.h"
 #include <hawkey/package.h>
-#include <typeinfo>
 
 namespace ssds_solving {
   
@@ -45,17 +44,27 @@ namespace ssds_solving {
   
   void solve::fillSack()
   {
-      for(LrYumRepo* a : repo_info){
-	//std::cout << "lr_yum_repo_path: " << lr_yum_repo_path(a,"filelists") << std::endl;
-      
-    
-	HyRepo repo = hy_repo_create("pokus");
-	hy_repo_set_string(repo, HY_REPO_MD_FN, lr_yum_repo_path(a,"repomd"));
-	hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, lr_yum_repo_path(a,"primary"));
-	hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, lr_yum_repo_path(a,"filelists"));
-	
-	if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
-	  std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
+      std::cout << repo_info.size() << std::endl;
+      for(LrResult* r : repo_info){
+	std::cout << "for" << std::endl;
+	GError *tmp_err = NULL;
+	LrYumRepo* repo = lr_yum_repo_init();
+	int ret = lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &repo);
+	if(ret)
+	{
+	  std::cout << "lr_yum_repo_path repomd: " << lr_yum_repo_path(repo,"repomd") << std::endl;
+	  std::cout << "lr_yum_repo_path filelists: " << lr_yum_repo_path(repo,"filelists") << std::endl;
+	  std::cout << "lr_yum_repo_path primary: " << lr_yum_repo_path(repo,"primary") << std::endl;
+	}
+//     
+// 	HyRepo repo = hy_repo_create("pokus");
+// 	hy_repo_set_string(repo, HY_REPO_MD_FN, lr_yum_repo_path(a,"repomd"));
+// 	hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, lr_yum_repo_path(a,"primary"));
+// 	hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, lr_yum_repo_path(a,"filelists"));
+// 	
+// 	hy_sack_load_yum_repo(sack, repo, 0);
+// 	
+// 	std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
       }
 
   }

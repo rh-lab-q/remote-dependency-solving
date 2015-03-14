@@ -37,7 +37,7 @@ namespace ssds_repo{
   class repo_metadata{
   public:
     repo_metadata();
-    void by_url(ssds_xml::xml_node* repo_node, std::vector<LrYumRepo*> &repo_info);
+    void by_url(ssds_xml::xml_node* repo_node, std::vector<LrResult*> &repo_info);
     
     std::vector<ssds_xml::xml_node*>* urls;
     
