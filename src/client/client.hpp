@@ -14,8 +14,9 @@
 
 //SSDS
 #include "../common/logger.hpp"
-#include "../common/xml_handler.hpp"
 #include "../common/repo_handler.hpp"
+#include "../common/solving.hpp"
+#include "../common/xml_handler.hpp"
 #include "../common/params.hpp"
 
 /*

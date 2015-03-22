@@ -42,7 +42,7 @@ namespace ssds_xml{
    void parse_xml_file(std::string path);
    void parse_xml_string(std::string message);
    int get_code();
-   bool get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr);
+   bool get_node_by_path(xmlChar* path, std::vector<xml_node*>& ret_vector_ptr);
    xmlNodePtr add_node_by_path(xmlChar* xpath);
    void free_resources();
    void flush_url_vector(std::vector<xml_node*>* urls);

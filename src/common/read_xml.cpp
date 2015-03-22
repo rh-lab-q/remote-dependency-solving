@@ -83,7 +83,7 @@ namespace ssds_xml {
   *	}
   *}
   */
-  bool read_xml::get_node_by_path(xmlChar* path, std::vector<xml_node*>* ret_vector_ptr)
+  bool read_xml::get_node_by_path(xmlChar* path, std::vector<xml_node*> &ret_vector_ptr)
   {
     xmlXPathContextPtr context;
     xmlXPathObjectPtr result;
@@ -116,7 +116,7 @@ namespace ssds_xml {
 	attribute=attribute->next;//next attribute
       }
 
-      ret_vector_ptr->push_back(new_node);//here I put the whole node with attributes into the vector
+      ret_vector_ptr.push_back(new_node);//here I put the whole node with attributes into the vector
       xmlFree(keyword);
     }
     

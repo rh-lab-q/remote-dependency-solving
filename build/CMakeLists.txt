@@ -84,11 +84,11 @@ set(CLISRC "../src/client/client_main.cpp")
 add_executable(ssds-client ${CLISRC}
 		../src/common/logger.cpp
 		../src/common/repo_handler.cpp
+		../src/common/repo_metadata.cpp
 		../src/common/xml_debug.cpp
-		../src/common/create_xml.cpp
-		../src/common/read_xml.cpp
 		../src/common/params.cpp
-		../src/common/solving.cpp)
+		../src/common/create_xml.cpp
+		../src/common/read_xml.cpp)
 target_link_libraries(
 	ssds-client
 	${Boost_SYSTEM_LIBRARY}

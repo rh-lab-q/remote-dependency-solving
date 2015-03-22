@@ -6,8 +6,8 @@
 // Description	: Server side of SSDS
 //============================================================================
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef _SERVER_HPP
+#define _SERVER_HPP
 
 //#include <stdlib.h>
 //#include <stdio.h>
@@ -33,18 +33,17 @@
 namespace ssds_server {
 	class server : private boost::noncopyable {
 	public:
-		server();
-		/*Server(const Server&other);*/
-		~server();
-		boost::asio::io_service& getIo();
-		void process_connection(boost::asio::ip::tcp::socket& sock);
-		int newPort(int);
-		//void handle_accept(const boost::system::error_code& ec);
-		void listen();
-		void connect();
-		void close();
-		
-		void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
+            server();
+            ~server();
+            boost::asio::io_service& getIo();
+            int newPort(int);
+            void listen();
+            void connect();
+            void close();
+            void process_connection(boost::asio::ip::tcp::socket& sock);
+            
+            
+            void session(boost::asio::ip::tcp::socket sock,boost::system::error_code ec);
 		
 		
 		

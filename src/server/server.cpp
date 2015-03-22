@@ -43,43 +43,37 @@ namespace ssds_server {
     
     boost::system::error_code ec;
     int64_t size;
-    
+
+    //recieving data
     boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
-    
     std::vector<char> buf(size);
     size_t len = sock.read_some(buffer(buf), ec);
     std::string input_message = std::string(buf.begin(), buf.end());
     
-    //solvePoint.parseMessage(input_message);
     xml.parse_xml_string(input_message);
+    /*
+     * Here I would put something that will decide what to do according to the code from the client
+     */
+    
+    
     
     xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
     
-    //debug.flush_url_vector(metadata.urls);
-    //std::cout << "zde pred for v server.cpp" <<std::endl;
-    int count = 0;
-    std::cout << "server pred for: " << metadata.urls->size() << std::endl;
+    metadata.locate_repo_metadata_by_url();
     
-    for(std::vector<ssds_xml::xml_node*>::iterator it = metadata.urls->begin(); it != metadata.urls->end(); it++){
-      metadata.by_url((*it), solvePoint.repo_info);
-//       count++;
-//       if(count==2)
-// 	 break;
-      //std::cout << "uvnitr for" << std::endl;
-    }
+    //debug.flush_url_vector(metadata.urls);
+    int count = 0;
+    
+    
     
 
     
     std::cout<< "Message has " << len << " characters." << std::endl;
-    //std::cout << "Message:" << input_message << std::endl;
-    solvePoint.fillSack();
-    //std::string message = solvePoint.answer(input_message);
-    
-    
+    solvePoint.fill_sack(metadata);
     
     std::string message = "this is some random message from server\n";
     write(sock, buffer(message), ec);
-  }
+  }//process_connection
 
 
   void server::session(ip::tcp::socket sock,boost::system::error_code ec){
