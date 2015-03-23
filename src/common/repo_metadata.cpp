@@ -28,6 +28,8 @@ namespace ssds_repo {
     char * url_char = (char *)repo_node.value.c_str();
     LrHandleOption type;
     
+    std::cout << "download_repo_metadata_by_url: prijata url: " << url_char << std::endl;
+    
     //find type of url in vector
     for(ssds_xml::xml_attr* it : repo_node.attributes){
       if(strcmp("url_type", it->name.c_str()) == 0){

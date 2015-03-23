@@ -47,7 +47,7 @@ namespace ssds_solving {
       std::string query(const char* request);
       bool parseMessage(std::string message);
       void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
-      std::string answer(std::string message);
+      std::string answer(ssds_xml::read_xml &client_data);
       
       //SOLVING
       HySack sack;

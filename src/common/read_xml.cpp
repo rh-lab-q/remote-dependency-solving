@@ -46,6 +46,17 @@ namespace ssds_xml {
   void read_xml::parse_xml_string(std::string message)
   {
     this->document = xmlParseMemory(message.c_str(), message.size());
+    rootNodePtr = xmlDocGetRootElement(document);
+    
+    currNodePtr = rootNodePtr;
+    while(currNodePtr != NULL){
+      if((!xmlStrcmp(currNodePtr->name, (const xmlChar *)"data")))
+      break;
+
+      currNodePtr = currNodePtr->next;
+    }
+
+    dataNodePtr = currNodePtr;
   }
 
   /*
@@ -106,7 +117,7 @@ namespace ssds_xml {
 
       xml_node* new_node = new xml_node;//create new_node, this one will be added at the end of return vector
       new_node->value=(char* )keyword;//value of the node extracted from xml will be added as a string
-
+      
       while(attribute!=nullptr){//while for attributes extraction
 	xml_attr* new_attr = new xml_attr;
 	new_attr->value = (char* )xmlNodeListGetString(document, attribute->children, 1);//value of the attribute

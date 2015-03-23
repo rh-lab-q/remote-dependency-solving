@@ -51,6 +51,8 @@ namespace ssds_server {
     std::string input_message = std::string(buf.begin(), buf.end());
     
     xml.parse_xml_string(input_message);
+//     debug.flush_xml(xml.rootNodePtr, 0);
+    std::cout << std::endl;
     /*
      * Here I would put something that will decide what to do according to the code from the client
      */
@@ -61,13 +63,10 @@ namespace ssds_server {
     
     metadata.locate_repo_metadata_by_url();
     
-    //debug.flush_url_vector(metadata.urls);
-    int count = 0;
-    
     std::cout<< "Message has " << len << " characters." << std::endl;
     solvePoint.fill_sack(metadata);
     
-    std::string message = "this is some random message from server\n";
+    std::string message = solvePoint.answer(xml);
     write(sock, buffer(message), ec);
   }//process_connection
 
