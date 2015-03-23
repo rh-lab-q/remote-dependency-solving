@@ -38,26 +38,26 @@
 
 namespace ssds_solving {
 
-	class solve{ 
-    	    public:
-		
-		solve(/* repos class instance with all enabled repos handlers */); 
-                    ~solve();
-		void fill_sack(ssds_repo::repo_metadata &metadata);
-		std::string query(const char* request);
-	    	bool parseMessage(std::string message);
-		void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
-		std::string answer(std::string message);
-		
-		//SOLVING
-		HySack sack;
-		
-		//XML
-		xmlDocPtr xml_document;
+  class solve{ 
+    public:
+          
+      solve(/* repos class instance with all enabled repos handlers */); 
+      ~solve();
+      void fill_sack(ssds_repo::repo_metadata &metadata);
+      std::string query(const char* request);
+      bool parseMessage(std::string message);
+      void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
+      std::string answer(std::string message);
+      
+      //SOLVING
+      HySack sack;
+      
+      //XML
+      xmlDocPtr xml_document;
 
-	    private:
-		/* repos class instance with all enabled repos handlers */
-	};
+    private:
+          /* repos class instance with all enabled repos handlers */
+  };
 
 }//ssds_ solving
 #endif

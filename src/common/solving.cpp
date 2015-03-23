@@ -46,9 +46,16 @@ namespace ssds_solving {
   {
     for(ssds_repo::metadata_files_location* loc : metadata.files_locations)
     {
-      std::cout << "pokus ve fill sack, filelists: " << loc->filelists << "\nprimary: " << loc->primary << std::endl;
-      
+      HyRepo repo = hy_repo_create("pokus");
+      std::string repomd_path = loc->repomd + "/repodata/repomd.xml";
+//       std::cout << "pokus ve fill sack, filelists: " << loc->filelists << "\nprimary: " << loc->primary << "\nrepomd: " << loc->repomd << std::endl;
+      hy_repo_set_string(repo, HY_REPO_MD_FN, repomd_path.c_str());
+      hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, loc->primary.c_str());
+      hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, loc->filelists.c_str());
+        
+      hy_sack_load_yum_repo(sack, repo, 0);
     }
+    std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
   }
 
   

@@ -60,14 +60,12 @@ namespace ssds_repo {
       printf("Download successfull (Destination dir: %s)\n", destdir);
       
       LrYumRepo* repo = lr_yum_repo_init();
-      LrYumRepoMd *repomd = lr_yum_repomd_init();
       lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &repo);
-      lr_result_getinfo(r, &tmp_err, LRR_YUM_REPOMD, &repomd);
       
-      std::cout << lr_yum_repo_path(repo, "filelists") << std::endl;
+      //std::cout << lr_yum_repo_path(repo, "filelists") << std::endl;
       
       ssds_repo::metadata_files_location* loc = new ssds_repo::metadata_files_location;
-//       loc->repomd = lr_yum_repo_path(repo,"repomd");
+      loc->repomd = destdir;
       loc->filelists = lr_yum_repo_path(repo,"filelists");
       loc->primary = lr_yum_repo_path(repo,"primary");
       
