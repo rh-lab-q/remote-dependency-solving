@@ -61,8 +61,6 @@ namespace ssds_solving {
   
   std::string solve::query(const char* request){
     /* QUERY */
-    std::cout << "query - na co se ptam?: " << request<< std::endl;
-    
     HyQuery query = hy_query_create(this->sack);
     hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request);
     hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
@@ -72,7 +70,15 @@ namespace ssds_solving {
     HyPackageList plist = hy_packagelist_create();
     plist = hy_query_run(query);
     
+    HyPackage test;
     std::cout << "pocet baliku nalezenych pomoci query: " << hy_packagelist_count(plist) << std::endl;
+    for(int i=0; i<hy_packagelist_count(plist);i++)
+    {
+      test = hy_packagelist_get(plist, i);
+      std::cout<< "baliky jsou na: " << hy_package_get_url(test) << ":"<< hy_package_get_location(test)<< std::endl;
+    
+      
+    }
     
     HyPackage pkg;
     pkg = hy_packagelist_get(plist, 0);
@@ -83,7 +89,45 @@ namespace ssds_solving {
     if(hy_goal_run(goal)==0)
       std::cout << "Dependencies solving true = dependence v poradku" << std::endl;
     
-    std::string answer = hy_package_get_name(pkg) + (std::string)"-" + hy_package_get_version(pkg) + (std::string)"-" + hy_package_get_release(pkg) + (std::string)"-" + hy_package_get_arch(pkg);
+    
+    std::string answer="";
+    HyPackageList goal_pkgs = hy_packagelist_create();
+    
+    goal_pkgs = hy_goal_list_installs(goal);
+    answer+="Packages needed to be installed:\n";
+    for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
+    {
+      pkg=hy_packagelist_get(goal_pkgs, i);
+      answer+=(std::string)"\t"+hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+ (std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg)+(std::string)";\n";
+    }
+    
+    goal_pkgs = hy_goal_list_erasures(goal);
+    answer+="\nPackages needed to be erased:\n";
+    if(hy_packagelist_count(goal_pkgs)==0)
+      answer+="\tnone\n";
+    else
+    {
+      for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
+      {
+        pkg=hy_packagelist_get(goal_pkgs, i);
+        answer+=(std::string)"\t"+hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+ (std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg)+(std::string)";\n";
+      }
+    }
+    
+    goal_pkgs = hy_goal_list_upgrades(goal);
+    answer+="\nPackages needed to be upgraded:\n";
+    if(hy_packagelist_count(goal_pkgs)==0)
+      answer+="\tnone\n";
+    else
+    {
+      for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
+      {
+        pkg=hy_packagelist_get(goal_pkgs, i);
+        answer+=(std::string)"\t"+hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+ (std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg)+(std::string)";\n";
+      }
+    }
+    
+    //answer = hy_package_get_name(pkg) + (std::string)"-" + hy_package_get_version(pkg) + (std::string)"-" + hy_package_get_release(pkg) + (std::string)"-" + hy_package_get_arch(pkg);
     return answer;
   }
   

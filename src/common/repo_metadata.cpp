@@ -52,6 +52,7 @@ namespace ssds_repo {
     lr_handle_setopt(h, NULL, type, url_char);//"https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64");
     lr_handle_setopt(h, NULL, LRO_REPOTYPE, LR_YUMREPO);
     lr_handle_setopt(h, NULL, LRO_YUMDLIST, download_list);
+    lr_handle_setopt(h, NULL, LRO_CONNECTTIMEOUT, 10);
     
     gboolean ret = lr_handle_perform(h, r, &tmp_err); 	
     
