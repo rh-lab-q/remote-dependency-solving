@@ -1,74 +1,129 @@
 This file describes simple structure of network protocol used by SSDS. 
 Right now there are only few tags but in time we will add more tags to support additional functionality.
 
-The protocol between client and server has following simple XML structure:
+The protocol between client and server has following simple JSON structure:
 
-<?xml version="1.0" encoding="utf-8"?>
-<ssds>
-  <code> <!--Code of the message identifying type of message-->
-    0-299 <!--codes will be explained in detail later-->
-  </code>
-  
-  <data>
-    <!--The tags that are present here depend on code above-->
-  </data>
-</ssds>
+{
+  "code" : Number, //Code of the message identifying type of message - codes are explained later
+  "data" : {} //The tags that are present here depend on code above
+}
 
 
-<!--=========================================================================-->
+================================================================================================
 
-possible child tags of <data> sent from client side:
-
+"data" object desribed here:
   packages requested by client to be installed, upgraded etc.:
-    <req_pkgs>
-      <pkg></pkg>
-      .
-      .
-    <req_pkgs>
+    "req_pkgs" : [ "package-1", "package-2", ... "package-n"],
     
   whether client wants to install, update, upgrade etc.:
-    <req_operation>
-    </req_operation>
+    "req_operation" : ["command-1", "command-2", ... "command-n"],
 
   known repos on client side:
-  <repolist>
-    <repo name="REPO_NAME"></repo>
-    .
-    .
-  </repolist>
+    "repolist" : 
+    [
+      {
+    	"name" : String, //name of the repo - maybe this is not important
+        "repo_url" : [String, String ...], //there can be more than one url to try for a repo
+        "type" : Number //1-baseurl, 2-mirrorlist, 3-metalink
+      },
+      {}...
+    ]
   
   values from dnf.conf from client to be considered on server side when dealing with dependencies
-    <dnf_conf>
-    </dnf_conf>
+    "dnf_conf" : 
+    {
+      option-name : String,
+      ...
+      option-name : String
+    }
     
   installed packages on client side - two options here:
     -send @System.solv as a seperate file
-    -send @System.solv inside xml
+    -send @System.solv inside json
     
+Example:
+{
+  "code" : 1,
+  "data" :
+  {
+    "req_pkgs" : ["abakus", "emacs"],
+    "req_operation" : ["install"],
+    "repolist" :
+    [
+      {
+        "repo_url" : ["https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&arch=$basearch"],
+        "name" : "Fedora",
+        "type" : 3
+      },
+      {}
+    ],
+    "dnf_conf" :
+    {}
+  }
+}
     
-  <!--======================================================================-->
+================================================================================================
   
-  possible child tags of <data> sent from server side:
+  possible child tags of "data" sent from server side:
   
     result of dependency solving - packages to install:
-      <install_pkgs>
-        <pkg></pkg>
-        .
-        .
-      </install_pkgs>
+      "install_pkgs" :
+      [
+      	{
+      	  "name" : String //name of package requested by client
+          "install" : [pkg1, pkg2, pkg3 ... ]
+          "erase" : [pkg1, pkg2, pkg3 ...]
+          "update" : [pkg1, pkg2, pkg3 ...]
+      	},
+      	{}...
+      ]
     
     
-  <!--======================================================================-->
+Example coresponding to client example above:
+{
+  "code" : 1,
+  "data" :
+  {
+    "install_pkgs":
+    [
+      {
+        "name" : "emacs",
+        "install" : 
+        [
+          "why-xemacs-2.34-13.fc21-noarch",
+	  "why-2.34-13.fc21-x86_64",
+	  "xemacs-21.5.34-8.20140605hgacf1c26e3019.fc21-x86_64",
+	  "Canna-libs-3.7p3-44.fc21-x86_64",
+	  "compface-1.5.2-18.fc21-x86_64",
+	  "neXtaw-0.15.1-22.fc21-x86_64",
+	  "xemacs-common-21.5.34-8.20140605hgacf1c26e3019.fc21-x86_64",
+	  "xemacs-packages-base-20140715-1.fc21-noarch",
+	  "xorg-x11-fonts-ISO8859-1-100dpi-7.5-14.fc21-noarch",
+	  "xorg-x11-fonts-ISO8859-1-75dpi-7.5-14.fc21-noarch"
+	],
+	"erase" : [],
+	"upgrade" : []
+      },
+      {
+        "name" : "abakus",
+        "install" : ["abakus-0.92-4.fc21-x86_64"],
+        "erase" : [],
+        "upgrade" : []
+      }
+    ]
+  }
+}
+================================================================================================
   
   possible error messages from client side:
   
   
   
-  <!--======================================================================-->
+================================================================================================
   
   possible error messages from server side:
 
-  <!--======================================================================-->
+================================================================================================
 
 	<!--Possible error codes-->
 
