@@ -63,6 +63,7 @@ PROJECT(ssds-server)
 set(SERVSRC "../src/server/server_main.cpp")
 add_executable(ssds-server ${SERVSRC}
 		../src/common/logger.cpp
+		../src/common/json_read.cpp
 		../src/common/xml_debug.cpp
 		../src/common/read_xml.cpp
 		../src/common/create_xml.cpp
@@ -83,6 +84,7 @@ set(CLISRC "../src/client/client_main.cpp")
 #add_library("../src/client/client.cpp")
 add_executable(ssds-client ${CLISRC}
 		../src/common/logger.cpp
+		../src/common/json_read.cpp
 		../src/common/repo_handler.cpp
 		../src/common/repo_metadata.cpp
 		../src/common/xml_debug.cpp
