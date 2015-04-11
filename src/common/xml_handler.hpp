@@ -47,12 +47,10 @@ namespace ssds_xml{
    void free_resources();
    void flush_url_vector(std::vector<xml_node*>* urls);
    
-   
    xmlDocPtr document;
    xmlNodePtr currNodePtr;
    xmlNodePtr rootNodePtr;
    xmlNodePtr dataNodePtr;
-
  };
  
   /*
