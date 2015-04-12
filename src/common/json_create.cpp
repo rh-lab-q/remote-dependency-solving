@@ -100,4 +100,14 @@ namespace ssds_json
     data = json_generator_to_data (this->generator, NULL);
     std::cout << (char*)data << std::endl;
   }
+  
+  char* json_create::json_to_string()
+  {
+    gsize len;
+    char* data;
+    data = (char*)json_generator_to_data (this->generator, &len);
+//     printf("from json_to_string: %s\n", data);
+//     buffer=(char*)malloc(len*sizeof(char));
+    return data;
+  }
 }

@@ -13,6 +13,7 @@
 
 //SSDS
 #include "xml_handler.hpp"
+#include "json_handler.hpp"
 //#include "solving.hpp"
 
 //SOLVING
@@ -35,7 +36,7 @@ namespace ssds_repo{
   public:
     parse_repo();
     void parse_default_repo();
-    void get_repo_url(ssds_xml::create_xml& xml);
+    void get_repo_url(ssds_json::json_create &json);
     void free_resources();
     
   public:

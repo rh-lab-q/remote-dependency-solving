@@ -1,6 +1,12 @@
 #ifndef _CLIENT_HPP
 #define _CLIENT_HPP
 
+#include <iostream>
+#include <string>
+#include <exception>
+#include <fstream>
+#include <vector>
+
 //BOOST - needs to be compiled with -lboost_system option
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
@@ -18,6 +24,9 @@
 #include "../common/solving.hpp"
 #include "../common/xml_handler.hpp"
 #include "../common/params.hpp"
+
+//GLIB-JSON
+#include "../common/json_handler.hpp"
 
 /*
 std::string usage = "Usage: ./ssds-client <command> [<args> ...]\n\n"

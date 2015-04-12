@@ -47,15 +47,8 @@ namespace ssds_repo{
   /*
   * Parses .repo files, creates nodes in xml representing repo name and url (baseurl | metalink | mirrorlist)
   */
-  void parse_repo::get_repo_url(ssds_xml::create_xml& xml)
+  void parse_repo::get_repo_url(ssds_json::json_create &json)
   {
-    //object representing xml that will be sent to the server
-    if(xml.find_node_by_path((xmlChar* )"//data/repolist") == nullptr){		//items will be added into this node
-      xml.add_child(xml.dataNodePtr, (xmlChar*) "repolist", (xmlChar*) "");	//if it is not there I create it
-      xml.currNodePtr = xml.addedNodePtr;//addedNodePtr might be needed later co I use currNodePtr instead
-    }
-    
-    
     GError * err = nullptr;
     GSList * list = lr_yum_repoconfs_get_list(repoHandler, &err);
     
@@ -100,20 +93,12 @@ namespace ssds_repo{
 	list = lr_urlvars_set(list, "basearch", "x86_64");
 	char *url_subst = lr_url_substitute(url.c_str(), list);
 	
-	xmlChar* doc_str = xmlEncodeEntitiesReentrant(xml.document, (xmlChar*) url_subst);
-	
-	
-	xml.add_child(xml.currNodePtr, (xmlChar*) "repo", doc_str);
-	xmlFree(doc_str);
-
-	xml.add_attr((xmlChar*) "name", (xmlChar*) name.c_str());
-	
 	switch(type){
-	  case ssds_xml::url_type::SSDS_BASEURL: xml.add_attr((xmlChar *) "url_type", (xmlChar*) "1"); 
+	  case ssds_xml::url_type::SSDS_BASEURL: json.add_repo((char*)url.c_str(), (char*)name.c_str(), 1);
 						 break;
-	  case ssds_xml::url_type::SSDS_MIRRORLIST: xml.add_attr((xmlChar *) "url_type", (xmlChar*) "2");
+	  case ssds_xml::url_type::SSDS_MIRRORLIST: json.add_repo((char*)url.c_str(), (char*)name.c_str(), 2);
 						    break;
-	  case ssds_xml::url_type::SSDS_METALINK: xml.add_attr((xmlChar *) "url_type", (xmlChar*) "3");
+	  case ssds_xml::url_type::SSDS_METALINK: json.add_repo((char*)url.c_str(), (char*)name.c_str(), 3);
 						  break;
 	}
       }

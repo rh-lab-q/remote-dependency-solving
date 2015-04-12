@@ -17,6 +17,8 @@
 #include <glib-2.0/glib.h>
 #include <glib-2.0/gobject/gobject.h>
 
+#include "repo_handler.hpp"
+
 namespace ssds_json{
  class json_debug{
  public:
@@ -66,6 +68,7 @@ namespace ssds_json{
    void insert_code(int code);
    void add_package(char* package);
    void add_repo(char* url, char* name, int type);
+   char* json_to_string();
    void json_dump();
    
  private:

@@ -28,6 +28,7 @@
 #include "../common/solving.hpp"
 #include "../common/repo_handler.hpp"
 #include "../common/xml_handler.hpp"
+#include "../common/json_handler.hpp"
 
 
 namespace ssds_server {

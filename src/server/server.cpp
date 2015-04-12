@@ -38,35 +38,40 @@ namespace ssds_server {
   {
     ssds_solving::solve solvePoint;
     ssds_xml::read_xml xml;
+    ssds_json::json_read json_parser;
     ssds_repo::repo_metadata metadata;
     ssds_xml::xml_debug debug;
     
     boost::system::error_code ec;
     int64_t size;
 
+    
     //recieving data
     boost::asio::read(sock,boost::asio::buffer(&size,sizeof(size)));
     std::vector<char> buf(size);
     size_t len = sock.read_some(buffer(buf), ec);
     std::string input_message = std::string(buf.begin(), buf.end());
     
-    xml.parse_xml_string(input_message);
-//     debug.flush_xml(xml.rootNodePtr, 0);
-    std::cout << std::endl;
+    json_parser.parse_data((char*)input_message.c_str());
+    struct ssds_json::json_read::pkgInfo* pkgs = json_parser.pkg_info_init();
+    json_parser.get_packages(pkgs);
+    json_parser.get_repo_info();
+    
     /*
      * Here I would put something that will decide what to do according to the code from the client
      */
     
     
     
-    xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
+//     xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
     
-    metadata.locate_repo_metadata_by_url();
+//     metadata.locate_repo_metadata_by_url();
     
-    std::cout<< "Message has " << len << " characters." << std::endl;
-    solvePoint.fill_sack(metadata);
+//     std::cout<< "Message has " << len << " characters." << std::endl;
+//     solvePoint.fill_sack(metadata);
     
-    std::string message = solvePoint.answer(xml);
+//     std::string message = solvePoint.answer(xml);
+    std::string message="some random message";
     write(sock, buffer(message), ec);
   }//process_connection
 
