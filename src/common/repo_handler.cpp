@@ -1,28 +1,7 @@
 #include "xml_handler.hpp"
 #include "repo_handler.hpp"
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <string.h>
-#include <libxml2/libxml/parser.h>
-#include <libxml2/libxml/xmlmemory.h>
-#include <libxml2/libxml/xpath.h>
-#include <libxml2/libxml/xmlwriter.h>
-#include <boost/program_options.hpp>
 
-#include <glib-2.0/glib/gerror.h>
-#include <glib-2.0/glib/gslist.h>
-
-
-//LIBREPO
-#include <librepo/repoconf.h>
-#include <librepo/url_substitution.h>
-/*
- 
+/* 
  * 
  * 
  * 
@@ -94,11 +73,11 @@ namespace ssds_repo{
 	char *url_subst = lr_url_substitute(url.c_str(), list);
 	
 	switch(type){
-	  case ssds_xml::url_type::SSDS_BASEURL: json.add_repo((char*)url.c_str(), (char*)name.c_str(), 1);
+	  case ssds_xml::url_type::SSDS_BASEURL: json.add_repo((char*)url_subst, (char*)name.c_str(), 1);
 						 break;
-	  case ssds_xml::url_type::SSDS_MIRRORLIST: json.add_repo((char*)url.c_str(), (char*)name.c_str(), 2);
+	  case ssds_xml::url_type::SSDS_MIRRORLIST: json.add_repo((char*)url_subst, (char*)name.c_str(), 2);
 						    break;
-	  case ssds_xml::url_type::SSDS_METALINK: json.add_repo((char*)url.c_str(), (char*)name.c_str(), 3);
+	  case ssds_xml::url_type::SSDS_METALINK: json.add_repo((char*)url_subst, (char*)name.c_str(), 3);
 						  break;
 	}
       }

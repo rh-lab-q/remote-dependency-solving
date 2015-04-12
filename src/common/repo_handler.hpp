@@ -49,13 +49,15 @@ namespace ssds_repo{
   class repo_metadata{
   public:
     repo_metadata();
-    int locate_repo_metadata_by_url();
+//     void transfer_repo_info(ssds_json::json_read &json);
+    int locate_repo_metadata_by_url(ssds_json::json_read &json);
     
-    std::vector<ssds_xml::xml_node*> urls;
+    //std::vector<ssds_xml::xml_node*> urls;
     std::vector<metadata_files_location*> files_locations;
+    GSList* urls;
     
   private:
-    void download_repo_metadata_by_url(ssds_xml::xml_node &repo_node);
+    void download_repo_metadata_by_url(ssds_json::json_read::repoInfo* repo_info);
   };
 }
 

@@ -57,21 +57,24 @@ namespace ssds_server {
     json_parser.get_packages(pkgs);
     json_parser.get_repo_info();
     
+    int list_len = (int)g_slist_length(json_parser.repoInfoList);
+    for(int i=0; i<list_len; i++)
+    {
+      ssds_json::json_read::repoInfo* repo_info = (ssds_json::json_read::repoInfo*)g_slist_nth_data(json_parser.repoInfoList, i);
+      std::cout << repo_info->name << std::endl;
+      
+    }
+    
     /*
      * Here I would put something that will decide what to do according to the code from the client
      */
+    metadata.locate_repo_metadata_by_url(json_parser);
     
+    std::cout<< "Message has " << len << " characters." << std::endl;
+    solvePoint.fill_sack(metadata);
     
-    
-//     xml.get_node_by_path((xmlChar* )"//data/repolist/repo", metadata.urls);
-    
-//     metadata.locate_repo_metadata_by_url();
-    
-//     std::cout<< "Message has " << len << " characters." << std::endl;
-//     solvePoint.fill_sack(metadata);
-    
-//     std::string message = solvePoint.answer(xml);
-    std::string message="some random message";
+    std::string message = solvePoint.answer(json_parser);
+//     std::string message="some random message";
     write(sock, buffer(message), ec);
   }//process_connection
 

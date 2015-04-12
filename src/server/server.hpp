@@ -23,6 +23,9 @@
 #include <thread>
 #include <utility>//for std::move()
 
+//GLIB
+#include <glib.h>
+
 //SSDS
 #include "../common/logger.hpp"
 #include "../common/solving.hpp"
