@@ -23,11 +23,15 @@
 #include <thread>
 #include <utility>//for std::move()
 
+//GLIB
+#include <glib.h>
+
 //SSDS
 #include "../common/logger.hpp"
 #include "../common/solving.hpp"
 #include "../common/repo_handler.hpp"
 #include "../common/xml_handler.hpp"
+#include "../common/json_handler.hpp"
 
 
 namespace ssds_server {

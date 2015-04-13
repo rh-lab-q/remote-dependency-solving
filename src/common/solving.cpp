@@ -211,15 +211,16 @@ namespace ssds_solving {
   }
 
   // result of SSDS
-  std::string solve::answer(ssds_xml::read_xml &client_data){
+  std::string solve::answer(ssds_json::json_read &client_data){
     std::string ret_msg = "";
-    std::vector<ssds_xml::xml_node*> requested_pkgs;
-    
-    client_data.get_node_by_path((xmlChar* )"//data/req_pkgs/pkg", requested_pkgs);
-    
-    for(ssds_xml::xml_node* pkg : requested_pkgs)
+    std::cout << "answer" << std::endl;
+    ssds_json::json_read::pkgInfo* pkgs = client_data.pkg_info_init();;
+    client_data.get_packages(pkgs);
+    std::cout << "answer za get_packages" << std::endl;
+    for(int i=0; i<pkgs->length; i++)
     {
-      ret_msg += query(pkg->value.c_str());
+      std::cout << "answer for" << std::endl;
+      ret_msg += query(pkgs->packages[i]);
       ret_msg += "\n";
     }
     

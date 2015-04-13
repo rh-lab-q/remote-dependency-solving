@@ -1,9 +1,5 @@
 #include "client.hpp"
-#include <iostream>
-#include <string>
-#include <exception>
-#include <fstream>
-#include <vector>
+
 
 //for debugging
 //#define DEBUG
@@ -23,28 +19,21 @@ int main(int argc, const char* argv[]){
   ssds_xml::xml_debug debug; //for xml flushing
   ssds_repo::parse_repo repo; //for parsing .repo files
   ssds_xml::create_xml xml; //for creating xml
+  ssds_json::json_create json_gen;
 	
 #ifndef DEBUG
-  xml.add_code((xmlChar* )"001");
-  
+  json_gen.insert_code(1);
   repo.parse_default_repo();
-  repo.get_repo_url(xml);//get all client repo url
-  
-  xml.add_child(xml.dataNodePtr, (xmlChar* ) "req_pkgs", (xmlChar* ) "");
-  xml.currNodePtr = xml.addedNodePtr;//addedNodePtr may change in the iteration so I use currNodePtr instead 
   
   for(std::vector<std::string>::iterator it = parameters.packages.begin(); it != parameters.packages.end(); it++){
-    xml.add_child(xml.currNodePtr, (xmlChar*) "pkg", (xmlChar*) (*it).c_str());
+    json_gen.add_package((char*)(*it).c_str());
   }
   
-  xml.doc_to_str();
-  xml.str_output += "\n";
-  
-  //debug.flush_xml(xml.rootNodePtr, 0);
-  if(!debug.validate_xml(xml.document)){
-    std::cout << "wrong xml" << std::endl;
-    return 1;
-  }
+  repo.get_repo_url(json_gen);
+  char* output;
+  output = json_gen.json_to_string();
+//   std::cout << "output: " << output <<"\n\n" << std::endl;
+//   json_gen.json_dump();
   
   /**************************************************************/
   /* Networking part - sending data to server and recieving*/
@@ -74,21 +63,18 @@ int main(int argc, const char* argv[]){
   boost::array<char, 128> buf;
   boost::system::error_code error;
 
-  std::string msg = "pokus z klienta\n";
-  std::string xml_output = xml.str_output;
-
-  //findout length of xml string		
-  int64_t size = xml_output.size();
+  //findout length of xml string
+  std::string string_output = output;
+  int64_t size = string_output.size();
   
   //write information about data length	
-  write(my_socket, boost::asio::buffer(&size, sizeof(size)));
+  write(my_socket, boost::asio::buffer(&string_output, sizeof(size)));
 
   //write data
-  write(my_socket, boost::asio::buffer(xml_output));
+  write(my_socket, boost::asio::buffer(string_output));
 
   //read the answer from server
   for (;;) {	
-
     size_t len = my_socket.read_some(buffer(buf), error);
     std::cout.write(buf.data(), len);
 
@@ -96,7 +82,6 @@ int main(int argc, const char* argv[]){
               break;
     else if (error)
               throw boost::system::system_error(error);
-            
   }
 
   //my_log.add_log(logINFO) << "message from client" << std::endl;
