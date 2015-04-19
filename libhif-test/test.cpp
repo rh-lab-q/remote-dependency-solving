@@ -2,7 +2,7 @@
 //#include <hawkey/types.h>
 //#include <libhif/libhif.h>
 //#include <libhif/hif-package.h>
-int main(){
+int main(int argc, char* argv[]){
 
 //	HifState state;
 //	HyPackage pkg;

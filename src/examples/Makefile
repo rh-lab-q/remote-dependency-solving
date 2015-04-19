@@ -2,7 +2,7 @@
 # Michal Ruprich, xrupri00, RedHat, SSDS - hawkey example
 
 PP=g++
-CPPFLAGS= -std=c++11 -pedantic
+CPPFLAGS= -std=c++11 -pedantic -Wextra -Wall -O2
 INCLUDE=-I/usr/include/json-glib-1.0/json-glib/ -I/usr/include/json-glib-1.0/ -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
 LINK=-ljson-glib-1.0 -lglib-2.0 -lgobject-2.0
 

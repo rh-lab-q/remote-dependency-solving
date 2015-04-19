@@ -110,4 +110,18 @@ namespace ssds_json
 //     buffer=(char*)malloc(len*sizeof(char));
     return data;
   }
+  
+  void json_create::install_pkgs_init()
+  {
+    if(!json_object_has_member(this->dataObj,(const gchar*)"install_pkgs"))
+    {
+      JsonNode* new_node = json_node_new(JSON_NODE_ARRAY);
+      json_object_set_member(this->dataObj, (gchar*)"install_pkgs", new_node);
+      this->currNode = new_node;
+      
+      JsonArray* new_array = json_array_new();
+      json_node_take_array(new_node, new_array);
+      this->currArray = new_array;
+    }
+  }
 }
