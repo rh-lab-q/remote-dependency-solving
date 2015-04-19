@@ -23,11 +23,17 @@ namespace ssds_json
     json_node_take_object(add, this->dataObj);
   }
   
+  /* Inserts given code in the json structure
+   * @param code    message code for the server
+   */
   void json_create::insert_code(int code)
   {
     json_node_set_int(this->codeNode, (gint64)code);
   }
   
+  /* Adds a package as a string in the json structure
+   * @param package name of the package as a string
+   */
   void json_create::add_package(char* package)
   {
     if(!json_object_has_member(this->dataObj,(const gchar*)"req_pkgs"))
@@ -50,7 +56,14 @@ namespace ssds_json
     json_array_add_element(this->currArray, pkg);
   }
   
-  void json_create::add_repo(char* url, char* name, int type)
+  
+  /* Adds repo structure in the json
+   * @param url               possible urls of repo, multiple urls are typical for baseurl - type 1
+   * @param name              name of parsed repo 
+   * @param type              type of repo - baseurl, mirrorlist or metalink
+   * @param url_count         number of urls in url
+   */  
+  void json_create::add_repo(char** url, char* name, int type, int url_count)
   {
     if(!json_object_has_member(this->dataObj,(const gchar*)"repolist"))
     {
@@ -81,7 +94,13 @@ namespace ssds_json
     json_node_take_array(new_inside, new_array);
     this->currArray = new_array;
     
-    json_array_add_string_element(this->currArray, (gchar*)url);
+    if(type==1)
+    {
+      for(int i=0; i<url_count; i++)
+        json_array_add_string_element(this->currArray, (gchar*)url[i]);
+    }
+    else
+      json_array_add_string_element(this->currArray, (gchar*)url[0]);
     
     JsonNode* repo_name=json_node_new(JSON_NODE_VALUE);
     json_node_set_string(repo_name, (gchar*)name);
@@ -92,6 +111,9 @@ namespace ssds_json
     json_object_set_member(this->currObj, (gchar*)"type", repo_type);
   }
   
+  /* Dumps json as a string to output for debugging
+   * 
+   */
   void json_create::json_dump()//this will always dump error when some array or object is empty - just ignore it
   {
     gchar *data;
@@ -101,6 +123,9 @@ namespace ssds_json
     std::cout << (char*)data << std::endl;
   }
   
+  /* Converts json structure to string for sending json over the network
+   * @return json structure as a string
+   */
   char* json_create::json_to_string()
   {
     gsize len;
@@ -111,6 +136,9 @@ namespace ssds_json
     return data;
   }
   
+  /* Creates a inner structure in json for answer from the server
+   * 
+   */
   void json_create::install_pkgs_init()
   {
     if(!json_object_has_member(this->dataObj,(const gchar*)"install_pkgs"))

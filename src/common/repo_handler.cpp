@@ -32,8 +32,8 @@ namespace ssds_repo{
     GSList * list = lr_yum_repoconfs_get_list(repoHandler, &err);
     
     for(unsigned int i=0; i<g_slist_length(list); i++){
-      std::string url;
-      std::string name;
+      char** url;
+      char* name;
       short type = 0;
       void * val;
       
@@ -49,20 +49,20 @@ namespace ssds_repo{
 	
 	err = nullptr;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_MIRRORLIST, &val) != false){
-	  url = (char*)val;
+	  url[0] = (char*)val;
 	  type = ssds_xml::url_type::SSDS_MIRRORLIST;
 	}
 	
 	err = nullptr;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_METALINK, &val) != false){
-	  url = (char*)val;
+	  url[0] = (char*)val;
 	  type = ssds_xml::url_type::SSDS_METALINK;
 	}
 	
 	err = nullptr;
 	//void ** val2;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
-	  url = ((char**)val)[0];
+	  url = (char**)val;
 	  type = ssds_xml::url_type::SSDS_BASEURL;
 	}
 	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
@@ -70,16 +70,40 @@ namespace ssds_repo{
 	
 	LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", "21"); //"3.18.6-200.fc21"
 	list = lr_urlvars_set(list, "basearch", "x86_64");
-	char *url_subst = lr_url_substitute(url.c_str(), list);
-	
+          
+	int k=0;
+          while(url[k]!=nullptr)
+            k++;
+          
+          char **url_subst_list=(char**)malloc(k*sizeof(char*));
+          char* url_copy;
+          char* url_subst;
+          for(int j=0; j<k; j++)
+          { 
+            url_copy = strdup(url[j]);
+            url_subst = lr_url_substitute(url_copy, list);
+            url_subst_list[j]=strdup(url_subst);
+            free(url_copy);
+            free(url_subst);
+          }
+          
 	switch(type){
-	  case ssds_xml::url_type::SSDS_BASEURL: json.add_repo((char*)url_subst, (char*)name.c_str(), 1);
-						 break;
-	  case ssds_xml::url_type::SSDS_MIRRORLIST: json.add_repo((char*)url_subst, (char*)name.c_str(), 2);
-						    break;
-	  case ssds_xml::url_type::SSDS_METALINK: json.add_repo((char*)url_subst, (char*)name.c_str(), 3);
-						  break;
+	  case ssds_xml::url_type::SSDS_BASEURL: 
+              json.add_repo(url_subst_list, name, 1, k);
+              break;
+	  case ssds_xml::url_type::SSDS_MIRRORLIST: 
+              json.add_repo(url_subst_list, name, 2,1);
+              break;
+	  case ssds_xml::url_type::SSDS_METALINK: 
+              json.add_repo(url_subst_list, name, 3,1);
+              break;
 	}
+	
+          for(int j=0; j<k; j++)
+            free(url_subst_list[j]);
+          
+          free(url_subst_list);
+        
       }
     }
   }

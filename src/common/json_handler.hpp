@@ -67,7 +67,7 @@ namespace ssds_json{
    json_create();
    void insert_code(int code);
    void add_package(char* package);
-   void add_repo(char* url, char* name, int type);
+   void add_repo(char** url, char* name, int type, int url_count);
    void install_pkgs_init();
    char* json_to_string();
    void json_dump();

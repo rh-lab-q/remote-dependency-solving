@@ -33,7 +33,7 @@ int main(int argc, const char* argv[]){
   char* output;
   output = json_gen.json_to_string();
 //   std::cout << "output: " << output <<"\n\n" << std::endl;
-//   json_gen.json_dump();
+  json_gen.json_dump();
   
   /**************************************************************/
   /* Networking part - sending data to server and recieving*/
