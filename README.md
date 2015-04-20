@@ -18,9 +18,8 @@ boost
 libsolv
 librepo-devel
 hawkey-devel
-libxml2-devel
-xml2
 glib2.0-devel
+json-glib-1.0
 
 Installation
 ============
