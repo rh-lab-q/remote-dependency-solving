@@ -29,8 +29,14 @@
 // #include "repo_handler.hpp"
 
 namespace ssds_json{
- class json_read{
- public:
+  enum url_type :short{
+    SSDS_BASEURL = 1,
+    SSDS_MIRRORLIST,
+    SSDS_METALINK
+  }; 
+  
+  class json_read{
+  public:
    struct pkgInfo{
      char** packages;
      int length;

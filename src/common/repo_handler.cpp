@@ -1,4 +1,3 @@
-#include "xml_handler.hpp"
 #include "repo_handler.hpp"
 
 /* 
@@ -50,20 +49,20 @@ namespace ssds_repo{
 	err = nullptr;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_MIRRORLIST, &val) != false){
 	  url[0] = (char*)val;
-	  type = ssds_xml::url_type::SSDS_MIRRORLIST;
+	  type = ssds_json::url_type::SSDS_MIRRORLIST;
 	}
 	
 	err = nullptr;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_METALINK, &val) != false){
 	  url[0] = (char*)val;
-	  type = ssds_xml::url_type::SSDS_METALINK;
+	  type = ssds_json::url_type::SSDS_METALINK;
 	}
 	
 	err = nullptr;
 	//void ** val2;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
 	  url = (char**)val;
-	  type = ssds_xml::url_type::SSDS_BASEURL;
+	  type = ssds_json::url_type::SSDS_BASEURL;
 	}
 	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
 	
