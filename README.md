@@ -3,23 +3,21 @@ server-side-dependency-solving - SSDS
 
 Description
 ===========
-Solving dependencies when installing new packages is a process that in some cases can be computationally very intensive. SSDS is designed to overcome this issue. Client device gathers information about installed packages and enabled repos which are then sent to a server. The server then takes care of dependency solving and the result is sent back to client device as a list of packages that are needed to proceed with the install process.
-
-Right now SSDS is a separated program but in the future it might become plugin for dnf.
+Solving dependencies when installing new packages is a process that in some cases can be computationally very intensive. SSDS is designed to overcome this issue. Client device gathers information about installed packages and enabled repos which are then sent to a server. The server then takes care of dependency solving and the result is sent back to client device as a list of packages that are needed to proceed with the install process and without dependency solving on client.
 
 Dependencies
 ============
 Required package which are needed for successfull compilation and build.
 
-git
-gcc-c++
-cmake
-boost
-libsolv
-librepo-devel
-hawkey-devel
-glib2.0-devel
-json-glib-1.0
+- git
+- gcc-c++
+- cmake
+- boost
+- libsolv
+- librepo-devel
+- hawkey-devel
+- glib2.0-devel
+- json-glib-1.0
 
 Installation
 ============
