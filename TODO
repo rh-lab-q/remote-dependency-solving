@@ -1,3 +1,3 @@
 Napsat mail klukum z hawkey - zeptat se, zda je mozny bez instalace updatovat .solv soubor na strane serveru na zaklade informace, ktery balik se nainstaloval na klientovi
 
-
+Vyhnout se dobudoucna nacitani sack na klientovi, melo by to jit obejit tim, ze se pouzije librepo downloader a pak rpm na konkretni stazenej balik
