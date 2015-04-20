@@ -1,5 +1,7 @@
-#include <iostream>
-#include <string>
+//#include <iostream>
+//#include <string>
+#include <stdio.h>
+#include <string.h>
 #include <hawkey/types.h>
 #include <hawkey/sack.h>
 #include <hawkey/packagelist.h>
@@ -8,11 +10,12 @@
 #include <hawkey/package.h>
 #include <libhif/libhif.h>
 #include <libhif/hif-package.h>
+#include <libhif/hif-state.h>
 int main(){
 
 	HySack sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
 	if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0){
-		std::cout << "Nacteni rep je OK. Pocet rep: " << hy_sack_count(sack) << std::endl;
+		printf("Nacteni rep je OK. Pocet rep: %d\n",hy_sack_count(sack));
 	}
 	
 	/* Loading repo metadata into sack */
@@ -22,7 +25,7 @@ int main(){
         hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
      
         if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
-          std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
+          printf("load_yum_repo v cajku, kontrolni pocet: %d\n", hy_sack_count(sack));
 
 	HyQuery query = hy_query_create(sack);
 	const char * ask = "babl";	
@@ -32,35 +35,36 @@ int main(){
 	HyPackageList plist = hy_packagelist_create();
 	plist = hy_query_run(query);
 
-	std::cout<< "Pocet nalezenych baliku: " << hy_packagelist_count(plist) << std::endl;
+	printf("Pocet nalezenych baliku: %d\n", hy_packagelist_count(plist));
 	
 	HyPackage pkg;
 	for( int i=0; i<hy_packagelist_count(plist); i++){
 		pkg = hy_packagelist_get(plist,i);
-		std::string name = hy_package_get_name(pkg),
-			    arch = hy_package_get_arch(pkg);
-		if(name.compare("babl") == 0  && arch.compare("x86_64") == 0){
+		const char *name = hy_package_get_name(pkg),
+		     *arch = hy_package_get_arch(pkg);
+		if(strcmp(name,"babl") == 0  && strcmp(arch,"x86_64") == 0){
  
-		std::cout << name << "." << arch << std::endl;
+			printf("%s.%s\n", name,arch);
 		break;
 	}
 	}
 
 
-	std::cout << hy_package_get_name(pkg);
+	printf("%s\n",hy_package_get_name(pkg));
 
-	HifState state;
+	HifState *state;
+	state = hif_state_new();
 //		HyPackage pkg = ;
 //	const gchar *name = "testovaci nazev";
 //	hif_package_set_filename(pkg, name);
 	const gchar *directory = "/home/jozkar/Plocha/download/";
 	GError *error = NULL;	
 	
-	std::cout << "Testovaci priklad" << std::endl;
+	printf("Testovaci priklad\n");
 	 
-	//HifSource *src = hif_package_get_source(pkg);
-	gchar *ret = hif_package_download(pkg, directory, &state, &error);
+	HifSource *src = hif_package_get_source(pkg);
+	gchar *ret = hif_package_download(pkg, directory, state, &error);
 
-	std::cout << ret << std::endl;
+	//printf("%s\n",ret);
 	return 0;
 }
