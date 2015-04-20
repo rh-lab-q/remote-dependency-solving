@@ -16,9 +16,7 @@ int main(int argc, const char* argv[]){
   /*******************************************************************/
   /* Creating xml with all the info*/
   /*******************************************************************/
-  ssds_xml::xml_debug debug; //for xml flushing
   ssds_repo::parse_repo repo; //for parsing .repo files
-  ssds_xml::create_xml xml; //for creating xml
   ssds_json::json_create json_gen;
   ssds_json::json_read json_read;
 	
@@ -89,7 +87,6 @@ int main(int argc, const char* argv[]){
   //my_log.add_log(logINFO) << "message from client" << std::endl;
   //log.add_log("This message is sent to client logger");*/
 #endif	
-  xml.free_resources();
   repo.free_resources();
   
   return 0;

@@ -64,10 +64,7 @@ set(SERVSRC "../src/server/server_main.cpp")
 add_executable(ssds-server ${SERVSRC}
 		../src/common/logger.cpp
 		../src/common/json_read.cpp
-		../src/common/xml_debug.cpp
 		../src/common/json_create.cpp
-		../src/common/read_xml.cpp
-		../src/common/create_xml.cpp
 		../src/common/repo_metadata.cpp
 		../src/common/repo_handler.cpp
 		../src/common/solving.cpp
@@ -89,10 +86,7 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/json_create.cpp
 		../src/common/repo_handler.cpp
 		../src/common/repo_metadata.cpp
-		../src/common/xml_debug.cpp
-		../src/common/params.cpp
-		../src/common/create_xml.cpp
-		../src/common/read_xml.cpp)
+		../src/common/params.cpp)
 target_link_libraries(
 	ssds-client
 	${Boost_SYSTEM_LIBRARY}

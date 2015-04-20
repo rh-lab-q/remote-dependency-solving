@@ -12,17 +12,10 @@
 #include <boost/array.hpp>
 #include <boost/program_options.hpp>
 
-//LIBXML
-#include <libxml2/libxml/parser.h>
-#include <libxml2/libxml/xmlmemory.h>
-#include <libxml2/libxml/xpath.h>
-#include <libxml2/libxml/xmlwriter.h>
-
 //SSDS
 #include "../common/logger.hpp"
 #include "../common/repo_handler.hpp"
 #include "../common/solving.hpp"
-#include "../common/xml_handler.hpp"
 #include "../common/params.hpp"
 
 //GLIB-JSON

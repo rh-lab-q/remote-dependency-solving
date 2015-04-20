@@ -91,14 +91,7 @@ namespace ssds_solving {
     answer.install_pkgs_insert(&goal, request);
   }
   
-  
-  
-  // parsing message
-  bool solve::parseMessage(std::string message){
-	this->xml_document = xmlParseMemory(message.c_str(), message.size());
-	return true;
-  }
-
+#if 0
   // findout, what user has and what user wants
   void solve::getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos){
 
@@ -169,7 +162,7 @@ namespace ssds_solving {
     std::cout << "Control print (result of parsing)" << std::endl << str_output << std::endl;
         
   }
-
+#endif
   // result of SSDS
   void solve::answer(ssds_json::json_read &client_data, ssds_json::json_create &answer){
     std::cout << "answer" << std::endl;
