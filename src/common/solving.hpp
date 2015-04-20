@@ -4,6 +4,7 @@
 //SSDS
 #include "xml_handler.hpp"
 #include "repo_handler.hpp"
+#include "json_handler.hpp"
 
 //STANDARD
 #include <string>
@@ -45,10 +46,10 @@ namespace ssds_solving {
       solve(/* repos class instance with all enabled repos handlers */); 
       ~solve();
       void fill_sack(ssds_repo::repo_metadata &metadata);
-      std::string query(const char* request);
+      void query(const char* request, ssds_json::json_create &answer);
       bool parseMessage(std::string message);
       void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
-      std::string answer(ssds_json::json_read &client_data);
+      void answer(ssds_json::json_read &client_data, ssds_json::json_create &answer);
       
       //SOLVING
       HySack sack;

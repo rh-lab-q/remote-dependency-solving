@@ -9,6 +9,15 @@
 #include <vector>
 #include <string.h>
 
+//SOLVING
+#include <hawkey/types.h>
+#include <hawkey/sack.h>
+#include <hawkey/packagelist.h>
+#include <hawkey/query.h>
+#include <hawkey/goal.h>
+#include <hawkey/repo.h>
+#include <hawkey/package.h>
+
 //GLIB
 #include <glib-2.0/glib/gerror.h>
 #include <glib-2.0/glib/glist.h>
@@ -20,11 +29,6 @@
 // #include "repo_handler.hpp"
 
 namespace ssds_json{
- class json_debug{
- public:
-   json_debug();
- };
- 
  class json_read{
  public:
    struct pkgInfo{
@@ -33,7 +37,6 @@ namespace ssds_json{
    };
    
    struct repoInfo{
-//      char* url;
      char** urls; //array of char pointers in case url is baseurl - there can be more than one baseurl for one repo
      char* name;
      int count;//number of addresses in urls
@@ -69,6 +72,7 @@ namespace ssds_json{
    void add_package(char* package);
    void add_repo(char** url, char* name, int type, int url_count);
    void install_pkgs_init();
+   void install_pkgs_insert(HyGoal* goal, const char* name);
    char* json_to_string();
    void json_dump();
    

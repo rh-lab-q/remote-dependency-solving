@@ -75,7 +75,7 @@ namespace ssds_repo{
           while(url[k]!=nullptr)
             k++;
           
-          char **url_subst_list=(char**)malloc(k*sizeof(char*));
+          char **url_subst_list=(char**)malloc((k+1)*sizeof(char*));
           char* url_copy;
           char* url_subst;
           for(int j=0; j<k; j++)
@@ -86,24 +86,14 @@ namespace ssds_repo{
             free(url_copy);
             free(url_subst);
           }
-          
-	switch(type){
-	  case ssds_xml::url_type::SSDS_BASEURL: 
-              json.add_repo(url_subst_list, name, 1, k);
-              break;
-	  case ssds_xml::url_type::SSDS_MIRRORLIST: 
-              json.add_repo(url_subst_list, name, 2,1);
-              break;
-	  case ssds_xml::url_type::SSDS_METALINK: 
-              json.add_repo(url_subst_list, name, 3,1);
-              break;
-	}
+          url_subst_list[k]=nullptr;
 	
-          for(int j=0; j<k; j++)
+          json.add_repo(url_subst_list, name, type, k);
+	
+          for(int j=0; j<=k; j++)
             free(url_subst_list[j]);
           
           free(url_subst_list);
-        
       }
     }
   }

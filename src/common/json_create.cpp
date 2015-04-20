@@ -152,4 +152,74 @@ namespace ssds_json
       this->currArray = new_array;
     }
   }
+  
+  void json_create::install_pkgs_insert(HyGoal* goal, const char* name)
+  {
+//     std::cout << "install_pkgs_insert" << std::endl;
+    if(!json_object_has_member(this->dataObj,(const gchar*)"install_pkgs"))
+    {
+      this->install_pkgs_init();
+    }
+    else
+    {
+      this->currArray = json_object_get_array_member(this->dataObj, (const gchar*)"install_pkgs");
+    }
+    
+    JsonNode* new_node = json_node_new(JSON_NODE_OBJECT);
+    JsonObject* new_obj = json_object_new();
+    json_node_take_object(new_node, new_obj);
+    
+    json_array_add_object_element(this->currArray, new_obj);
+    this->currObj=new_obj;
+    
+    HyPackageList goal_pkgs = hy_packagelist_create();
+    HyPackage pkg;
+    
+    goal_pkgs = hy_goal_list_installs(*goal);
+    JsonNode* new_inside=json_node_new(JSON_NODE_ARRAY);
+    json_object_set_member(this->currObj, (gchar*)"name", new_inside);
+    JsonArray* new_arr = json_array_new();
+    json_node_take_array(new_inside, new_arr);
+    json_array_add_string_element(new_arr, name);
+    
+    goal_pkgs = hy_goal_list_installs(*goal);
+    new_inside=json_node_new(JSON_NODE_ARRAY);
+    json_object_set_member(this->currObj, (gchar*)"install", new_inside);
+    new_arr = json_array_new();
+    json_node_take_array(new_inside, new_arr);
+    
+    for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
+    {
+      pkg=hy_packagelist_get(goal_pkgs, i);
+      std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
+      json_array_add_string_element(new_arr, full_pkg.c_str());
+    }
+    
+    goal_pkgs = hy_goal_list_erasures(*goal);
+    new_inside=json_node_new(JSON_NODE_ARRAY);
+    json_object_set_member(this->currObj, (gchar*)"erase", new_inside);
+    new_arr = json_array_new();
+    json_node_take_array(new_inside, new_arr);
+    
+    for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
+    {
+      pkg=hy_packagelist_get(goal_pkgs, i);
+      std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
+      json_array_add_string_element(new_arr, full_pkg.c_str());
+    }
+    
+    goal_pkgs = hy_goal_list_upgrades(*goal);
+    new_inside=json_node_new(JSON_NODE_ARRAY);
+    json_object_set_member(this->currObj, (gchar*)"upgrade", new_inside);
+    new_arr = json_array_new();
+    json_node_take_array(new_inside, new_arr);
+    
+    for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
+    {
+      pkg=hy_packagelist_get(goal_pkgs, i);
+      std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
+      json_array_add_string_element(new_arr, full_pkg.c_str());
+    }
+    
+  }
 }

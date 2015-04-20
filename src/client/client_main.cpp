@@ -20,6 +20,7 @@ int main(int argc, const char* argv[]){
   ssds_repo::parse_repo repo; //for parsing .repo files
   ssds_xml::create_xml xml; //for creating xml
   ssds_json::json_create json_gen;
+  ssds_json::json_read json_read;
 	
 #ifndef DEBUG
   json_gen.insert_code(1);
@@ -76,6 +77,7 @@ int main(int argc, const char* argv[]){
   //read the answer from server
   for (;;) {	
     size_t len = my_socket.read_some(buffer(buf), error);
+    json_read.parse_data(buf.data());
     std::cout.write(buf.data(), len);
 
     if(error==error::eof)

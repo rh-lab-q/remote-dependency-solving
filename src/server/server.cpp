@@ -39,6 +39,7 @@ namespace ssds_server {
     ssds_solving::solve solvePoint;
     ssds_xml::read_xml xml;
     ssds_json::json_read json_parser;
+    ssds_json::json_create json_answer;
     ssds_repo::repo_metadata metadata;
     ssds_xml::xml_debug debug;
     
@@ -62,7 +63,6 @@ namespace ssds_server {
     {
       ssds_json::json_read::repoInfo* repo_info = (ssds_json::json_read::repoInfo*)g_slist_nth_data(json_parser.repoInfoList, i);
       std::cout << repo_info->name << std::endl;
-      
     }
     
     /*
@@ -73,8 +73,10 @@ namespace ssds_server {
     std::cout<< "Message has " << len << " characters." << std::endl;
     solvePoint.fill_sack(metadata);
     
-    std::string message = solvePoint.answer(json_parser);
-//     std::string message="some random message";
+    solvePoint.answer(json_parser, json_answer);
+    std::string message = json_answer.json_to_string();
+//     json_answer.json_dump();
+//     message="some random message";
     write(sock, buffer(message), ec);
   }//process_connection
 
