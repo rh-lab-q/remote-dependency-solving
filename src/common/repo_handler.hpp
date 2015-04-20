@@ -4,17 +4,16 @@
 #include <stdio.h>
 #include <string>
 #include <string.h>
-#include <librepo/repoconf.h>
-#include <librepo/librepo.h>
 #include <vector>
 #include <iostream>
-#include <glib-2.0/glib/gerror.h>
-#include <glib-2.0/glib/gslist.h>
+#include <glib.h>
+
+//LIBREPO
+#include <librepo/repoconf.h>
+#include <librepo/librepo.h>
 
 //SSDS
-#include "xml_handler.hpp"
 #include "json_handler.hpp"
-//#include "solving.hpp"
 
 //SOLVING
 #include <hawkey/types.h>

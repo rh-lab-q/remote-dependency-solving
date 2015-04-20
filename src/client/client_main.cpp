@@ -16,10 +16,9 @@ int main(int argc, const char* argv[]){
   /*******************************************************************/
   /* Creating xml with all the info*/
   /*******************************************************************/
-  ssds_xml::xml_debug debug; //for xml flushing
   ssds_repo::parse_repo repo; //for parsing .repo files
-  ssds_xml::create_xml xml; //for creating xml
   ssds_json::json_create json_gen;
+  ssds_json::json_read json_read;
 	
 #ifndef DEBUG
   json_gen.insert_code(1);
@@ -33,7 +32,7 @@ int main(int argc, const char* argv[]){
   char* output;
   output = json_gen.json_to_string();
 //   std::cout << "output: " << output <<"\n\n" << std::endl;
-//   json_gen.json_dump();
+  json_gen.json_dump();
   
   /**************************************************************/
   /* Networking part - sending data to server and recieving*/
@@ -76,6 +75,7 @@ int main(int argc, const char* argv[]){
   //read the answer from server
   for (;;) {	
     size_t len = my_socket.read_some(buffer(buf), error);
+    json_read.parse_data(buf.data());
     std::cout.write(buf.data(), len);
 
     if(error==error::eof)
@@ -87,7 +87,6 @@ int main(int argc, const char* argv[]){
   //my_log.add_log(logINFO) << "message from client" << std::endl;
   //log.add_log("This message is sent to client logger");*/
 #endif	
-  xml.free_resources();
   repo.free_resources();
   
   return 0;

@@ -59,7 +59,7 @@ namespace ssds_solving {
   }
 
   
-  std::string solve::query(const char* request){
+  void solve::query(const char* request, ssds_json::json_create &answer){
     /* QUERY */
     HyQuery query = hy_query_create(this->sack);
     hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request);
@@ -76,8 +76,6 @@ namespace ssds_solving {
     {
       test = hy_packagelist_get(plist, i);
       std::cout<< "baliky jsou na: " << hy_package_get_url(test) << ":"<< hy_package_get_location(test)<< std::endl;
-    
-      
     }
     
     HyPackage pkg;
@@ -89,56 +87,11 @@ namespace ssds_solving {
     if(hy_goal_run(goal)==0)
       std::cout << "Dependencies solving true = dependence v poradku" << std::endl;
     
-    
-    std::string answer="";
-    HyPackageList goal_pkgs = hy_packagelist_create();
-    
-    goal_pkgs = hy_goal_list_installs(goal);
-    answer+="Packages needed to be installed:\n";
-    for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
-    {
-      pkg=hy_packagelist_get(goal_pkgs, i);
-      answer+=(std::string)"\t"+hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+ (std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg)+(std::string)";\n";
-    }
-    
-    goal_pkgs = hy_goal_list_erasures(goal);
-    answer+="\nPackages needed to be erased:\n";
-    if(hy_packagelist_count(goal_pkgs)==0)
-      answer+="\tnone\n";
-    else
-    {
-      for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
-      {
-        pkg=hy_packagelist_get(goal_pkgs, i);
-        answer+=(std::string)"\t"+hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+ (std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg)+(std::string)";\n";
-      }
-    }
-    
-    goal_pkgs = hy_goal_list_upgrades(goal);
-    answer+="\nPackages needed to be upgraded:\n";
-    if(hy_packagelist_count(goal_pkgs)==0)
-      answer+="\tnone\n";
-    else
-    {
-      for(int i=0; i<hy_packagelist_count(goal_pkgs); i++)
-      {
-        pkg=hy_packagelist_get(goal_pkgs, i);
-        answer+=(std::string)"\t"+hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+ (std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg)+(std::string)";\n";
-      }
-    }
-    
-    //answer = hy_package_get_name(pkg) + (std::string)"-" + hy_package_get_version(pkg) + (std::string)"-" + hy_package_get_release(pkg) + (std::string)"-" + hy_package_get_arch(pkg);
-    return answer;
+//     answer.install_pkgs_init();
+    answer.install_pkgs_insert(&goal, request);
   }
   
-  
-  
-  // parsing message
-  bool solve::parseMessage(std::string message){
-	this->xml_document = xmlParseMemory(message.c_str(), message.size());
-	return true;
-  }
-
+#if 0
   // findout, what user has and what user wants
   void solve::getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos){
 
@@ -209,10 +162,9 @@ namespace ssds_solving {
     std::cout << "Control print (result of parsing)" << std::endl << str_output << std::endl;
         
   }
-
+#endif
   // result of SSDS
-  std::string solve::answer(ssds_json::json_read &client_data){
-    std::string ret_msg = "";
+  void solve::answer(ssds_json::json_read &client_data, ssds_json::json_create &answer){
     std::cout << "answer" << std::endl;
     ssds_json::json_read::pkgInfo* pkgs = client_data.pkg_info_init();;
     client_data.get_packages(pkgs);
@@ -220,8 +172,7 @@ namespace ssds_solving {
     for(int i=0; i<pkgs->length; i++)
     {
       std::cout << "answer for" << std::endl;
-      ret_msg += query(pkgs->packages[i]);
-      ret_msg += "\n";
+      query(pkgs->packages[i], answer);
     }
     
     // local variables (int64_t used for multiplaform using)
@@ -249,7 +200,5 @@ namespace ssds_solving {
 //     }
 //     
 //     ret_msg = "Connection accepted. Answer: "+ret_msg+"\n";
-    ret_msg += "\n";
-    return ret_msg;
   }
 }

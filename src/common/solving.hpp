@@ -2,18 +2,12 @@
 #define _SOLVING_HPP
 
 //SSDS
-#include "xml_handler.hpp"
 #include "repo_handler.hpp"
+#include "json_handler.hpp"
 
 //STANDARD
 #include <string>
 #include <iostream>
-
-//LIBXML
-#include <libxml2/libxml/parser.h>
-#include <libxml2/libxml/xmlmemory.h>
-#include <libxml2/libxml/xpath.h>
-#include <libxml2/libxml/xmlwriter.h>
 
 //#include <glib-2.0/glib/gerror.h>
 //#include <glib-2.0/glib/gslist.h>
@@ -33,7 +27,6 @@
 #include <librepo/handle.h>
 
 //SSDS
-#include "xml_handler.hpp"
 #include "repo_handler.hpp"
 #include "json_handler.hpp"
 
@@ -45,17 +38,12 @@ namespace ssds_solving {
       solve(/* repos class instance with all enabled repos handlers */); 
       ~solve();
       void fill_sack(ssds_repo::repo_metadata &metadata);
-      std::string query(const char* request);
-      bool parseMessage(std::string message);
-      void getRequest(xmlDocPtr xml, std::vector<std::string> &request, std::vector<std::string> &repos, int64_t &countRequest, int64_t &countRepos);
-      std::string answer(ssds_json::json_read &client_data);
+      void query(const char* request, ssds_json::json_create &answer);
+      void answer(ssds_json::json_read &client_data, ssds_json::json_create &answer);
       
       //SOLVING
       HySack sack;
       
-      //XML
-      xmlDocPtr xml_document;
-
     private:
           /* repos class instance with all enabled repos handlers */
   };
