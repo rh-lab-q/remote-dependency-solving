@@ -42,7 +42,7 @@ namespace ssds_repo{
       
       if(((long int)val)){
 	err = nullptr;
-	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_NAME, &val) != false){
+	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_ID, &val) != false){
 	  name = (char*)val;
 	}
 	
@@ -61,7 +61,7 @@ namespace ssds_repo{
 	err = nullptr;
 	//void ** val2;
 	if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != false){
-	  url = (char**)val;
+	  url = (char**)val; 
 	  type = ssds_json::url_type::SSDS_BASEURL;
 	}
 	//std::cout << "name: " << name << "\nurl: " << url << std::endl;
