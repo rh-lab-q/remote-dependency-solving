@@ -6,6 +6,7 @@
 #include <exception>
 #include <fstream>
 #include <vector>
+#include <stdio.h>
 
 //BOOST - needs to be compiled with -lboost_system option
 #include <boost/asio.hpp>
