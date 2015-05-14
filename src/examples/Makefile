@@ -1,13 +1,10 @@
-#soubor: Makefile
-# Michal Ruprich, xrupri00, RedHat, SSDS - hawkey example
-
 CC=gcc
-CFLAGS= -std=c11 -pedantic -Wextra -Wall -O2
+CFLAGS=-std=c11
+INCLUDE=-I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
+LINKS=-lglib-2.0
 
-all: server client
-server:
-	$(CC) $(CFLAGS) server.c -o server
-client:
-	$(CC) $(CFLAGS) client.c -o client
+
+all:
+	$(CC) $(CFLAGS) $(INCLUDE) $(LINKS) log_example.c -o log
 clean:
-	rm -rf server client
+	rm -rf log
