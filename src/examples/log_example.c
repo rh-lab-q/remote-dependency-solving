@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <glib-2.0/glib.h>
 
 static const gchar *log_level_to_string (GLogLevelFlags level)
