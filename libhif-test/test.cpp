@@ -1,64 +1,60 @@
 #include <stdio.h>
-#include <string.h>
-#include <hawkey/types.h>
-#include <hawkey/sack.h>
-#include <hawkey/packagelist.h>
-#include <hawkey/query.h>
-#include <hawkey/repo.h>
-#include <hawkey/package.h>
-#include <libhif/libhif.h>
-#include <libhif/hif-package.h>
-#include <libhif/hif-state.h>
+#include <glib.h>
+#include <stdlib.h>
+#include <librepo/librepo.h>
+
+static void log_handler_cb(const gchar *log_domain G_GNUC_UNUSED, GLogLevelFlags log_level G_GNUC_UNUSED, const gchar *message, gpointer user_data G_GNUC_UNUSED){
+
+	g_print("%s\n", message);
+}
+
 int main(){
 
-	HySack sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
-	if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0){
-		printf("Repo loading is correctly done. Count of repofiles: %d\n",hy_sack_count(sack));
-	}
+	int rc = EXIT_SUCCESS;
+	gboolean ret;
+	LrHandle *h;
+	GSList *packages = NULL;
+	LrPackageTarget *target;
+	GError *error = NULL;
+
+	// setup logging (optional)
 	
-	/* Loading repo metadata into sack */
-	HyRepo repo = hy_repo_create("test");
-        hy_repo_set_string(repo, HY_REPO_MD_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/repomd.xml");
-        hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/e2a28baab2ea4632fad93f9f28144cda3458190888fdf7f2acc9bc289f397e96-primary.xml.gz");
-        hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, "/var/cache/dnf/x86_64/21/fedora/repodata/abb4ea5ccb9ad46253984126c6bdc86868442a4662dbcfa0e0f51b1bb209331e-filelists.xml.gz");
-     
-        if(hy_sack_load_yum_repo(sack, repo, 0) == 0)
-          printf("load_yum_repo pass, control count: %d\n", hy_sack_count(sack));
+//	g_log_set_handler("librepo-test", G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL | G_LOG_LEVEL_DEBUG | G_LOG_LEVEL_WARNING, log_handler_cb, NULL);
 
-	HyQuery query = hy_query_create(sack);
-	const char * ask = "babl";	
-	hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, ask);
-	hy_query_filter_latest_per_arch(query, 1);
-
-	HyPackageList plist = hy_packagelist_create();
-	plist = hy_query_run(query);
-
-	printf("Count of found packages: %d\n", hy_packagelist_count(plist));
+	// prepare handle
 	
-	HyPackage pkg;
-	for( int i=0; i<hy_packagelist_count(plist); i++){
-		pkg = hy_packagelist_get(plist,i);
-		const char *name = hy_package_get_name(pkg),
-		     *arch = hy_package_get_arch(pkg);
-		if(strcmp(name,"babl") == 0  && strcmp(arch,"x86_64") == 0){
+	char *urls[] = {"http://beaker-project.org/yum/client-testing/Fedora19/", NULL};
+	h = lr_handle_init();
+	lr_handle_setopt(h, NULL, LRO_URLS, urls);
+	lr_handle_setopt(h, NULL, LRO_REPOTYPE, LR_YUMREPO);
+
+	// Prepare list of target
+
+	target = lr_packagetarget_new(h, "beaker-0.15.2-1.fc18.src.rpm", "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, NULL, NULL, &error);
+	packages = g_slist_append(packages, target);
+
+	
+	// Download all packages	
+
+	ret = lr_download_packages(packages, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
+	
+	if(!ret){
+		fprintf(stderr, "Error: %d: %s\n", error->code, error->message);
+		rc = EXIT_FAILURE;
+		g_error_free(error);
+	}	
  
-			printf("%s.%s\n", name,arch);
-		break;
-	}
-	}
-
-
-	printf("%s\n",hy_package_get_name(pkg));
-
-	HifState *state;
-	state = hif_state_new();
-	const gchar *directory = "/home/jozkar/Plocha/download/";
-	GError *error = NULL;	
+	// Check statuses
 	
-	printf("Testing example\n");
-	 
-	gchar *ret = hif_package_download(pkg, directory, state, &error);
+	for(GSList *elem = packages; elem; elem = g_slist_next(elem)){
+		LrPackageTarget *t = (LrPackageTarget *)elem->data;
+		printf("%s: %s\n", t->local_path, t->err ? t->err : "OK");
+	}
+	
+	// Clean up
 
-	printf("%s\n",ret);
-	return 0;
+	g_slist_free_full(packages, (GDestroyNotify) lr_packagetarget_free);
+	lr_handle_free(h);
+
+	return rc;
 }
