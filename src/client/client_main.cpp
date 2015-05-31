@@ -10,7 +10,6 @@ int main(int argc, const char* argv[]){
   if(!parameters.parse_params(argc, argv))
     return 1;
   
-  logger::log my_log; //logger init
   ssds_client::client client; //object for network handling
   
   /*******************************************************************/

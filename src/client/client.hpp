@@ -14,7 +14,7 @@
 #include <boost/program_options.hpp>
 
 //SSDS
-#include "../common/logger.hpp"
+#include "../common/log_handler.h"
 #include "../common/repo_handler.hpp"
 #include "../common/solving.hpp"
 #include "../common/params.hpp"

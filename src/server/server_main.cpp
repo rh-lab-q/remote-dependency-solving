@@ -11,6 +11,7 @@
 /*synchronous start of server based on boost.asio library*/
 
 #include "server.hpp"
+#include "../common/log_handler.h"
 #include "../common/solving.hpp"
 #include <iostream>
 
@@ -49,7 +50,6 @@ int main() {
   *************************************************************************/
   ssds_server::server mainserver;
 
-  logger::log my_log;
   int portnum = 40002;
   //portnum = mainserver.newPort(portnum);
   boost::asio::io_service &ios = mainserver.getIo();	
@@ -96,7 +96,9 @@ int main() {
   catch (std::exception& e){
     //std::ostringstream os;
     //os << "Server: "<< e.what();
-    /*std::cerr*/my_log.add_log(logERROR,e.what());
+    /*std::cerr*///my_log.add_log(logERROR,e.what());
+    ssds_log("pokus", logERROR);
+    //ssds_log(e.what(), logERROR); //might not work since e.what returns virtual const char*
   }
 
 #endif

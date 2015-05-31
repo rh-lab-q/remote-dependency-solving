@@ -57,17 +57,17 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
 
-file(GLOB SRCS *.cpp *.hpp)
+file(GLOB SRCS *.cpp *.hpp *.c *.h)
 
 PROJECT(ssds-server)
 set(SERVSRC "../src/server/server_main.cpp")
 add_executable(ssds-server ${SERVSRC}
-		../src/common/logger.cpp
 		../src/common/json_read.cpp
 		../src/common/json_create.cpp
 		../src/common/repo_metadata.cpp
 		../src/common/repo_handler.cpp
 		../src/common/solving.cpp
+		../src/common/log_handler.c
 		../src/server/server.cpp)
 
 target_link_libraries(
@@ -81,11 +81,11 @@ PROJECT(ssds-client)
 set(CLISRC "../src/client/client_main.cpp")
 #add_library("../src/client/client.cpp")
 add_executable(ssds-client ${CLISRC}
-		../src/common/logger.cpp
 		../src/common/json_read.cpp
 		../src/common/json_create.cpp
 		../src/common/repo_handler.cpp
 		../src/common/repo_metadata.cpp
+		../src/common/log_handler.c
 		../src/common/params.cpp)
 target_link_libraries(
 	ssds-client

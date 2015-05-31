@@ -3,7 +3,7 @@
 const char* log_lvl_msg[4] = {"INFO", "MESSAGE", "WARNING", "ERROR"};
 int __verbose = 0;
 
-void ssds_log(char *message, int log_level)
+void ssds_log(const char *message, int log_level)
 {
   FILE *flog = fopen("/tmp/ssds.log", "a");
   
