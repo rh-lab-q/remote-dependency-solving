@@ -6,6 +6,7 @@
 #include <exception>
 #include <fstream>
 #include <vector>
+#include <stdio.h>
 
 //BOOST - needs to be compiled with -lboost_system option
 #include <boost/asio.hpp>
@@ -13,7 +14,7 @@
 #include <boost/program_options.hpp>
 
 //SSDS
-#include "../common/logger.hpp"
+#include "../common/log_handler.h"
 #include "../common/repo_handler.hpp"
 #include "../common/solving.hpp"
 #include "../common/params.hpp"

@@ -25,7 +25,7 @@ namespace ssds_solving {
     this->sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
     
     if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE) == 0)
-      std::cout << "load_system_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
+      std::cout << "load_system_repo in order, control count: " << hy_sack_count(sack) << std::endl;
     
     /* Loading repo metadata into sack */
 //     HyRepo repo = hy_repo_create("pokus");
@@ -55,7 +55,7 @@ namespace ssds_solving {
         
       hy_sack_load_yum_repo(sack, repo, 0);
     }
-    std::cout << "load_yum_repo v cajku, kontrolni pocet: " << hy_sack_count(sack) << std::endl;
+    std::cout << "load_yum_repo in order, control count: " << hy_sack_count(sack) << std::endl;
   }
 
   
@@ -75,7 +75,7 @@ namespace ssds_solving {
     for(int i=0; i<hy_packagelist_count(plist);i++)
     {
       test = hy_packagelist_get(plist, i);
-      std::cout<< "baliky jsou na: " << hy_package_get_url(test) << ":"<< hy_package_get_location(test)<< std::endl;
+//       std::cout<< "baliky jsou na: " << hy_package_get_url(test) << ":"<< hy_package_get_location(test)<< std::endl;
     }
     
     HyPackage pkg;

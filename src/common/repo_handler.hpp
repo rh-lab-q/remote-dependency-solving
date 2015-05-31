@@ -7,6 +7,8 @@
 #include <vector>
 #include <iostream>
 #include <glib.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 //LIBREPO
 #include <librepo/repoconf.h>
@@ -49,7 +51,9 @@ namespace ssds_repo{
   public:
     repo_metadata();
 //     void transfer_repo_info(ssds_json::json_read &json);
-    int locate_repo_metadata_by_url(ssds_json::json_read &json);
+    int locate_repo_metadata(ssds_json::json_read &json);
+    bool local_repo_metadata(ssds_json::json_read::repoInfo* repo_info);
+    char* full_path_to_metadata(char* repo_name);
     
     //std::vector<ssds_xml::xml_node*> urls;
     std::vector<metadata_files_location*> files_locations;

@@ -10,7 +10,6 @@ int main(int argc, const char* argv[]){
   if(!parameters.parse_params(argc, argv))
     return 1;
   
-  logger::log my_log; //logger init
   ssds_client::client client; //object for network handling
   
   /*******************************************************************/
@@ -72,18 +71,22 @@ int main(int argc, const char* argv[]){
   //write data
   write(my_socket, boost::asio::buffer(string_output));
 
+  std::string rec="";
   //read the answer from server
-  for (;;) {	
+  for (;;) {
     size_t len = my_socket.read_some(buffer(buf), error);
-    json_read.parse_data(buf.data());
-    std::cout.write(buf.data(), len);
-
+//     json_read.parse_data(buf.data());
+//     std::cout.write(buf.data(), len);
+    rec+=buf.data();
+    
+    
     if(error==error::eof)
               break;
     else if (error)
               throw boost::system::system_error(error);
   }
 
+  std::cout << rec << std::endl;
   //my_log.add_log(logINFO) << "message from client" << std::endl;
   //log.add_log("This message is sent to client logger");*/
 #endif	

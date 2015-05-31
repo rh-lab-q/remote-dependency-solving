@@ -1,16 +1,14 @@
-#soubor: Makefile
-# Michal Ruprich, xrupri00, RedHat, SSDS - hawkey example
+CC=gcc
+CFLAGS=-std=c11
+INCLUDE=-I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
+LINKS=-lglib-2.0
 
-PP=g++
-CPPFLAGS= -std=c++11 -pedantic -Wextra -Wall -O2
-INCLUDE=-I/usr/include/json-glib-1.0/json-glib/ -I/usr/include/json-glib-1.0/ -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
-LINK=-ljson-glib-1.0 -lglib-2.0 -lgobject-2.0
 
-all: json_read json_create
-	$(PP) $(CPPFLAGS) $(INCLUDE) $(LINK) json_ex.cpp json_read.o json_create.o -o json
-json_read:
-	$(PP) $(CPPFLAGS) $(INCLUDE) $(LINK) -c json_read.cpp -o json_read.o
-json_create:
-	$(PP) $(CPPFLAGS) $(INCLUDE) $(LINK) -c json_create.cpp -o json_create.o
+all: handler example
+	$(CC) $(CFLAGS) $(INCLUDE) $(LINKS) log_example.o log_handler.o -o log
+example:
+	$(CC) $(CFLAGS) $(INCLUDE) $(LINKS) -c log_example.c -o log_example.o
+handler:
+	$(CC) $(CFLAGS) $(INCLUDE) $(LINKS) -c log_handler.c -o log_handler.o
 clean:
-	rm -r json *.o
+	rm -rf log *.o
