@@ -60,13 +60,13 @@ namespace ssds_server {
     for(int i=0; i<list_len; i++)
     {
       ssds_json::json_read::repoInfo* repo_info = (ssds_json::json_read::repoInfo*)g_slist_nth_data(json_parser.repoInfoList, i);
-      std::cout << repo_info->name << std::endl;
+      
     }
     
     /*
      * Here I would put something that will decide what to do according to the code from the client
      */
-    metadata.locate_repo_metadata_by_url(json_parser);
+    metadata.locate_repo_metadata(json_parser);
     
     std::cout<< "Message has " << len << " characters." << std::endl;
     solvePoint.fill_sack(metadata);

@@ -8,6 +8,7 @@
 #include <fstream>
 #include <vector>
 #include <string.h>
+#include <stdio.h>
 
 //SOLVING
 #include <hawkey/types.h>

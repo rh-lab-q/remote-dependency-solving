@@ -11,6 +11,7 @@ namespace ssds_json
   bool json_read::parse_data(char* buffer)
   {
     GError **error;
+    
     bool ret = json_parser_load_from_data(this->parser, (const gchar*)buffer, -1, error);
     this->rootNode = json_parser_get_root(parser);
     
