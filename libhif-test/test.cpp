@@ -2,6 +2,9 @@
 #include <glib.h>
 #include <stdlib.h>
 #include <librepo/librepo.h>
+#include <rpm/rpmlib.h>
+#include <rpm/rpmts.h>
+#include <rpm/rpmio.h>
 
 static void log_handler_cb(const gchar *log_domain G_GNUC_UNUSED, GLogLevelFlags log_level G_GNUC_UNUSED, const gchar *message, gpointer user_data G_GNUC_UNUSED){
 
@@ -47,9 +50,17 @@ int main(){
 	// Check statuses
 	
 	for(GSList *elem = packages; elem; elem = g_slist_next(elem)){
-		LrPackageTarget *t = (LrPackageTarget *)elem->data;
-		printf("%s: %s\n", t->local_path, t->err ? t->err : "OK");
-	}
+                LrPackageTarget *t = (LrPackageTarget *)elem->data;
+                printf("%s: %s\n", t->local_path, t->err ? t->err : "OK");
+		// installing package
+                if(!t->err){
+                        FD_t fd = (FD_t)fopen(t->local_path,"r");
+                        rpmRC result;
+                        rpmts ts = rpmtsCreate();
+
+                        result = rpmInstallSourcePackage(ts, fd, NULL, NULL);
+                }
+        }
 	
 	// Clean up
 
