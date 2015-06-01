@@ -14,7 +14,7 @@ extern int __verbose;
 #define out_error(message) printf("SSDS: ERROR: %s\n", message)
 #define out_unknown(message) printf("SSDS: UNKNOWN: %s\n", message)
 
-void ssds_log(char *message, int log_level);
+void ssds_log(const char *message, int log_level);
 void set_verbose();
 void unset_verbose();
 
