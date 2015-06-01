@@ -4,7 +4,7 @@
 #include <librepo/librepo.h>
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
-#include <rpm/rpmio.h>
+#include <rpm/rpmcli.h>
 
 static void log_handler_cb(const gchar *log_domain G_GNUC_UNUSED, GLogLevelFlags log_level G_GNUC_UNUSED, const gchar *message, gpointer user_data G_GNUC_UNUSED){
 
@@ -27,13 +27,14 @@ int main(){
 	// prepare handle
 	
 	char *urls[] = {"http://beaker-project.org/yum/client-testing/Fedora19/", NULL};
+	char *name = "beaker-0.15.2-1.fc18.src.rpm";
 	h = lr_handle_init();
 	lr_handle_setopt(h, NULL, LRO_URLS, urls);
 	lr_handle_setopt(h, NULL, LRO_REPOTYPE, LR_YUMREPO);
 
 	// Prepare list of target
 
-	target = lr_packagetarget_new(h, "beaker-0.15.2-1.fc18.src.rpm", "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, NULL, NULL, &error);
+	target = lr_packagetarget_new(h, name, "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, NULL, NULL, &error);
 	packages = g_slist_append(packages, target);
 
 	
@@ -48,22 +49,36 @@ int main(){
 	}	
  
 	// Check statuses
-	
+
+	// RPM init  
+	// TODO: need to init rpmdb connection
+	rpmts ts = rpmtsCreate();
+	rpmprobFilterFlags ignoreSet = 0;
+	rpmtsSetRootDir(ts, rpmcliRootDir);
+
 	for(GSList *elem = packages; elem; elem = g_slist_next(elem)){
                 LrPackageTarget *t = (LrPackageTarget *)elem->data;
                 printf("%s: %s\n", t->local_path, t->err ? t->err : "OK");
 		// installing package
                 if(!t->err){
                         FD_t fd = (FD_t)fopen(t->local_path,"r");
-                        rpmRC result;
-                        rpmts ts = rpmtsCreate();
-
-                        result = rpmInstallSourcePackage(ts, fd, NULL, NULL);
+			Header hd = headerRead(fd, HEADER_MAGIC_YES);
+			int upgrade = 0;
+			//rpmRelocation rel = NULL;
+			int r = rpmtsAddInstallElement(ts, hd, (fnpyKey)name, 0,0);
                 }
         }
 	
+	if(!rpmtsCheck(ts)){
+		if(rpmtsOrder(ts)){
+			printf("ERROR: some packages cannot be ordered\n");
+		}else{
+			int result = rpmtsRun(ts, NULL, ignoreSet);
+		}
+	}
 	// Clean up
 
+	rpmtsFree(ts);
 	g_slist_free_full(packages, (GDestroyNotify) lr_packagetarget_free);
 	lr_handle_free(h);
 
