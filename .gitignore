@@ -2,3 +2,4 @@
 *Cache.txt
 *.o
 *ssds-client
+build/librepo-*
