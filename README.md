@@ -9,7 +9,6 @@ Dependencies
 ============
 Required package which are needed for successfull compilation and build.
 
-- git
 - gcc-c++
 - cmake
 - boost
