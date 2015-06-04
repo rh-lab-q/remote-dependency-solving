@@ -1,30 +1,29 @@
 #include "network_util.h"
 
 
-#define MAX_INPUT_LEN 200
-#define BUFF_SIZE 1000
+#define MAX_INPUT_LEN 2000
+#define BUFF_SIZE 2000
 
 
 
 char* sock_recv(int sock_fd)
 {
-  char* buffer=(char*)malloc(BUFF_SIZE*sizeof(char));
-  char reply[MAX_INPUT_LEN];
-  
-  memset(buffer, 0, BUFF_SIZE);
+  char* reply=(char*)malloc(MAX_INPUT_LEN*sizeof(char));
   memset(reply, 0, MAX_INPUT_LEN);
-  
   ssize_t ret = read(sock_fd, reply , MAX_INPUT_LEN);
   
   if(ret==-1)
   {
     ssds_log("Unable to read data from socket.", logERROR);
-    free(buffer);
+    free(reply);
     return NULL;
   }
   
   if(ret==MAX_INPUT_LEN)
   {
+    char* buffer=(char*)malloc(BUFF_SIZE*sizeof(char));
+    memset(buffer, 0, BUFF_SIZE);
+    
     int read_count = 0;
     int buff_size = 1;
     memcpy(buffer, reply, MAX_INPUT_LEN);
@@ -42,7 +41,10 @@ char* sock_recv(int sock_fd)
       
       
     }while(!(ret<MAX_INPUT_LEN));
+    
+    free(reply);
+    return buffer;
   }
-  
-  return buffer;
+  //no buffer is needed for very short messages
+  return reply;
 }

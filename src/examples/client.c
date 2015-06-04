@@ -41,5 +41,6 @@ int main()
   
   printf("%s", buf);
   
+  free(buf);
   return 0;
 }

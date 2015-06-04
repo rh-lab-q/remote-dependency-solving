@@ -13,7 +13,7 @@ extern "C"{
  *  There is a buffer that resizes according to the size of recieved data.
  *  @param sock_fd  File descriptor for socket that is recieving data
  * 
- *  @return         buffer with recieved data
+ *  @return         buffer with recieved data - needs to be freed in the end
  */
 char* sock_recv(int sock_fd);
 
