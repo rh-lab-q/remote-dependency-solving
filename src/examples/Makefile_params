@@ -1,0 +1,15 @@
+#soubor: Makefile
+# Michal Ruprich, xrupri00, RedHat, SSDS - hawkey example
+
+CC=gcc
+CFLAGS= -std=c11
+
+all: param_ex
+param_ex: params log
+	$(CC) $(CFLAGS) param_ex.c params.o log_handler.o -o param_ex
+params:
+	$(CC) $(CFLAGS) ../common/params.c -c
+log: ../common/log_handler.c
+	$(CC) $(CFLAGS) ../common/log_handler.c -c
+clean:
+	rm -rf param_ex *.o
