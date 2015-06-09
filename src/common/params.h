@@ -2,7 +2,6 @@
 #define _PARAMS_H
 
 #include <glib.h>
-// #include <glib-2.0/glib/galloca.h>
 #include <stdio.h>
 #include "log_handler.h"
 #include <unistd.h>
@@ -23,9 +22,15 @@ enum ParamsOptions{
   
 typedef struct ParamOpts ParamOpt;
 
+struct ParamOpts{
+  int command;
+  int pkg_count;
+  GSList* pkgs;
+};
+
 extern int param_opt;
 
-int parse_params(int argc, const char** args);
+int parse_params(int argc, const char** args, ParamOpt* params);
 ParamOpt* init_params();
 void print_help();
 

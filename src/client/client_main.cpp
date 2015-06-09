@@ -6,8 +6,14 @@
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
-  if(parse_params(argc, argv) == -1)
+  ParamOpt* params = init_params();
+  
+  if(parse_params(argc, argv, params) == -1)
     return 1;
+  
+  for(int i=0; i<g_slist_length(params->pkgs); i++)
+    printf("%s\n", g_slist_nth_data(params->pkgs, (guint)i));
+  
 #if 0
   ssds_client::client client; //object for network handling
   

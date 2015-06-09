@@ -1,13 +1,8 @@
 #include "params.h"
 
-struct ParamOpts{
-  int verbose;
-  int command;
-  int pkg_count;
-  GSList* pkgs;
-};
 
-int parse_params(int argc, const char** args)
+
+int parse_params(int argc, const char** args, ParamOpt* params)
 {
   if(argc==1)
   {
@@ -26,6 +21,7 @@ int parse_params(int argc, const char** args)
   int c;
   int opt_index=0;
   int seen=0;
+  extern int optind;
   
   while(1)
   {
@@ -44,7 +40,6 @@ int parse_params(int argc, const char** args)
         set_verbose();
         break;
       case '?':
-        printf(args[opt_index]);
         break;
     }
     
@@ -59,7 +54,31 @@ int parse_params(int argc, const char** args)
     return -1;
   }
   
+  if(seen==0)
+  {
+    ssds_log("No command provided. The program will terminate now.", logERROR);
+    exit(1);
+  }
+  
+  if(optind < argc)
+  {
+    while(optind < argc)
+    {
+      params->pkgs = g_slist_append(params->pkgs, args[optind++]);
+      params->pkg_count++;
+    }
+  }
+  
   return 1;
+}
+
+ParamOpt* init_params()
+{
+  ParamOpt* new = (ParamOpt*)malloc(sizeof(ParamOpt));
+  new->pkg_count=0;
+  new->command=-1;
+  new->pkgs=NULL;
+  return new;
 }
 
 
