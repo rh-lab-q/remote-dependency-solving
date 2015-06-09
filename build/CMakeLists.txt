@@ -11,6 +11,8 @@
 #for glib.h:	-I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
 #for librepo.h:	-L/usr/include/librepo/ -lrepo
 
+INCLUDE(FindPkgConfig)
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_COLOR_MAKEFILE ON)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
@@ -40,6 +42,18 @@ else(NOT Boost_FOUND)
 	include_directories(${Boost_INCLUDE_DIRS})
 endif(NOT Boost_FOUND)
 
+#GLIB-2.0
+FIND_PACKAGE(PkgConfig)
+PKG_CHECK_MODULES(GLIB2 glib-2.0 REQUIRED)
+if (NOT GLIB2_FOUND)
+	message(FATAL_ERROR "Library Glib-2.0 not found.")
+else (NOT GLIB2_FOUND)
+	include_directories(${GLIB2_INCLUDE_DIRS})
+	message(${GLIB2_INCLUDE_DIRS})
+endif(NOT GLIB2_FOUND)
+#if (NOT PKG_CONFIG_FOUND)
+#	message(FATAL_ERROR "Library Glib-2.0 required, but not found!")
+
 #LIBXML++
 # find_package(LibXML++ REQUIRED)
 # if (NOT LIBXML++_FOUND)
@@ -52,7 +66,7 @@ endif(NOT Boost_FOUND)
 # endif(NOT LIBXML++_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2/ -I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lglib-2.0 -I/usr/include/json-glib-1.0/json-glib/ -I/usr/include/json-glib-1.0/ -ljson-glib-1.0 -lgobject-2.0")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -I/usr/include/json-glib-1.0/json-glib/ -I/usr/include/json-glib-1.0/ -ljson-glib-1.0 -lgobject-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
@@ -75,6 +89,7 @@ target_link_libraries(
 	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
 	${Boost_FILESYSTEM_LIBRARY}
 	${LIBS}
+	${GLIB2_LDFLAGS}
 )
 
 PROJECT(ssds-client)
@@ -86,10 +101,11 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/repo_handler.cpp
 		../src/common/repo_metadata.cpp
 		../src/common/log_handler.c
-		../src/common/params.cpp)
+		../src/common/params.c)
 target_link_libraries(
 	ssds-client
 	${Boost_SYSTEM_LIBRARY}
 	${Boost_FILESYSTEM_LIBRARY}
 	${LIBS}
+	${GLIB2_LDFLAGS}
 )

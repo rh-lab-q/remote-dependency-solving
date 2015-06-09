@@ -17,7 +17,7 @@
 #include "../common/log_handler.h"
 #include "../common/repo_handler.hpp"
 #include "../common/solving.hpp"
-#include "../common/params.hpp"
+#include "../common/params.h"
 
 //GLIB-JSON
 #include "../common/json_handler.hpp"

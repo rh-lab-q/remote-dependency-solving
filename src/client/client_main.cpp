@@ -1,4 +1,4 @@
-#include "client.hpp"
+#include "client.h"
 
 
 //for debugging
@@ -6,10 +6,9 @@
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
-  ssds_params::params parameters;	
-  if(!parameters.parse_params(argc, argv))
+  if(parse_params(argc, argv) == -1)
     return 1;
-  
+#if 0
   ssds_client::client client; //object for network handling
   
   /*******************************************************************/
@@ -23,9 +22,9 @@ int main(int argc, const char* argv[]){
   json_gen.insert_code(1);
   repo.parse_default_repo();
   
-  for(std::vector<std::string>::iterator it = parameters.packages.begin(); it != parameters.packages.end(); it++){
-    json_gen.add_package((char*)(*it).c_str());
-  }
+//   for(std::vector<std::string>::iterator it = parameters.packages.begin(); it != parameters.packages.end(); it++){
+//     json_gen.add_package((char*)(*it).c_str());
+//   }
   
   repo.get_repo_url(json_gen);
   char* output;
@@ -91,6 +90,6 @@ int main(int argc, const char* argv[]){
   //log.add_log("This message is sent to client logger");*/
 #endif	
   repo.free_resources();
-  
+#endif
   return 0;
 }

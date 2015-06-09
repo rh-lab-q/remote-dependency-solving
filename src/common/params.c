@@ -1,7 +1,20 @@
 #include "params.h"
 
-int parse_params(int argc, char** args)
+struct ParamOpts{
+  int verbose;
+  int command;
+  int pkg_count;
+  GSList* pkgs;
+};
+
+int parse_params(int argc, const char** args)
 {
+  if(argc==1)
+  {
+    ssds_log("No command provided. The program will terminate now.", logERROR);
+    exit(1);
+  }
+  
   static int param_opt; //needs to be static or else make fails
   static struct option long_options[]=
   {
@@ -24,11 +37,14 @@ int parse_params(int argc, char** args)
         seen++;
         break;
       case 'h':
-        printf("this is help!\n");
+        print_help();
         exit(0);
         break;
       case 'v':
         set_verbose();
+        break;
+      case '?':
+        printf(args[opt_index]);
         break;
     }
     
@@ -45,3 +61,10 @@ int parse_params(int argc, char** args)
   
   return 1;
 }
+
+
+void print_help()
+{
+  printf("this is help!\n");
+}
+

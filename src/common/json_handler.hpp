@@ -20,12 +20,13 @@
 #include <hawkey/package.h>
 
 //GLIB
-#include <glib-2.0/glib/gerror.h>
-#include <glib-2.0/glib/glist.h>
-#include <glib-2.0/glib/gslist.h>
-#include <glib-2.0/gio/gio.h>
-#include <glib-2.0/glib.h>
-#include <glib-2.0/gobject/gobject.h>
+// #include <glib-2.0/glib/gerror.h>
+// #include <glib-2.0/glib/glist.h>
+// #include <glib-2.0/glib/gslist.h>
+// #include <glib-2.0/gio/gio.h>
+// #include <glib-2.0/glib.h>
+// #include <glib-2.0/gobject/gobject.h>
+#include <glib.h>
 
 // #include "repo_handler.hpp"
 
