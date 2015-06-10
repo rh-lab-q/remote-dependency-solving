@@ -15,6 +15,7 @@
 
 //SSDS
 #include "../common/log_handler.h"
+#include "../common/network_util.h"
 #include "../common/repo_handler.hpp"
 #include "../common/solving.hpp"
 #include "../common/params.h"

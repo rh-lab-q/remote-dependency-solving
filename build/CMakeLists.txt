@@ -82,6 +82,7 @@ add_executable(ssds-server ${SERVSRC}
 		../src/common/repo_handler.cpp
 		../src/common/solving.cpp
 		../src/common/log_handler.c
+		../src/common/network_util.c
 		../src/server/server.cpp)
 
 target_link_libraries(
@@ -101,6 +102,7 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/repo_handler.cpp
 		../src/common/repo_metadata.cpp
 		../src/common/log_handler.c
+		../src/common/network_util.c
 		../src/common/params.c)
 target_link_libraries(
 	ssds-client

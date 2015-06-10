@@ -6,16 +6,15 @@
 namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
+  /*******************************************************************/
+  /* Parsing parameters */
+  /*******************************************************************/
   ParamOpt* params = init_params();
   
   if(parse_params(argc, argv, params) == -1)
     return 1;
   
-  for(int i=0; i<g_slist_length(params->pkgs); i++)
-    printf("%s\n", g_slist_nth_data(params->pkgs, (guint)i));
   
-#if 0
-  ssds_client::client client; //object for network handling
   
   /*******************************************************************/
   /* Creating xml with all the info*/
@@ -28,74 +27,46 @@ int main(int argc, const char* argv[]){
   json_gen.insert_code(1);
   repo.parse_default_repo();
   
-//   for(std::vector<std::string>::iterator it = parameters.packages.begin(); it != parameters.packages.end(); it++){
-//     json_gen.add_package((char*)(*it).c_str());
-//   }
-  
   repo.get_repo_url(json_gen);
   char* output;
   output = json_gen.json_to_string();
-//   std::cout << "output: " << output <<"\n\n" << std::endl;
   json_gen.json_dump();
   
   /**************************************************************/
   /* Networking part - sending data to server and recieving*/
   /***************************************************************/
-  using namespace boost::asio;
+  int socket_desc;
+  const char * message = "Hello from client\n";
+  socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   
-  //resolver for dns query
-  ip::tcp::resolver resolver(client.io_service_object);
-  ip::tcp::resolver::query query("localhost", "40002");
+  struct sockaddr_in server;
+  server.sin_addr.s_addr=inet_addr("127.0.0.1");
+  server.sin_family=AF_INET;
+  server.sin_port=htons(2345);
   
-  //a list of responses is returned
-  ip::tcp::resolver::iterator iter = resolver.resolve(query);
-  ip::tcp::resolver::iterator end;
-  ip::tcp::endpoint endpoint;
-  
-  //try to connect to any of the returned endpoints
-  while(iter != end)
+  if(socket_desc==-1)
   {
-    endpoint = *iter++;
+    ssds_log("Client encountered an error when creating socket for communication.", logERROR);
+    return 1;
   }
-
-  //openning a connection through the created socket
-  //connect(my_socket, resolver.resolve(query));
-  ip::tcp::socket my_socket(client.io_service_object);
-  my_socket.connect(endpoint);
-
-  boost::array<char, 128> buf;
-  boost::system::error_code error;
-
-  //findout length of xml string
-  std::string string_output = output;
-  int64_t size = string_output.size();
   
-  //write information about data length	
-  write(my_socket, boost::asio::buffer(&string_output, sizeof(size)));
-
-  //write data
-  write(my_socket, boost::asio::buffer(string_output));
-
-  std::string rec="";
-  //read the answer from server
-  for (;;) {
-    size_t len = my_socket.read_some(buffer(buf), error);
-//     json_read.parse_data(buf.data());
-//     std::cout.write(buf.data(), len);
-    rec+=buf.data();
-    
-    
-    if(error==error::eof)
-              break;
-    else if (error)
-              throw boost::system::system_error(error);
+  if(connect(socket_desc, (struct sockaddr *)&server, sizeof(server))<0)
+  {  
+    ssds_log("Connection error.", logERROR);
+    return 1;
   }
-
-  std::cout << rec << std::endl;
-  //my_log.add_log(logINFO) << "message from client" << std::endl;
-  //log.add_log("This message is sent to client logger");*/
-#endif	
-  repo.free_resources();
+  
+  write(socket_desc, message, strlen(message));
+  char* buf=sock_recv(socket_desc);
+  if(buf == NULL)
+  {
+    ssds_log("Error while recieving data.", logERROR);
+    return 1;
+  }
+  
+  printf("%s", buf);
+  
+  free(buf);
 #endif
   return 0;
 }

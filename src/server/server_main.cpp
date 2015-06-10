@@ -18,8 +18,6 @@
 //#include <hawkey/sack.h>
 
 
-using namespace boost::asio;
-
 #if 0
 void session(ip::tcp::socket sock,boost::system::error_code ec){
 	try {
@@ -48,21 +46,67 @@ int main() {
   * 	Establishing port, socket etc for the communication
   * 
   *************************************************************************/
-  ssds_server::server mainserver;
+  int socket_desc, new_sock;
+  char* client_ip;
 
-  int portnum = 40002;
-  //portnum = mainserver.newPort(portnum);
-  boost::asio::io_service &ios = mainserver.getIo();	
-  ip::tcp::endpoint endpoint_(ip::tcp::v4(),portnum);
-  ip::tcp::acceptor acceptor_(ios,endpoint_);  //listener
-  std::cout << "Server is ready..." << std::endl;
-  boost::system::error_code ec;
-  ip::tcp::socket sock(ios);
-
+  char client_msg[1000];
+  socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  
+  set_verbose();
+  
+  if(socket_desc==-1)
+  {
+    ssds_log("Server encountered an error when creating socket for communication", logERROR);
+    return 1;
+  }
+  
+  struct sockaddr_in server, client;
+  server.sin_family=AF_INET;
+  server.sin_addr.s_addr=INADDR_ANY;
+  server.sin_port=htons(2345);
+  
+  if(bind(socket_desc, (struct sockaddr*)&server, sizeof(server)) <0)
+  {
+    ssds_log("Server wasn't able to bind with socket", logERROR);
+    return 1;
+  }
+  
+  ssds_log("Server started. Waiting for incoming connections.", logINFO);
+  
+  if(listen(socket_desc, 5)!=0)
+  {
+    ssds_log("Listen failed on server.", logERROR);
+    return 1;
+  }
+  
+  const char* message = "Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw Antwone into a glass motherfuckin' house, fuckin' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, 'cause I'll kill the motherfucker, know what I'm sayin'?\n";
+  int addr_len = sizeof(server);
+  while(1)
+  {
+    if((new_sock=accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
+    {
+      ssds_log("Accept connection has failed.", logERROR);
+      return 1;
+    }
+    
+    char* buf=sock_recv(new_sock);
+    
+    if(buf == NULL)
+    {
+      ssds_log("Recieving of data has failed.", logERROR);
+      return 1;
+    }
+    
+    client_ip=inet_ntoa(client.sin_addr);
+    printf("Connection accepted from ip address %s\n", client_ip);
+    printf("%s\n", client_msg);
+    
+    write(new_sock, message, strlen(message));
+  }
   //ssds_solving::solve solveHandler;
 
 
-#if 1
+#if 0
   try {
     ip::tcp::iostream streams("");
     while(42) {
