@@ -1,5 +1,5 @@
-#ifndef _REPO_HANDLER_HPP
-#define _REPO_HANDLER_HPP
+#ifndef _REPO_HANDLER_H
+#define _REPO_HANDLER_H
 
 #include <stdio.h>
 #include <string>
@@ -15,7 +15,7 @@
 #include <librepo/librepo.h>
 
 //SSDS
-#include "json_handler.hpp"
+#include "json_handler.h"
 
 //SOLVING
 #include <hawkey/types.h>

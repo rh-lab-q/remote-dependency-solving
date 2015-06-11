@@ -1,5 +1,5 @@
-#ifndef _JSON_HANDLER_HPP
-#define _JSON_HANDLER_HPP
+#ifndef _JSON_HANDLER_H
+#define _JSON_HANDLER_H
 #include <json-glib-1.0/json-glib/json-glib.h>
 //#include <json-glib/glib-object.h>
 #include <string>

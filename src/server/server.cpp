@@ -10,7 +10,7 @@
 /*BUILDED WITH THESE FLAGS: -O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0*/
 /*synchronous start of server based on boost.asio library*/
 
-#include "server.hpp"
+#include "server.h"
 
 namespace ssds_server {
   using namespace boost::asio;

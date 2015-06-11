@@ -29,9 +29,9 @@
 //SSDS
 #include "../common/log_handler.h"
 #include "../common/network_util.h"
-#include "../common/solving.hpp"
-#include "../common/repo_handler.hpp"
-#include "../common/json_handler.hpp"
+#include "../common/solving.h"
+#include "../common/repo_handler.h"
+#include "../common/json_handler.h"
 
 
 namespace ssds_server {

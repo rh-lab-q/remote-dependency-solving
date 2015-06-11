@@ -10,10 +10,7 @@
 /*BUILDED WITH THESE FLAGS: -O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0*/
 /*synchronous start of server based on boost.asio library*/
 
-#include "server.hpp"
-#include "../common/log_handler.h"
-#include "../common/solving.hpp"
-#include <iostream>
+#include "server.h"
 
 //#include <hawkey/sack.h>
 
@@ -79,7 +76,7 @@ int main() {
     return 1;
   }
   
-  const char* message = "Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw Antwone into a glass motherfuckin' house, fuckin' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, 'cause I'll kill the motherfucker, know what I'm sayin'?\n";
+  const char* message = "Message from server\n";
   int addr_len = sizeof(server);
   while(1)
   {
@@ -99,7 +96,7 @@ int main() {
     
     client_ip=inet_ntoa(client.sin_addr);
     printf("Connection accepted from ip address %s\n", client_ip);
-    printf("%s\n", client_msg);
+    printf("%s\n", buf);
     
     write(new_sock, message, strlen(message));
   }

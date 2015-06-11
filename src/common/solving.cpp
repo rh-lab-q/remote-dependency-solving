@@ -9,7 +9,7 @@
 
 /*BUILDED WITH THESE FLAGS: -O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0*/
 
-#include "solving.hpp"
+#include "solving.h"
 //#include "../../../hawkey/hawkey/src/package_internal.h"
 
 

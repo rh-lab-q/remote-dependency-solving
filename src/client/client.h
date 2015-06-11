@@ -1,5 +1,5 @@
-#ifndef _CLIENT_HPP
-#define _CLIENT_HPP
+#ifndef _CLIENT_H
+#define _CLIENT_H
 
 #include <iostream>
 #include <string>
@@ -16,12 +16,12 @@
 //SSDS
 #include "../common/log_handler.h"
 #include "../common/network_util.h"
-#include "../common/repo_handler.hpp"
-#include "../common/solving.hpp"
+#include "../common/repo_handler.h"
+#include "../common/solving.h"
 #include "../common/params.h"
 
 //GLIB-JSON
-#include "../common/json_handler.hpp"
+#include "../common/json_handler.h"
 
 /*
 std::string usage = "Usage: ./ssds-client <command> [<args> ...]\n\n"

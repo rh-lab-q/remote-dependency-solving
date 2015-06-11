@@ -1,9 +1,9 @@
-#ifndef _SOLVING_HPP
-#define _SOLVING_HPP
+#ifndef _SOLVING_H
+#define _SOLVING_H
 
 //SSDS
-#include "repo_handler.hpp"
-#include "json_handler.hpp"
+#include "repo_handler.h"
+#include "json_handler.h"
 
 //STANDARD
 #include <string>
@@ -26,9 +26,6 @@
 #include <librepo/yum.h>
 #include <librepo/handle.h>
 
-//SSDS
-#include "repo_handler.hpp"
-#include "json_handler.hpp"
 
 namespace ssds_solving {
 
