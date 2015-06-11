@@ -49,24 +49,18 @@ if (NOT GLIB2_FOUND)
 	message(FATAL_ERROR "Library Glib-2.0 not found.")
 else (NOT GLIB2_FOUND)
 	include_directories(${GLIB2_INCLUDE_DIRS})
-	message(${GLIB2_INCLUDE_DIRS})
 endif(NOT GLIB2_FOUND)
-#if (NOT PKG_CONFIG_FOUND)
-#	message(FATAL_ERROR "Library Glib-2.0 required, but not found!")
 
-#LIBXML++
-# find_package(LibXML++ REQUIRED)
-# if (NOT LIBXML++_FOUND)
-# 	message(FATAL_ERROR "Library LibXML++ required, but not found!")
-# else(NOT LIBXMLPP_FOUND)
-# 	include_directories(${LIBXML++_INCLUDE_DIRS})
-# 	#include_directories( "${LIBXMLPP_SOURCE_DIR}/include" "${CMAKE_INSTALL_PREFIX}/include")
-# 	#LINK_DIRECTORIES("${CMAKE_INSTALL_PREFIX}/lib")
-# 	set(LIBS ${LIBS} ${LIBXML++_LIBRARIES})
-# endif(NOT LIBXML++_FOUND)
+#JSON-GLIB-1.0
+PKG_CHECK_MODULES(JSON json-glib-1.0 REQUIRED)
+if(NOT JSON_FOUND)
+	message(FATAL_ERROR "Library json-glib-1.0 not found.")
+else (NOT JSON_FOUND)
+	include_directories(${JSON_INCLUDE_DIRS})
+endif(NOT JSON_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -I/usr/include/libxml2/ -L/usr/include/librepo/ -lrepo -lxml2 -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -I/usr/include/json-glib-1.0/json-glib/ -I/usr/include/json-glib-1.0/ -ljson-glib-1.0 -lgobject-2.0")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lgobject-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
@@ -77,7 +71,9 @@ PROJECT(ssds-server)
 set(SERVSRC "../src/server/server_main.cpp")
 add_executable(ssds-server ${SERVSRC}
 		../src/common/json_read.cpp
+		../src/common/json_read.c
 		../src/common/json_create.cpp
+		../src/common/json_create.c
 		../src/common/repo_metadata.cpp
 		../src/common/repo_handler.cpp
 		../src/common/solving.cpp
@@ -91,6 +87,7 @@ target_link_libraries(
 	${Boost_FILESYSTEM_LIBRARY}
 	${LIBS}
 	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
 )
 
 PROJECT(ssds-client)
@@ -98,7 +95,9 @@ set(CLISRC "../src/client/client_main.cpp")
 #add_library("../src/client/client.cpp")
 add_executable(ssds-client ${CLISRC}
 		../src/common/json_read.cpp
+		../src/common/json_read.c
 		../src/common/json_create.cpp
+		../src/common/json_create.c
 		../src/common/repo_handler.cpp
 		../src/common/repo_metadata.cpp
 		../src/common/log_handler.c
@@ -110,4 +109,5 @@ target_link_libraries(
 	${Boost_FILESYSTEM_LIBRARY}
 	${LIBS}
 	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
 )
