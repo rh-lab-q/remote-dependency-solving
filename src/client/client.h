@@ -22,6 +22,7 @@
 
 //GLIB-JSON
 #include "../common/json_handler.h"
+#include "../common/json_handler_2.h"
 
 /*
 std::string usage = "Usage: ./ssds-client <command> [<args> ...]\n\n"

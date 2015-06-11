@@ -17,7 +17,7 @@ int main(int argc, const char* argv[]){
   
   
   /*******************************************************************/
-  /* Creating xml with all the info*/
+  /* Creating json with all the info*/
   /*******************************************************************/
   ssds_repo::parse_repo repo; //for parsing .repo files
   ssds_json::json_create json_gen;
@@ -32,6 +32,7 @@ int main(int argc, const char* argv[]){
   output = json_gen.json_to_string();
   json_gen.json_dump();
   
+#if 0
   /**************************************************************/
   /* Networking part - sending data to server and recieving*/
   /***************************************************************/
@@ -67,6 +68,7 @@ int main(int argc, const char* argv[]){
   printf("%s", buf);
   
   free(buf);
+#endif
 #endif
   return 0;
 }

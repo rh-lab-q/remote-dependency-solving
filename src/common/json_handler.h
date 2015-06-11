@@ -74,7 +74,7 @@ namespace ssds_json{
   */
  class json_create{
  public:
-   json_create();
+   json_create();//
    void insert_code(int code);
    void add_package(char* package);
    void add_repo(char** url, char* name, int type, int url_count);
