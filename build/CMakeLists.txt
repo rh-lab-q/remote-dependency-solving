@@ -76,6 +76,7 @@ add_executable(ssds-server ${SERVSRC}
 		../src/common/json_create.c
 		../src/common/repo_metadata.cpp
 		../src/common/repo_handler.cpp
+		../src/common/repo_handler.c
 		../src/common/solving.cpp
 		../src/common/log_handler.c
 		../src/common/network_util.c
@@ -99,6 +100,7 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/json_create.cpp
 		../src/common/json_create.c
 		../src/common/repo_handler.cpp
+		../src/common/repo_handler.c
 		../src/common/repo_metadata.cpp
 		../src/common/log_handler.c
 		../src/common/network_util.c

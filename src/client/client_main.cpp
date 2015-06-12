@@ -24,13 +24,18 @@ int main(int argc, const char* argv[]){
   ssds_json::json_read json_read;
 	
 #ifndef DEBUG
+  SsdsJsonCreate* json = ssds_js_cr_init();
+  ssds_js_insert_code(json, 123);
+  ssds_js_dump(json);
+  
+  /*
   json_gen.insert_code(1);
   repo.parse_default_repo();
   
   repo.get_repo_url(json_gen);
   char* output;
   output = json_gen.json_to_string();
-  json_gen.json_dump();
+  json_gen.json_dump();*/
   
 #if 0
   /**************************************************************/

@@ -2,7 +2,6 @@
 #define _CLIENT_H
 
 #include <iostream>
-#include <string>
 #include <exception>
 #include <fstream>
 #include <vector>
@@ -23,6 +22,7 @@
 //GLIB-JSON
 #include "../common/json_handler.h"
 #include "../common/json_handler_2.h"
+#include "../common/repo_handler_2.h"
 
 /*
 std::string usage = "Usage: ./ssds-client <command> [<args> ...]\n\n"

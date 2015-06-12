@@ -25,11 +25,11 @@
 extern "C"{
 #endif
 
-// typedef enum {
-//   SSDS_BASEURL = 1,
-//   SSDS_MIRRORLIST,
-//   SSDS_METALINK
-// } JsonUrlType;
+typedef enum {
+  SSDS_BASEURL = 1,
+  SSDS_MIRRORLIST,
+  SSDS_METALINK
+} SsdsJsonUrlType;
 
 /******************************************************************/
 /* json_create part - implementation of functions in json_create.c*/
@@ -60,26 +60,16 @@ void ssds_js_dump(SsdsJsonCreate* json);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 /******************************************************************/
 /* json_read part - implementation of functions in json_read.c    */
 /******************************************************************/
 
 
-#endif
+
 
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
