@@ -19,30 +19,32 @@ int main(int argc, const char* argv[]){
   /*******************************************************************/
   /* Creating json with all the info*/
   /*******************************************************************/
-  ssds_repo::parse_repo repo; //for parsing .repo files
-  ssds_json::json_create json_gen;
-  ssds_json::json_read json_read;
+//   ssds_repo::parse_repo repo; //for parsing .repo files
+//   ssds_json::json_create json_gen;
+//   ssds_json::json_read json_read;
+//   json_gen.insert_code(1);
+//   repo.parse_default_repo();
+//   repo.get_repo_url(json_gen);
 	
 #ifndef DEBUG
-  SsdsJsonCreate* json = ssds_js_cr_init();
-  ssds_js_insert_code(json, 123);
-  ssds_js_dump(json);
+  SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
+  SsdsJsonCreate* json_gen = ssds_js_cr_init();
+  SsdsJsonRead* json_read = ssds_json_read_init();
   
-  /*
-  json_gen.insert_code(1);
-  repo.parse_default_repo();
+  ssds_js_insert_code(json_gen, 123); //insert code into json
+  ssds_parse_default_repo(local_repo); //parsing local repo
+  ssds_get_repo_urls(local_repo, json_gen);
   
-  repo.get_repo_url(json_gen);
+  ssds_js_dump(json_gen);
   char* output;
-  output = json_gen.json_to_string();
-  json_gen.json_dump();*/
+  output = ssds_js_to_string(json_gen);
   
-#if 0
+#if 1
   /**************************************************************/
   /* Networking part - sending data to server and recieving*/
   /***************************************************************/
   int socket_desc;
-  const char * message = "Hello from client\n";
+//   const char * message = "Hello from client\n";
   socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   
   struct sockaddr_in server;
@@ -62,7 +64,7 @@ int main(int argc, const char* argv[]){
     return 1;
   }
   
-  write(socket_desc, message, strlen(message));
+  write(socket_desc, output, strlen(output));
   char* buf=sock_recv(socket_desc);
   if(buf == NULL)
   {
