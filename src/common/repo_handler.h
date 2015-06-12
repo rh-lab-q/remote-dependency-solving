@@ -41,7 +41,6 @@ namespace ssds_repo{
     void free_resources();
     
   public:
-    std::vector<std::ifstream*> repolist;
     LrYumRepoConfs * repoHandler;
     LrYumRepoConf * singleRepo;
     

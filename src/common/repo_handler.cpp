@@ -103,7 +103,6 @@ namespace ssds_repo{
   void parse_repo::free_resources()
   {
     lr_yum_repoconfs_free(this->repoHandler);
-    repolist.erase(repolist.begin(), repolist.end());
   }
 
 

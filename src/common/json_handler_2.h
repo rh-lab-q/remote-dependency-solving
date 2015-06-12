@@ -57,15 +57,48 @@ char* ssds_js_to_string(SsdsJsonCreate* json);
 void ssds_js_dump(SsdsJsonCreate* json);
 
 
-
-
-
 /******************************************************************/
 /* json_read part - implementation of functions in json_read.c    */
 /******************************************************************/
+typedef struct SsdsPkgInfo SsdsPkgInfo;
+typedef struct SsdsRepoInfo SsdsRepoInfo;
+typedef struct SsdsRepoInfoList SsdsRepoInfoList;
+typedef struct SsdsJsonRead SsdsJsonRead;
 
+struct SsdsPkgInfo{
+  char** packages;
+  int length;
+};
 
+struct SsdsRepoInfo{
+  char** urls; //array of char pointers in case url is baseurl - there can be more than one baseurl for one repo
+  char* name;
+  int count;//number of addresses in urls
+  int type;
+};
 
+struct SsdsRepoInfoList{
+  GSList* repoInfoList;
+};
+
+struct SsdsJsonRead{
+  JsonParser* parser;
+  JsonNode* rootNode;
+  JsonNode* currNode;
+  JsonNode* dataNode;
+  JsonObject* currObj;
+  JsonObject* dataObj;
+};
+
+SsdsJsonRead* ssds_json_read_init();
+int ssds_read_parse(char* buffer, SsdsJsonRead* json);
+int ssds_read_get_code(SsdsJsonRead* json);
+void ssds_read_get_packages(struct SsdsPkgInfo* pkgs, SsdsJsonRead* json);//used by server to get packages required by client
+void ssds_read_repo_info(SsdsJsonRead* json, SsdsRepoInfoList* list);
+SsdsPkgInfo* ssds_read_pkginfo_init();
+SsdsRepoInfo* ssds_read_repoinfo_init();
+  
+// GSList* repoInfoList;
 
 
 #ifdef __cplusplus
