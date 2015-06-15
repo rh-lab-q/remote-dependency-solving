@@ -9,7 +9,8 @@ int main(int argc, const char* argv[]){
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
-  ParamOpt* params = init_params();
+  std::cout << argc << std::endl;
+	ParamOpt* params = init_params();
   
   if(parse_params(argc, argv, params) == -1)
     return 1;
@@ -30,7 +31,8 @@ int main(int argc, const char* argv[]){
   SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
   SsdsJsonCreate* json_gen = ssds_js_cr_init();
   SsdsJsonRead* json_read = ssds_json_read_init();
-  
+  //SsdsPkgInfo* packages; 
+
   ssds_js_insert_code(json_gen, 123); //insert code into json
   ssds_parse_default_repo(local_repo); //parsing local repo
   ssds_get_repo_urls(local_repo, json_gen);
@@ -72,6 +74,16 @@ int main(int argc, const char* argv[]){
     return 1;
   }
   
+  // downloading packages
+  
+  // parse response
+
+  if(!ssds_read_parse(output,json_read)){
+      ssds_log("Error while parsing recived data.", logERROR);
+      return 1;
+  }
+
+  //ssds_read_get_packages(packages,json_read);
   printf("%s", buf);
   
   free(buf);
