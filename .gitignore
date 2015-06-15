@@ -3,3 +3,4 @@
 *.o
 *ssds-client
 build/librepo-*
+libhif-test/test
