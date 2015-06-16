@@ -35,6 +35,9 @@ enum param_options{
 	CHECK_DEPENDENCIES
 };*/
 
+// path to package download directory
+static const char *DOWNLOAD_TARGET = "/var/cache/ssds/packages/";
+
 namespace ssds_client{
   class client{
   public:
