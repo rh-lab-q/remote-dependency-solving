@@ -3,7 +3,6 @@
 
 //for debugging
 //#define DEBUG
-namespace params = boost::program_options;
 
 int main(int argc, const char* argv[]){
   /*******************************************************************/
@@ -34,6 +33,13 @@ int main(int argc, const char* argv[]){
   ssds_js_insert_code(json_gen, 123); //insert code into json
   ssds_parse_default_repo(local_repo); //parsing local repo
   ssds_get_repo_urls(local_repo, json_gen);
+  
+  int i;
+  for(i=0; i<params->pkg_count; i++)
+  {
+    char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
+    ssds_js_add_package(json_gen, pkg);
+  }
   
   ssds_js_dump(json_gen);
   char* output;
