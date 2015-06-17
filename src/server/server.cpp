@@ -11,6 +11,7 @@
 /*synchronous start of server based on boost.asio library*/
 
 #include "server.h"
+#include "server_2.h"
 
 namespace ssds_server {
   using namespace boost::asio;

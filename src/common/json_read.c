@@ -102,3 +102,10 @@ SsdsRepoInfo* ssds_read_repoinfo_init()
   new->urls=NULL;
   return new;
 }
+
+SsdsRepoInfoList* ssds_read_list_init()
+{
+  SsdsRepoInfoList* new = (SsdsRepoInfoList*)malloc(sizeof(SsdsRepoInfoList));
+  new->repoInfoList=NULL;
+  return new;
+}

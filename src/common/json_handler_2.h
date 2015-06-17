@@ -78,7 +78,7 @@ struct SsdsRepoInfo{
 };
 
 struct SsdsRepoInfoList{
-  GSList* repoInfoList;
+  GSList* repoInfoList;//for SsdsRepoInfo
 };
 
 struct SsdsJsonRead{
@@ -97,6 +97,7 @@ void ssds_read_get_packages(struct SsdsPkgInfo* pkgs, SsdsJsonRead* json);//used
 void ssds_read_repo_info(SsdsJsonRead* json, SsdsRepoInfoList* list);
 SsdsPkgInfo* ssds_read_pkginfo_init();
 SsdsRepoInfo* ssds_read_repoinfo_init();
+SsdsRepoInfoList* ssds_read_list_init();
   
 // GSList* repoInfoList;
 

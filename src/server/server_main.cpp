@@ -11,6 +11,7 @@
 /*synchronous start of server based on boost.asio library*/
 
 #include "server.h"
+#include "server_2.h"
 
 //#include <hawkey/sack.h>
 
@@ -78,6 +79,8 @@ int main() {
   
   const char* message = "Message from server\n";
   int addr_len = sizeof(server);
+  char* buf;
+  
   while(1)
   {
     if((new_sock=accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
@@ -86,7 +89,7 @@ int main() {
       return 1;
     }
     
-    char* buf=sock_recv(new_sock);
+    buf=sock_recv(new_sock);
     
     if(buf == NULL)
     {
@@ -99,9 +102,27 @@ int main() {
     printf("%s\n", buf);
     
     write(new_sock, message, strlen(message));
+  
+    SsdsJsonRead* json = ssds_json_read_init();
+    ssds_read_parse(buf, json);//parse incoming message
+  
+    SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
+    ssds_read_get_packages(pkgs, json);
+  
+    SsdsRepoInfoList* list = ssds_read_list_init();
+    ssds_read_repo_info(json, list);
+  
+  SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
+//   ssds_locate_repo_metadata(json, list, meta_list);
+  
+    printf("Konec server\n");
   }
   //ssds_solving::solve solveHandler;
 
+  
+  
+//   HySack* sack = ssds_solve_init();
+//   ssds_fill_sack(sack, list);
 
 #if 0
   try {

@@ -58,8 +58,8 @@ struct SsdsMetadataFilesLoc{
 };
 
 SsdsRepoMetadataList* ssds_repo_metadata_init();//
-int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* list);//
-int local_repo_metadata(SsdsRepoInfo* repo);//
+int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list);//
+int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list);//
 char* full_path_to_metadata(char* repo_name);//
 void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* list);
 

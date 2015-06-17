@@ -1,16 +1,16 @@
 //============================================================================
 // Name		: server.hpp
-// Author	: mruprich
+// Author	          : mruprich
 // Version	: 0.2
 // Copyright	: GNU GPL
 // Description	: Server side of SSDS
 //============================================================================
 
-#ifndef _SERVER_HPP
-#define _SERVER_HPP
+#ifndef _SERVER_H
+#define _SERVER_H
 
-//#include <stdlib.h>
-//#include <stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <string>
 #include <iostream>

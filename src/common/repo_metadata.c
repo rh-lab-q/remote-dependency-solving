@@ -5,20 +5,19 @@ SsdsRepoMetadataList* ssds_repo_metadata_init()
 {
   SsdsRepoMetadataList* new = (SsdsRepoMetadataList*) malloc(sizeof(SsdsRepoMetadataList));
   new->files_locations = NULL;
-  new->urls = NULL;
   return new;
 }
 
 
-int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* list)
+int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list)
 {
-  int len = g_slist_length(list->repoInfoList);
+  int len = g_slist_length(info_list->repoInfoList);
   int i;
   for(i=0;i<len;i++){
-    SsdsRepoInfo* repo = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
+    SsdsRepoInfo* repo = (SsdsRepoInfo*)g_slist_nth_data(info_list->repoInfoList, i);
     
-    if(!local_repo_metadata(repo))
-      download_repo_metadata_by_url(repo);
+    if(!local_repo_metadata(repo, meta_list))
+      download_repo_metadata_by_url(repo, meta_list);
   }
 }
 
@@ -32,7 +31,7 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
   
   char** handle_urls=(char**)malloc(2*sizeof(char*));
   handle_urls[0]=local_path;
-  handle_urls[1]=nullptr;
+  handle_urls[1]=NULL;
   lr_handle_setopt(h, NULL, LRO_URLS, handle_urls);
   lr_handle_setopt(h, NULL, LRO_LOCAL, (long)1);
   lr_handle_setopt(h, NULL, LRO_REPOTYPE, LR_YUMREPO);
@@ -47,15 +46,15 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
     
     SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)malloc(sizeof(SsdsMetadataFilesLoc));
     loc->repomd = local_path;
-    loc->filelists = lr_yum_repo_path(repo,"filelists");
-    loc->primary = lr_yum_repo_path(repo,"primary");
+    loc->filelists = (char*)lr_yum_repo_path(repo,"filelists");
+    loc->primary = (char*)lr_yum_repo_path(repo,"primary");
     
     list->files_locations = g_slist_append(list->files_locations, loc);
 //     this->files_locations.push_back(loc);
     return 1;
   }
     
-  printf("Local metadata for %s repo were not found at %s. Metadata will be downloaded.\n", repo_info->name, local_path);
+  printf("Local metadata for %s repo were not found at %s. Metadata will be downloaded.\n", repo->name, local_path);
   return 0;
 }
 
@@ -86,7 +85,7 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
   //char *download_list[] = { "primary", "filelists", NULL};
   LrHandle *h = lr_handle_init();
   LrResult *r = lr_result_init();
-  repo->urls[repo->count]=nullptr;
+  repo->urls[repo->count]=NULL;
   
   //find type of url in vector
   switch(repo->type)

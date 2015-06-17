@@ -1,16 +1,9 @@
 #ifndef _CLIENT_H
 #define _CLIENT_H
 
-#include <iostream>
-#include <exception>
-#include <fstream>
-#include <vector>
 #include <stdio.h>
-
-//BOOST - needs to be compiled with -lboost_system option
-#include <boost/asio.hpp>
-#include <boost/array.hpp>
-#include <boost/program_options.hpp>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
 //SSDS
 #include "../common/log_handler.h"
@@ -18,8 +11,6 @@
 #include "../common/repo_handler.h"
 #include "../common/solving.h"
 #include "../common/params.h"
-
-//GLIB-JSON
 #include "../common/json_handler.h"
 #include "../common/json_handler_2.h"
 #include "../common/repo_handler_2.h"
@@ -35,13 +26,5 @@ enum param_options{
 	CHECK_DEPENDENCIES
 };*/
 
-namespace ssds_client{
-  class client{
-  public:
-    client(){};
-    
-    int command;
-    boost::asio::io_service io_service_object;//object that grants access to system I/O operations
-  };
-}
+
 #endif
