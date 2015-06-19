@@ -13,8 +13,6 @@
 #include "server.h"
 #include "server_2.h"
 
-//#include <hawkey/sack.h>
-
 
 #if 0
 void session(ip::tcp::socket sock,boost::system::error_code ec){
@@ -111,11 +109,31 @@ int main() {
   
     SsdsRepoInfoList* list = ssds_read_list_init();
     ssds_read_repo_info(json, list);
+    
+    guint len=g_slist_length(list->repoInfoList);
+    guint i;
+    
+    for(i=0; i<len; i++)
+    {
+      SsdsRepoInfo* repo = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
+      printf("name: %s, count: %d, type: %d\n",repo->name, repo->count, repo->type);
+    }
   
-  SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
-//   ssds_locate_repo_metadata(json, list, meta_list);
-  
-    printf("Konec server\n");
+    SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
+    ssds_locate_repo_metadata(json, list, meta_list);
+    
+    //TODO - change this so that it doesn't need to be created manually
+    HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+    hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
+    HySack* sack_p = &sack;
+    
+    ssds_fill_sack(sack_p, meta_list);
+
+    SsdsJsonCreate* answer = ssds_js_cr_init();
+    ssds_dep_answer(json, answer, sack_p);
+    
+    ssds_js_dump(answer);
+    printf("Konec server, sack ma %d baliku\n", hy_sack_count(sack));
   }
   //ssds_solving::solve solveHandler;
 

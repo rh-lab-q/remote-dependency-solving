@@ -30,9 +30,10 @@
 #include "../common/log_handler.h"
 #include "../common/network_util.h"
 #include "../common/solving.h"
-#include "../common/repo_handler.h"
-#include "../common/json_handler.h"
-
+#include "../common/solving_2.h"
+// #include "../common/repo_handler.h"
+// #include "../common/json_handler.h"
+// 
 
 namespace ssds_server {
 	class server : private boost::noncopyable {

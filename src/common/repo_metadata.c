@@ -11,13 +11,14 @@ SsdsRepoMetadataList* ssds_repo_metadata_init()
 
 int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list)
 {
-  int len = g_slist_length(info_list->repoInfoList);
-  int i;
+  guint len = g_slist_length(info_list->repoInfoList);
+  guint i;
   for(i=0;i<len;i++){
     SsdsRepoInfo* repo = (SsdsRepoInfo*)g_slist_nth_data(info_list->repoInfoList, i);
     
     if(!local_repo_metadata(repo, meta_list))
       download_repo_metadata_by_url(repo, meta_list);
+    
   }
 }
 
@@ -123,13 +124,13 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
     
     LrYumRepo* lrRepo = lr_yum_repo_init();
     lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &lrRepo);
-    
     //std::cout << lr_yum_repo_path(repo, "filelists") << std::endl;
     
     SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)malloc(sizeof(SsdsMetadataFilesLoc));
+    
     loc->repomd = destdir;
-    loc->filelists = lr_yum_repo_path(repo,"filelists");
-    loc->primary = lr_yum_repo_path(repo,"primary");
+    loc->filelists = lr_yum_repo_path(lrRepo,"filelists");
+    loc->primary = lr_yum_repo_path(lrRepo,"primary");
     
     list->files_locations = g_slist_append(list->files_locations, loc);
 //     this->files_locations.push_back(loc);
