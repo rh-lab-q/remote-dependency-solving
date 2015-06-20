@@ -13,8 +13,6 @@ int main(int argc, const char* argv[]){
   if(parse_params(argc, argv, params) == -1)
     return 1;
   
-  
-  
   /*******************************************************************/
   /* Creating json with all the info*/
   /*******************************************************************/
@@ -70,8 +68,60 @@ int main(int argc, const char* argv[]){
     ssds_log("Error while recieving data.", logERROR);
     return 1;
   }
+
+  /***********************************************************/
+  /* Downloading packages part                               */
+  /***********************************************************/
+
+  // required variables
+  gboolean return_status;
+  LrHandle *handler;
+  GSList *package_list = NULL;
+  LrPackageTarget *target;
+  GError *error = NULL;
+  char **packages, **urls;
+  
+  // parse response
+  if(!ssds_read_parse(output,json_read)){
+      ssds_log("Error while parsing recived data.", logERROR);
+      return 1;
+  }
+
+                               
+  // TODO:
+  // get available urls
+  // ssds_read_get_urls(urls, json_read);
+  
+  // get names of packages
+  int num_pkgs/* = ssds_read_get_packages_string(pkgs,packages,json_read)*/, i = 0;
   
   printf("%s", buf);
+  
+  handler = lr_handle_init();
+  lr_handle_setopt(handler, NULL, LRO_URLS, urls);
+  lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
+  
+  for(i; i < num_pkgs; i++){
+  
+     // Prepare list of target
+     target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET, LR_CHECKSUM_UNKNOWN,
+                                   NULL, 0, NULL, TRUE, NULL, NULL, &error);
+     package_list = g_slist_append(package_list, target);
+  }
+  
+  // Download all packages        
+  return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
+  
+  if(!return_status || error != NULL){
+      char *err_message;
+      sprintf(err_message,"%d: %s\n", error->code, error->message);
+      ssds_log(err_message, logERROR);
+      g_error_free(error);
+      return 1;
+  }
+  
+  g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
+  lr_handle_free(handler);
   
   free(buf);
 #endif
