@@ -1,4 +1,4 @@
-#include "repo_handler_2.h"
+#include "repo_handler.h"
 
 SsdsLocalRepoInfo* ssds_repo_parse_init()
 { //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch

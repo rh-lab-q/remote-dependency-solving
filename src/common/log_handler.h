@@ -1,12 +1,12 @@
 #ifndef LOG_HANDLER_H
 #define LOG_HANDLER_H
+  
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"{
 #endif
-  
-#include <stdio.h>
-#include <stdlib.h>
 
 enum LogClass{logINFO=0, logMESSAGE, logWARNING, logERROR};
 extern const char* log_lvl_msg[4];

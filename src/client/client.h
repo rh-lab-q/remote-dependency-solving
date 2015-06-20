@@ -1,6 +1,10 @@
 #ifndef _CLIENT_H
 #define _CLIENT_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -8,12 +12,9 @@
 //SSDS
 #include "../common/log_handler.h"
 #include "../common/network_util.h"
-#include "../common/repo_handler.h"
-#include "../common/solving.h"
 #include "../common/params.h"
 #include "../common/json_handler.h"
-#include "../common/json_handler_2.h"
-#include "../common/repo_handler_2.h"
+#include "../common/repo_handler.h"
 
 /*
 std::string usage = "Usage: ./ssds-client <command> [<args> ...]\n\n"
@@ -26,5 +27,8 @@ enum param_options{
 	CHECK_DEPENDENCIES
 };*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
