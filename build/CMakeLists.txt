@@ -63,7 +63,7 @@ else (NOT LIBREPO_FOUND)
 endif(NOT LIBREPO_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCC) 
-	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lgobject-2.0")
+	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
