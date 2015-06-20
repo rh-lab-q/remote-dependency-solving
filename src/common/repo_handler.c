@@ -69,8 +69,8 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       char* url_copy;
       char* url_subst;
       
-      int j;
-      for(j=0; j<k; j++)
+//       int j;
+      for(int j=0; j<k; j++)
       { 
         url_copy = strdup(url[j]);
         url_subst = lr_url_substitute(url_copy, list);
@@ -82,7 +82,7 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       
       ssds_js_add_repo(json,url_subst_list, name, type, k);
       
-      for(j=0; j<=k; j++)
+      for(int j=0; j<=k; j++)
         free(url_subst_list[j]);
       
       free(url_subst_list);

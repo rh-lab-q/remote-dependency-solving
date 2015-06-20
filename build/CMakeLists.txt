@@ -62,8 +62,8 @@ else (NOT LIBREPO_FOUND)
 	include_directories(${LIBREPO_INCLUDE_DIRS})
 endif(NOT LIBREPO_FOUND)
 
-if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lgobject-2.0")
+if(CMAKE_COMPILER_IS_GNUCC) 
+	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lgobject-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
@@ -83,8 +83,6 @@ add_executable(ssds-server ${SERVSRC}
 
 target_link_libraries(
 	ssds-server
-	${Boost_SYSTEM_LIBRARY} #or ${Boost_LIBRARIES}
-	${Boost_FILESYSTEM_LIBRARY}
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
@@ -103,8 +101,6 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/params.c)
 target_link_libraries(
 	ssds-client
-	${Boost_SYSTEM_LIBRARY}
-	${Boost_FILESYSTEM_LIBRARY}
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
