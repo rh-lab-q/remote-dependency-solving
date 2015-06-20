@@ -1,4 +1,4 @@
-#include "json_handler_2.h"
+#include "json_handler.h"
 
 SsdsJsonRead* ssds_json_read_init()
 {
@@ -100,5 +100,12 @@ SsdsRepoInfo* ssds_read_repoinfo_init()
   new->type=0;
   new->name=NULL;
   new->urls=NULL;
+  return new;
+}
+
+SsdsRepoInfoList* ssds_read_list_init()
+{
+  SsdsRepoInfoList* new = (SsdsRepoInfoList*)malloc(sizeof(SsdsRepoInfoList));
+  new->repoInfoList=NULL;
   return new;
 }

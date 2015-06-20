@@ -1,7 +1,6 @@
 //============================================================================
 // Name		: server_main.cpp
-// Author	: brumlablo
-// Editor	: Jozkar, mruprich
+// Author	          : Jozkar, mruprich
 // Version	: 0.2
 // Copyright	: GNU GPL
 // Description	: Server side of SSDS
@@ -11,8 +10,6 @@
 /*synchronous start of server based on boost.asio library*/
 
 #include "server.h"
-
-//#include <hawkey/sack.h>
 
 
 #if 0
@@ -76,8 +73,9 @@ int main() {
     return 1;
   }
   
-  const char* message = "Message from server\n";
   int addr_len = sizeof(server);
+  char* buf;
+  
   while(1)
   {
     if((new_sock=accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
@@ -86,7 +84,7 @@ int main() {
       return 1;
     }
     
-    char* buf=sock_recv(new_sock);
+    buf=sock_recv(new_sock);
     
     if(buf == NULL)
     {
@@ -95,13 +93,42 @@ int main() {
     }
     
     client_ip=inet_ntoa(client.sin_addr);
-    printf("Connection accepted from ip address %s\n", client_ip);
-    printf("%s\n", buf);
+    printf("Connection accepted from ip address %s\n", client_ip);//TODO - change to ssds_log
     
+  
+    SsdsJsonRead* json = ssds_json_read_init();
+    ssds_read_parse(buf, json);//parse incoming message
+  
+    SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
+    ssds_read_get_packages(pkgs, json);
+  
+    SsdsRepoInfoList* list = ssds_read_list_init();
+    ssds_read_repo_info(json, list);
+    
+    guint len=g_slist_length(list->repoInfoList);
+    guint i;
+    
+    SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
+    ssds_locate_repo_metadata(json, list, meta_list);
+    
+    //TODO - change this so that it doesn't need to be created manually
+    HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+    hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
+    HySack* sack_p = &sack;
+    ssds_fill_sack(sack_p, meta_list);
+
+    SsdsJsonCreate* answer = ssds_js_cr_init();
+    ssds_dep_answer(json, answer, sack_p);
+    
+    char* message = ssds_js_to_string(answer);
     write(new_sock, message, strlen(message));
   }
   //ssds_solving::solve solveHandler;
 
+  
+  
+//   HySack* sack = ssds_solve_init();
+//   ssds_fill_sack(sack, list);
 
 #if 0
   try {

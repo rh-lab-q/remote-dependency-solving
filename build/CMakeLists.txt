@@ -1,11 +1,6 @@
 #CMAKE BUILD 1.3
 #Usage in CLI: "cmake .","make"; executables are in "/build" folder
 
-#Upravy: 	1. Nechtela se mi tam nalinkovat libxml2 a nevedel jsem jak za kompilace pridat prikaz `xml2-config --libs --cflags`
-#		   Tak jsem ten prikaz spustil mimo cmake a jeho vystup (-I/usr/include/libxml2 -lxml2 -lz -lm -ldl) jsem pridal do cflags
-#		   Funguje to ale pokud bys mela lepsi reseni klido sem s nim :)
-#		2. Potreboval jsem dalsi cast boost knihovny tak jsem pridal -lboost_program_options
-
 #Used compile parameters:
 #for libxml:	-I/usr/include/libxml2 -lxml2 -lz -lm -ldl
 #for glib.h:	-I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
@@ -34,14 +29,6 @@ include_directories ("${PROJECT_SOURCE_DIR}/src/server/")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
-#BOOST
-find_package(Boost REQUIRED thread system filesystem)
-if (NOT Boost_FOUND)
-	message(FATAL_ERROR "Library Boost required, but not found!")
-else(NOT Boost_FOUND)
-	include_directories(${Boost_INCLUDE_DIRS})
-endif(NOT Boost_FOUND)
-
 #GLIB-2.0
 FIND_PACKAGE(PkgConfig)
 PKG_CHECK_MODULES(GLIB2 glib-2.0 REQUIRED)
@@ -59,28 +46,40 @@ else (NOT JSON_FOUND)
 	include_directories(${JSON_INCLUDE_DIRS})
 endif(NOT JSON_FOUND)
 
+#HAWKEY
+PKG_CHECK_MODULES(HAWKEY hawkey  REQUIRED)
+if(NOT HAWKEY_FOUND)
+	message(FATAL_ERROR "Library hawkey not found.")
+else (NOT HAWKEY_FOUND)
+	include_directories(${HAWKEY_INCLUDE_DIRS})
+endif(NOT HAWKEY_FOUND)
+
+#LIBREPO
+PKG_CHECK_MODULES(LIBREPO librepo REQUIRED)
+if(NOT LIBREPO_FOUND)
+	message(FATAL_ERROR "Library librepo not found.")
+else (NOT LIBREPO_FOUND)
+	include_directories(${LIBREPO_INCLUDE_DIRS})
+endif(NOT LIBREPO_FOUND)
+
 if(CMAKE_COMPILER_IS_GNUCXX) 
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lgobject-2.0")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lboost_program_options -lpthread -lhawkey -lgobject-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
     	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
 
-file(GLOB SRCS *.cpp *.hpp *.c *.h)
+file(GLOB SRCS *.c *.h)
 
 PROJECT(ssds-server)
-set(SERVSRC "../src/server/server_main.cpp")
+set(SERVSRC "../src/server/server_main.c")
 add_executable(ssds-server ${SERVSRC}
-		../src/common/json_read.cpp
 		../src/common/json_read.c
-		../src/common/json_create.cpp
 		../src/common/json_create.c
-		../src/common/repo_metadata.cpp
-		../src/common/repo_handler.cpp
+		../src/common/repo_metadata.c
 		../src/common/repo_handler.c
-		../src/common/solving.cpp
+		../src/common/solving.c
 		../src/common/log_handler.c
-		../src/common/network_util.c
-		../src/server/server.cpp)
+		../src/common/network_util.c)
 
 target_link_libraries(
 	ssds-server
@@ -89,19 +88,16 @@ target_link_libraries(
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
 )
 
 PROJECT(ssds-client)
-set(CLISRC "../src/client/client_main.cpp")
-#add_library("../src/client/client.cpp")
+set(CLISRC "../src/client/client_main.c")
 add_executable(ssds-client ${CLISRC}
-		../src/common/json_read.cpp
 		../src/common/json_read.c
-		../src/common/json_create.cpp
 		../src/common/json_create.c
-		../src/common/repo_handler.cpp
 		../src/common/repo_handler.c
-		../src/common/repo_metadata.cpp
 		../src/common/log_handler.c
 		../src/common/network_util.c
 		../src/common/params.c)
@@ -112,4 +108,6 @@ target_link_libraries(
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
 )

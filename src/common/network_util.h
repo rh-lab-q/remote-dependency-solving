@@ -1,9 +1,10 @@
-#ifndef NETWORK_UTIL_H
-#define NETWORK_UTIL_H
+#ifndef _NETWORK_UTIL_H
+#define _NETWORK_UTIL_H
 
 #include "log_handler.h"
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"{

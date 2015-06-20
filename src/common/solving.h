@@ -1,16 +1,15 @@
 #ifndef _SOLVING_H
 #define _SOLVING_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 //SSDS
 #include "repo_handler.h"
 #include "json_handler.h"
 
-//STANDARD
-#include <string>
-#include <iostream>
-
-//#include <glib-2.0/glib/gerror.h>
-//#include <glib-2.0/glib/gslist.h>
+//GLIB
 #include <glib.h>
 
 //SOLVING
@@ -26,24 +25,13 @@
 #include <librepo/yum.h>
 #include <librepo/handle.h>
 
+HySack* ssds_solve_init();
+void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list);
+void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack);
+void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack);
 
-namespace ssds_solving {
+#ifdef __cplusplus
+}
+#endif
 
-  class solve{ 
-    public:
-          
-      solve(/* repos class instance with all enabled repos handlers */); 
-      ~solve();
-      void fill_sack(ssds_repo::repo_metadata &metadata);
-      void query(const char* request, ssds_json::json_create &answer);
-      void answer(ssds_json::json_read &client_data, ssds_json::json_create &answer);
-      
-      //SOLVING
-      HySack sack;
-      
-    private:
-          /* repos class instance with all enabled repos handlers */
-  };
-
-}//ssds_ solving
 #endif

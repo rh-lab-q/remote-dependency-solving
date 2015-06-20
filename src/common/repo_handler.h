@@ -2,10 +2,7 @@
 #define _REPO_HANDLER_H
 
 #include <stdio.h>
-#include <string>
 #include <string.h>
-#include <vector>
-#include <iostream>
 #include <glib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -25,42 +22,49 @@
 #include <hawkey/goal.h>
 #include <hawkey/repo.h>
 
-namespace ssds_repo{  
-  class metadata_files_location{
-  public:
-    std::string repomd;
-    std::string filelists;
-    std::string primary;
-  };
-  
-  class parse_repo{
-  public:
-    parse_repo();
-    void parse_default_repo();
-    void get_repo_url(ssds_json::json_create &json);
-    void free_resources();
-    
-  public:
-    LrYumRepoConfs * repoHandler;
-    LrYumRepoConf * singleRepo;
-    
-  };
-  
-  class repo_metadata{
-  public:
-    repo_metadata();
-//     void transfer_repo_info(ssds_json::json_read &json);
-    int locate_repo_metadata(ssds_json::json_read &json);
-    bool local_repo_metadata(ssds_json::json_read::repoInfo* repo_info);
-    char* full_path_to_metadata(char* repo_name);
-    
-    //std::vector<ssds_xml::xml_node*> urls;
-    std::vector<metadata_files_location*> files_locations;
-    GSList* urls;
-    
-  private:
-    void download_repo_metadata_by_url(ssds_json::json_read::repoInfo* repo_info);
-  };
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+/************************************************************/
+/* Parse repo - getting information from local .repo files  */
+/************************************************************/
+typedef struct SsdsLocalRepoInfo SsdsLocalRepoInfo;
+
+struct SsdsLocalRepoInfo{
+  LrYumRepoConfs* repoHandler;
+  LrYumRepoConf* singleRepo;
+};
+
+SsdsLocalRepoInfo* ssds_repo_parse_init();
+void ssds_parse_default_repo(SsdsLocalRepoInfo* repo);
+void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json);
+
+/*****************************************************************/
+/* Repo metadata - information about metadata location on server */
+/*****************************************************************/
+typedef struct SsdsRepoMetadataList SsdsRepoMetadataList;
+typedef struct SsdsMetadataFilesLoc SsdsMetadataFilesLoc;
+
+struct SsdsRepoMetadataList{
+  GSList *files_locations; //list of SsdsMetadataFilesLoc
+//   GSList *urls;
+};
+
+struct SsdsMetadataFilesLoc{
+  char* repomd;
+  char* filelists;
+  char* primary;
+};
+
+SsdsRepoMetadataList* ssds_repo_metadata_init();//
+int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list);//
+int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list);//
+char* full_path_to_metadata(char* repo_name);//
+void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* list);
+
+#ifdef __cplusplus
 }
+#endif
 
 #endif
