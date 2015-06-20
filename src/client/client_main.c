@@ -32,7 +32,12 @@ int main(int argc, const char* argv[]){
   ssds_parse_default_repo(local_repo); //parsing local repo
   ssds_get_repo_urls(local_repo, json_gen);
   
-  ssds_js_dump(json_gen);
+  for(int i=0; i<params->pkg_count; i++)
+  {
+    char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
+    ssds_js_add_package(json_gen, pkg);
+  }
+  
   char* output;
   output = ssds_js_to_string(json_gen);
   

@@ -4,7 +4,7 @@ SsdsJsonRead* ssds_json_read_init()
 {
   SsdsJsonRead* new = (SsdsJsonRead*)malloc(sizeof(SsdsJsonRead));
   new->parser=json_parser_new();
-//   new->repoInfoList=NULL;
+  return new;
 }
 
 

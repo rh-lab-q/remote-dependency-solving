@@ -94,7 +94,6 @@ int main() {
     
     client_ip=inet_ntoa(client.sin_addr);
     printf("Connection accepted from ip address %s\n", client_ip);//TODO - change to ssds_log
-    
   
     SsdsJsonRead* json = ssds_json_read_init();
     ssds_read_parse(buf, json);//parse incoming message
@@ -110,6 +109,7 @@ int main() {
     
     SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
     ssds_locate_repo_metadata(json, list, meta_list);
+    
     
     //TODO - change this so that it doesn't need to be created manually
     HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
