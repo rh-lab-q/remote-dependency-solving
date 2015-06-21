@@ -107,3 +107,6 @@ target_link_libraries(
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
 )
+
+file(MAKE_DIRECTORY /tmp/ssds/)
+file(MAKE_DIRECTORY /var/cache/ssds/packages/)
