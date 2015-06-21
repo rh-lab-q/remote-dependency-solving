@@ -7,11 +7,10 @@ Solving dependencies when installing new packages is a process that in some case
 
 Dependencies
 ============
-Required package which are needed for successfull compilation and build.
+Required packages needed for successfull compilation and build.
 
-- gcc-c++
+- gcc
 - cmake
-- boost
 - libsolv
 - librepo-devel
 - hawkey-devel
