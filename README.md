@@ -31,8 +31,11 @@ There is new module in librepo, but it is not among updates yet so this is what 
 
 Now everything should be in order to build ssds:
   -enter build/ and type:
+    
     $cmake .
+    
     $make
+  
   -two files are created - ssds-client and ssds-server
   
 Enjoy :)
