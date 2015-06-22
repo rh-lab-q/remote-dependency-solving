@@ -29,8 +29,10 @@ include_directories ("${PROJECT_SOURCE_DIR}/src/server/")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
-#GLIB-2.0
+#pkg-config is needed to find and properly link some libraries
 FIND_PACKAGE(PkgConfig)
+
+#GLIB-2.0
 PKG_CHECK_MODULES(GLIB2 glib-2.0 REQUIRED)
 if (NOT GLIB2_FOUND)
 	message(FATAL_ERROR "Library Glib-2.0 not found.")
@@ -62,6 +64,14 @@ else (NOT LIBREPO_FOUND)
 	include_directories(${LIBREPO_INCLUDE_DIRS})
 endif(NOT LIBREPO_FOUND)
 
+#LIBREPO
+PKG_CHECK_MODULES(CHECK check REQUIRED)
+if(NOT CHECK_FOUND)
+	message(FATAL_ERROR "Library check not found.")
+else (NOT CHECK_FOUND)
+	include_directories(${CHECK_INCLUDE_DIRS})
+endif(NOT CHECK_FOUND)
+
 if(CMAKE_COMPILER_IS_GNUCC) 
 	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
@@ -88,6 +98,7 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS}
 )
 
 PROJECT(ssds-client)
@@ -106,6 +117,7 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS}
 )
 
 file(MAKE_DIRECTORY /tmp/ssds/)
