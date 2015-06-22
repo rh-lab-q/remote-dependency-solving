@@ -29,9 +29,6 @@ There is new module in librepo, but it is not among updates yet so this is what 
   -install these packages at the same time like this:
    $sudo dnf update <pkg.rpm> <pkg.rpm> ... - put them all into the same command
 
-Then enter /usr/include/hawkey/ dir and apply patch located in src/bugzilla/bug.patch:
-  $patch -p1 -R < bug.patch
-
 Now everything should be in order to build ssds:
   -enter build/ and type:
     $cmake .
