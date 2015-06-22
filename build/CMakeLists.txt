@@ -1,11 +1,6 @@
 #CMAKE BUILD 1.3
 #Usage in CLI: "cmake .","make"; executables are in "/build" folder
 
-#Used compile parameters:
-#for libxml:	-I/usr/include/libxml2 -lxml2 -lz -lm -ldl
-#for glib.h:	-I/usr/include/glib-2.0/ -I/usr/lib64/glib-2.0/include/
-#for librepo.h:	-L/usr/include/librepo/ -lrepo
-
 INCLUDE(FindPkgConfig)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
@@ -15,19 +10,16 @@ SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 PROJECT(ssds)
 SET(ssds_VERSION_MAJOR 0)
-SET(ssds_VERSION_MINOR 0)
-SET(ssds_VERSION_BUILD 1)
+SET(ssds_VERSION_MINOR 2)
+SET(ssds_VERSION_BUILD 0)
 SET(ssds_VERSION
    	"${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
 SET(PACKAGE_VERSION
 	"${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
 
+message(${PROJECT_SOURCE_DIR})
 
-include_directories ("${PROJECT_SOURCE_DIR}/src/common/")
-include_directories ("${PROJECT_SOURCE_DIR}/src/client/")
-include_directories ("${PROJECT_SOURCE_DIR}/src/server/")
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/../cmake/Modules/")
 
 #pkg-config is needed to find and properly link some libraries
 FIND_PACKAGE(PkgConfig)
@@ -64,13 +56,17 @@ else (NOT LIBREPO_FOUND)
 	include_directories(${LIBREPO_INCLUDE_DIRS})
 endif(NOT LIBREPO_FOUND)
 
+enable_testing()
+include_directories(../tests)
+#add_subdirectory(../tests)
+
 #LIBREPO
-PKG_CHECK_MODULES(CHECK check REQUIRED)
-if(NOT CHECK_FOUND)
-	message(FATAL_ERROR "Library check not found.")
-else (NOT CHECK_FOUND)
-	include_directories(${CHECK_INCLUDE_DIRS})
-endif(NOT CHECK_FOUND)
+#PKG_CHECK_MODULES(CHECK check REQUIRED)
+#if(NOT CHECK_FOUND)
+	#message(FATAL_ERROR "Library check not found.")
+#else (NOT CHECK_FOUND)
+	#include_directories(${CHECK_INCLUDE_DIRS})
+#endif(NOT CHECK_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCC) 
 	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0")
@@ -98,7 +94,7 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	${CHECK_LDFLAGS}
+	#${CHECK_LDFLAGS}
 )
 
 PROJECT(ssds-client)
@@ -117,7 +113,7 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	${CHECK_LDFLAGS}
+	#${CHECK_LDFLAGS}
 )
 
 file(MAKE_DIRECTORY /tmp/ssds/)
