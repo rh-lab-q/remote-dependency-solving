@@ -1,7 +1,6 @@
 #CMAKE BUILD 1.3
 #Usage in CLI: "cmake .","make"; executables are in "/build" folder
 
-INCLUDE(FindPkgConfig)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -17,12 +16,11 @@ SET(ssds_VERSION
 SET(PACKAGE_VERSION
 	"${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
 
-message(${PROJECT_SOURCE_DIR})
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/../cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
 #pkg-config is needed to find and properly link some libraries
 FIND_PACKAGE(PkgConfig)
+INCLUDE(FindPkgConfig)
 
 #GLIB-2.0
 PKG_CHECK_MODULES(GLIB2 glib-2.0 REQUIRED)
@@ -56,28 +54,21 @@ else (NOT LIBREPO_FOUND)
 	include_directories(${LIBREPO_INCLUDE_DIRS})
 endif(NOT LIBREPO_FOUND)
 
-enable_testing()
-include_directories(../tests)
-#add_subdirectory(../tests)
+#CHECK
+find_package(Check REQUIRED)
+include_directories(${CHECKLIB_INCLUDE_DIRS})
 
-#LIBREPO
-#PKG_CHECK_MODULES(CHECK check REQUIRED)
-#if(NOT CHECK_FOUND)
-	#message(FATAL_ERROR "Library check not found.")
-#else (NOT CHECK_FOUND)
-	#include_directories(${CHECK_INCLUDE_DIRS})
-#endif(NOT CHECK_FOUND)
 
 if(CMAKE_COMPILER_IS_GNUCC) 
 	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
-    	set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
+  set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
 
 file(GLOB SRCS *.c *.h)
 
 PROJECT(ssds-server)
-set(SERVSRC "../src/server/server_main.c")
+set(SERVSRC "src/server/server_main.c")
 add_executable(ssds-server ${SERVSRC}
 		../src/common/json_read.c
 		../src/common/json_create.c
@@ -94,11 +85,11 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	#${CHECK_LDFLAGS}
+	${CHECK_LDFLAGS}
 )
 
 PROJECT(ssds-client)
-set(CLISRC "../src/client/client_main.c")
+set(CLISRC "src/client/client_main.c")
 add_executable(ssds-client ${CLISRC}
 		../src/common/json_read.c
 		../src/common/json_create.c
@@ -113,8 +104,10 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	#${CHECK_LDFLAGS}
+	${CHECK_LDFLAGS}
 )
 
 file(MAKE_DIRECTORY /tmp/ssds/)
 file(MAKE_DIRECTORY /var/cache/ssds/packages/)
+enable_testing()
+add_subdirectory(tests)
