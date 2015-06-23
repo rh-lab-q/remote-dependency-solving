@@ -1,0 +1,8 @@
+find_package(Check REQUIRED)
+#set(LIBS ${LIBS} ${CHECK_LIBRARIES})
+#include_directories(${CHECK_INCLUDE_DIRS})
+#target_link_libraries(${CHECK_LDFLAGS})
+include_directories(. ../src ${CHECK_INCLUDE_DIRS})
+add_executable(test_main test_main.c test_dummy.c)
+target_link_libraries(test_main ${CHECK_LDFLAGS})
+add_test(test_main ${CMAKE_CURRENT_BINARY_DIR}/../tests/test_main)
