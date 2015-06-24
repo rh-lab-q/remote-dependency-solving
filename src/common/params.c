@@ -1,3 +1,23 @@
+/* Server side dependency solving - transfer of dependency solving from local machine to server when installing new packages
+ * Copyright (C) 2015  Michal Ruprich, Josef Řídký
+ *
+ * Licensed under the GNU Lesser General Public License Version 2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #include "params.h"
 
 int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
@@ -32,7 +52,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
         break;
         
       case 'h':
-        print_help();
+        print_help_cl();
         exit(EXIT_SUCCESS);
         break;
         
@@ -45,7 +65,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
         break;
         
       case '?':
-        print_help();
+        print_help_cl();
         exit(EXIT_FAILURE);
         break;
     }
@@ -101,15 +121,22 @@ void parse_params_srv(int argc, char* argv[])
         set_debug();
         break;
       default: /* '?' */
-        print_help();
+        print_help_cl();
         exit(EXIT_FAILURE);
     }
   }
 }
 
 
-void print_help()
+void print_help_cl()
 {
-  printf("this is help!\n");
+  printf("Usage: ./ssds-client <commands> [<packages> ...]\n\n"
+         "List of Commands\n\n"
+         "--install\t\tResolve dependencies and install packages\n"
+         "--checkdep\t\tOnly show required packages - do not install yet\n"
+         "--help, -h\t\tDisplays help\n"
+         "-v\t\t\tVerbose - turned off by default\n"
+         "-d\t\t\tDebug - turned off by default\n"
+  );
 }
 

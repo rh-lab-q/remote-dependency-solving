@@ -1,13 +1,22 @@
-//============================================================================
-// Name		: server_main.cpp
-// Author	          : Jozkar, mruprich
-// Version	: 0.2
-// Copyright	: GNU GPL
-// Description	: Server side of SSDS
-//============================================================================
-
-/*BUILDED WITH THESE FLAGS: -O2 -g -Wall -Wextra -pedantic  -std=c++11 -lboost_thread -lboost_system -fmessage-length=0*/
-/*synchronous start of server based on boost.asio library*/
+/* Server side dependency solving - transfer of dependency solving from local machine to server when installing new packages
+ * Copyright (C) 2015  Michal Ruprich, Josef Řídký
+ *
+ * Licensed under the GNU Lesser General Public License Version 2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
 
 #include "server.h"
 
@@ -94,14 +103,16 @@ int main(int argc, char* argv[]) {
     }
     
     client_ip=inet_ntoa(client.sin_addr);
-    ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);//TODO - change to ssds_log
-  
+    ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);
+    
     SsdsJsonRead* json = ssds_json_read_init();
-    if(ssds_read_parse(buf, json)==0)//parse incoming message
+    if(!ssds_read_parse(buf, json))//parse incoming message
     {
       ssds_log(logERROR, "False data recieved from %s. Client rejected\n", client_ip);
-      return 0;
+      continue;
     }
+    
+    /* Dependency solving part */
     
     SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
     ssds_read_get_packages(pkgs, json);

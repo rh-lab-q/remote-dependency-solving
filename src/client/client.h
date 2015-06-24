@@ -16,17 +16,8 @@ extern "C"{
 #include "../common/json_handler.h"
 #include "../common/repo_handler.h"
 
-// path to package download directory
+/** path to package download directory */
 static const char *DOWNLOAD_TARGET = "/var/cache/ssds/packages/";
-/*
-std::string usage = "Usage: ./ssds-client <command> [<args> ...]\n\n"
-                    "List of Commands\n\n"
-                    "install\t\tResolve dependencies and install packages\n"
-                    "checkdep\t\tOnly show required packages - do not install yet\n"
-                    "help\t\tDisplays help\n";
-enum param_options{
-          CHECK_DEPENDENCIES
-};*/
 
 #ifdef __cplusplus
 }

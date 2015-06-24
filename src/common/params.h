@@ -1,3 +1,23 @@
+/* Server side dependency solving - transfer of dependency solving from local machine to server when installing new packages
+ * Copyright (C) 2015  Michal Ruprich, Josef Řídký
+ *
+ * Licensed under the GNU Lesser General Public License Version 2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #ifndef _PARAMS_H
 #define _PARAMS_H
 
@@ -8,37 +28,63 @@
 #include <getopt.h>
 #include <stdlib.h>
 
-
-
 #ifdef __cplusplus
 extern "C"{
 #endif
 
+/**
+ * Integer option for command in ParamOptsCl
+ */
 enum ParamsOptions{ 
-  PAR_NO_OPT = 0,   // 0 No option was provided
-  PAR_INSTALL,      // 1 Install option chosen
-  PAR_CHK_DEP       // 2 Only check if dependencies are fulfilled
+  PAR_NO_OPT = 0,   /**< 0 No option was provided */
+  PAR_INSTALL,      /**< 1 Install option chosen */
+  PAR_CHK_DEP       /**< 2 Only check if dependencies are fulfilled */
 }ParOpt;
-  
+ 
+/********************************/
+/*  This part is used by client */
+/********************************/
+
+/**
+ * Structure hold information parsed from parameters provided by user */
 typedef struct ParamOptsCl ParamOptsCl;
 
 struct ParamOptsCl{
-  int command;
-  int pkg_count;
-  GSList* pkgs;
+  int command;      /**< ParOpt number of command */
+  int pkg_count;    /**< Number of packages required by user */
+  GSList* pkgs;     /**< Names of packages from command line */
 };
 
-extern int param_opt;
-
+/**
+ * Parses command line on client side.
+ * @param argc      int
+ * @param argv      char**
+ * @param params    ParamOptsCl*
+ * @return          EXIT_SUCCES when all parameters are in order, EXIT_FAILURE otherwise
+ */
 int parse_params_cl(int argc, char* argv[], ParamOptsCl* params);
+
+/**
+ * Returns newly allocated ParamOptsCl
+ * @return          ParamOptsCl*
+ */
 ParamOptsCl* init_params_cl();
+
+/**
+ * Prints help for client users
+ */
+void print_help_cl();
+
+/********************************/
+/*  This part is used by server */
+/********************************/
 
 void parse_params_srv(int argc,char* argv[]);
 
-void print_help();
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* _PARAMS_H */
