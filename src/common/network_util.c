@@ -14,7 +14,7 @@ char* sock_recv(int sock_fd)
   
   if(ret==-1)
   {
-    ssds_log("Unable to read data from socket.", logERROR);
+    ssds_log(logERROR, "Unable to read data from socket\n");
     free(reply);
     return NULL;
   }

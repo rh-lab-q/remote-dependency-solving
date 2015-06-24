@@ -3,25 +3,26 @@
   
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-enum LogClass{logINFO=0, logMESSAGE, logWARNING, logERROR};
+enum LogClass{logINFO=0, logMESSAGE, logWARNING, logERROR, logDEBUG};
 extern const char* log_lvl_msg[4];
 extern int __verbose;
+extern int __debug;
 
+#define LOG_FILE "/tmp/ssds.log"
 
-#define out_message(message) fprintf(stderr, "SSDS: MESSAGE: %s\n", message)
-#define out_info(message) fprintf(stderr, "SSDS: INFO: %s\n", message)
-#define out_warning(message) fprintf(stderr, "SSDS: WARNING: %s\n", message)
-#define out_error(message) fprintf(stderr, "SSDS: ERROR: %s\n", message)
-#define out_unknown(message) fprintf(stderr, "SSDS: UNKNOWN: %s\n", message)
+void ssds_log(int log_level, const char *message, ...);
 
-void ssds_log(const char *message, int log_level);
 void set_verbose();
 void unset_verbose();
+
+void set_debug();
+void unset_debug();
 
 #ifdef __cplusplus
 }

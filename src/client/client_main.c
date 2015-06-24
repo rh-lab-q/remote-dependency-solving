@@ -8,21 +8,14 @@ int main(int argc, const char* argv[]){
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
-  ParamOpt* params = init_params();
+  ParamOptsCl* params = init_params_cl();
   
-  if(parse_params(argc, argv, params) == -1)
+  if(parse_params_cl(argc, argv, params) == -1)
     return 1;
   
   /*******************************************************************/
   /* Creating json with all the info*/
   /*******************************************************************/
-//   ssds_repo::parse_repo repo; //for parsing .repo files
-//   ssds_json::json_create json_gen;
-//   ssds_json::json_read json_read;
-//   json_gen.insert_code(1);
-//   repo.parse_default_repo();
-//   repo.get_repo_url(json_gen);
-	
 #ifndef DEBUG
   SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
   SsdsJsonCreate* json_gen = ssds_js_cr_init();
@@ -56,13 +49,13 @@ int main(int argc, const char* argv[]){
   
   if(socket_desc==-1)
   {
-    ssds_log("Client encountered an error when creating socket for communication.", logERROR);
+    ssds_log(logERROR, "Client encountered an error when creating socket for communication\n");
     return 1;
   }
   
   if(connect(socket_desc, (struct sockaddr *)&server, sizeof(server))<0)
   {  
-    ssds_log("Connection error.", logERROR);
+    ssds_log(logERROR, "Connection error\n");
     return 1;
   }
   
@@ -70,7 +63,7 @@ int main(int argc, const char* argv[]){
   char* buf=sock_recv(socket_desc);
   if(buf == NULL)
   {
-    ssds_log("Error while recieving data.", logERROR);
+    ssds_log(logERROR, "Error while recieving data\n");
     return 1;
   }
 
@@ -88,7 +81,7 @@ int main(int argc, const char* argv[]){
   
   // parse response
   if(!ssds_read_parse(output,json_read)){
-      ssds_log("Error while parsing recived data.", logERROR);
+      ssds_log(logERROR, "Error while parsing recived data\n");
       return 1;
   }
 
@@ -118,9 +111,9 @@ int main(int argc, const char* argv[]){
   return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
   
   if(!return_status || error != NULL){
-      char *err_message;
-      sprintf(err_message,"%d: %s\n", error->code, error->message);
-      ssds_log(err_message, logERROR);
+//       char *err_message;
+//       sprintf(err_message,"%d: %s\n", error->code, error->message);
+      ssds_log(logERROR, "%d: %s\n", error->code, error->message);
       g_error_free(error);
       return 1;
   }

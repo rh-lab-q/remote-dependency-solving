@@ -76,7 +76,8 @@ add_executable(ssds-server ${SERVSRC}
 		../src/common/repo_handler.c
 		../src/common/solving.c
 		../src/common/log_handler.c
-		../src/common/network_util.c)
+		../src/common/network_util.c
+		../src/common/params.c)
 
 target_link_libraries(
 	ssds-server

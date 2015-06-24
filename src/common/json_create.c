@@ -211,8 +211,6 @@ char* ssds_js_to_string(SsdsJsonCreate* json)
   gsize len;
   char* data;
   data = (char*)json_generator_to_data (json->generator, &len);
-//     printf("from json_to_string: %s\n", data);
-//     buffer=(char*)malloc(len*sizeof(char));
   return data;
 }
 

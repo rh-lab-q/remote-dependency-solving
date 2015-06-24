@@ -34,7 +34,10 @@ void session(ip::tcp::socket sock,boost::system::error_code ec){
 }
 #endif
 
-int main() {
+int main(int argc, char* argv[]) {
+  parse_params_srv(argc, argv);
+    
+  
   /*************************************************************************
   * 
   * 	Establishing port, socket etc for the communication
@@ -46,11 +49,9 @@ int main() {
   char client_msg[1000];
   socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   
-  set_verbose();
-  
   if(socket_desc==-1)
   {
-    ssds_log("Server encountered an error when creating socket for communication", logERROR);
+    ssds_log(logERROR, "Server encountered an error when creating socket for communication");
     return 1;
   }
   
@@ -61,15 +62,15 @@ int main() {
   
   if(bind(socket_desc, (struct sockaddr*)&server, sizeof(server)) <0)
   {
-    ssds_log("Server wasn't able to bind with socket", logERROR);
+    ssds_log(logERROR, "Server wasn't able to bind with socket\n");
     return 1;
   }
   
-  ssds_log("Server started. Waiting for incoming connections.", logINFO);
+  ssds_log(logINFO, "Server started. Waiting for incoming connections\n");
   
   if(listen(socket_desc, 5)!=0)
   {
-    ssds_log("Listen failed on server.", logERROR);
+    ssds_log(logERROR, "Listen failed on server\n");
     return 1;
   }
   
@@ -80,7 +81,7 @@ int main() {
   {
     if((new_sock=accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
     {
-      ssds_log("Accept connection has failed.", logERROR);
+      ssds_log(logERROR, "Accept connection has failed");
       return 1;
     }
     
@@ -88,17 +89,17 @@ int main() {
     
     if(buf == NULL)
     {
-      ssds_log("Recieving of data has failed.", logERROR);
+      ssds_log(logERROR, "Recieving of data has failed\n");
       return 1;
     }
     
     client_ip=inet_ntoa(client.sin_addr);
-    printf("Connection accepted from ip address %s\n", client_ip);//TODO - change to ssds_log
+    ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);//TODO - change to ssds_log
   
     SsdsJsonRead* json = ssds_json_read_init();
     if(ssds_read_parse(buf, json)==0)//parse incoming message
     {
-      ssds_log("False data recieved. Client rejected.", logERROR);
+      ssds_log(logERROR, "False data recieved from %s. Client rejected\n", client_ip);
       return 0;
     }
     

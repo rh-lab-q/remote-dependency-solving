@@ -17,6 +17,7 @@ extern "C"{
 #include "../common/repo_handler.h"
 #include "../common/json_handler.h"
 #include "../common/solving.h"
+#include "../common/params.h"
 
 
 #ifdef __cplusplus

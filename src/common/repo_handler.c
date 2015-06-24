@@ -20,8 +20,7 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
   GError* err = NULL;
   GSList* list = lr_yum_repoconfs_get_list(repo->repoHandler, &err);
   
-  unsigned int i;
-  for(i=0; i<g_slist_length(list); i++){
+  for(unsigned int i=0; i<g_slist_length(list); i++){
     char** url;
     char* name;
     short type = 0;
@@ -69,7 +68,6 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       char* url_copy;
       char* url_subst;
       
-//       int j;
       for(int j=0; j<k; j++)
       { 
         url_copy = strdup(url[j]);

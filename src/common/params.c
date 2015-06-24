@@ -1,12 +1,10 @@
 #include "params.h"
 
-
-
-int parse_params(int argc, const char** args, ParamOpt* params)
+int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 {
   if(argc==1)
   {
-    ssds_log("No command provided. The program will terminate now.", logERROR);
+    ssds_log(logERROR, "No command provided. The program will terminate now\n");
     exit(1);
   }
   
@@ -25,21 +23,30 @@ int parse_params(int argc, const char** args, ParamOpt* params)
   
   while(1)
   {
-    c = getopt_long(argc, args, "vh", long_options, &opt_index);
+    c = getopt_long(argc, argv, "vhd", long_options, &opt_index);
     
     switch(c)
     {
       case 0:
         seen++;
         break;
+        
       case 'h':
         print_help();
-        exit(0);
+        exit(EXIT_SUCCESS);
         break;
+        
       case 'v':
         set_verbose();
         break;
+        
+      case 'd':
+        set_debug();
+        break;
+        
       case '?':
+        print_help();
+        exit(EXIT_FAILURE);
         break;
     }
     
@@ -49,14 +56,14 @@ int parse_params(int argc, const char** args, ParamOpt* params)
 
   if(seen>1)
   {
-    ssds_log("Choose either install or chkdep. The program will terminate now.", logMESSAGE);
-    ssds_log("Wrong parameter combination. Terminating.",logERROR);
+    ssds_log(logMESSAGE, "Choose either install or chkdep. The program will terminate now\n");
+    ssds_log(logERROR, "Wrong parameter combination. Terminating\n");
     return -1;
   }
   
   if(seen==0)
   {
-    ssds_log("No command provided. The program will terminate now.", logERROR);
+    ssds_log(logERROR, "No command provided. The program will terminate now\n");
     exit(1);
   }
   
@@ -64,7 +71,7 @@ int parse_params(int argc, const char** args, ParamOpt* params)
   {
     while(optind < argc)
     {
-      params->pkgs = g_slist_append(params->pkgs, args[optind++]);
+      params->pkgs = g_slist_append(params->pkgs, argv[optind++]);
       params->pkg_count++;
     }
   }
@@ -72,13 +79,32 @@ int parse_params(int argc, const char** args, ParamOpt* params)
   return 1;
 }
 
-ParamOpt* init_params()
+ParamOptsCl* init_params_cl()
 {
-  ParamOpt* new = (ParamOpt*)malloc(sizeof(ParamOpt));
+  ParamOptsCl* new = (ParamOptsCl*)malloc(sizeof(ParamOptsCl));
   new->pkg_count=0;
   new->command=-1;
   new->pkgs=NULL;
   return new;
+}
+
+
+void parse_params_srv(int argc, char* argv[])
+{
+  int opt;
+  while ((opt = getopt(argc, argv, "vd")) != -1) {
+    switch (opt) {
+      case 'v':
+        set_verbose();
+        break;
+      case 'd':
+        set_debug();
+        break;
+      default: /* '?' */
+        print_help();
+        exit(EXIT_FAILURE);
+    }
+  }
 }
 
 
