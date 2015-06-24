@@ -13,6 +13,9 @@ int ssds_read_parse(char* buffer, SsdsJsonRead* json)
   GError **error;
     
   int ret = json_parser_load_from_data(json->parser, (const gchar*)buffer, -1, error);
+  if(!ret)
+    return 0;
+  
   json->rootNode = json_parser_get_root(json->parser);
   
   JsonObject* obj=json_node_get_object(json->rootNode);

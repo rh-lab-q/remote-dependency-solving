@@ -96,8 +96,12 @@ int main() {
     printf("Connection accepted from ip address %s\n", client_ip);//TODO - change to ssds_log
   
     SsdsJsonRead* json = ssds_json_read_init();
-    ssds_read_parse(buf, json);//parse incoming message
-  
+    if(ssds_read_parse(buf, json)==0)//parse incoming message
+    {
+      ssds_log("False data recieved. Client rejected.", logERROR);
+      return 0;
+    }
+    
     SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
     ssds_read_get_packages(pkgs, json);
   
