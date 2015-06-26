@@ -91,7 +91,7 @@ int main(int argc, const char* argv[]){
   // ssds_read_get_urls(urls, json_read);
   
   // get names of packages
-  int num_pkgs/* = ssds_read_get_packages_string(pkgs,packages,json_read)*/, i = 0;
+  int num_pkgs/* = ssds_read_get_packages_string(pkgs,packages,json_read)*/;
   
   printf("%s", buf);
   
@@ -99,7 +99,7 @@ int main(int argc, const char* argv[]){
   lr_handle_setopt(handler, NULL, LRO_URLS, urls);
   lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
   
-  for(i; i < num_pkgs; i++){
+  for(int i = 0; i < num_pkgs; i++){
   
      // Prepare list of target
      target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET, LR_CHECKSUM_UNKNOWN,
@@ -111,13 +111,31 @@ int main(int argc, const char* argv[]){
   return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
   
   if(!return_status || error != NULL){
-//       char *err_message;
-//       sprintf(err_message,"%d: %s\n", error->code, error->message);
       ssds_log(logERROR, "%d: %s\n", error->code, error->message);
       g_error_free(error);
       return 1;
   }
   
+
+  /*********************************************************/
+  /* Installing packages                                   */
+  /*********************************************************/
+
+  for(GSList *elem = package_list; elem; elem = g_slist_next(elem)){
+
+      char command[300];
+      LrPackageTarget *target = (LrPackageTarget *)elem->data;
+
+      if(!target->err){
+          sprintf(command, "rpm --install --nodeps %s", target->local_path);
+          printf("%s\n",command);
+          system(command);
+      }else{
+          ssds_log(logERROR, "Package Error: %s\n", target->err);
+      }
+
+  }
+ 
   g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
   lr_handle_free(handler);
   
