@@ -16,6 +16,7 @@ Required packages needed for successfull compilation and build.
 - hawkey-devel
 - glib2.0-devel
 - json-glib-1.0
+- check
 
 Installation
 ============
@@ -36,9 +37,9 @@ Now everything should be in order to build ssds:
 
 		$cd build/
     
-    $cmake ..
+    		$cmake ..
     
-    $make
+    		$make
   
   -two files are created - ssds-client and ssds-server
 	-to test type in build/ dir:
