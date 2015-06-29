@@ -1,6 +1,6 @@
 #include "client.h"
 
-
+// #define VERSION_HAWKEY @HKY_22@
 //for debugging
 //#define DEBUG
 
@@ -8,6 +8,7 @@ int main(int argc, const char* argv[]){
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
+  
   ParamOptsCl* params = init_params_cl();
   
   if(parse_params_cl(argc, argv, params) == -1)

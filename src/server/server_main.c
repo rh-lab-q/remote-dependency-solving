@@ -128,7 +128,13 @@ int main(int argc, char* argv[]) {
     
     
     //TODO - change this so that it doesn't need to be created manually
-    HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+    HySack sack;
+#if VERSION_HAWKEY
+      sack = hy_sack_create(NULL, NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
+#else
+      sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
+#endif
+    
     hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
     HySack* sack_p = &sack;
     ssds_fill_sack(sack_p, meta_list);

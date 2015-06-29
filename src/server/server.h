@@ -18,6 +18,7 @@ extern "C"{
 #include "../common/json_handler.h"
 #include "../common/solving.h"
 #include "../common/params.h"
+#include "../../cmake/Config/version_conf.h"
 
 
 #ifdef __cplusplus

@@ -2,7 +2,7 @@
 #Usage in CLI: "cmake .","make"; executables are in "/build" folder
 
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
 SET(CMAKE_COLOR_MAKEFILE ON)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
@@ -38,11 +38,21 @@ else (NOT JSON_FOUND)
 	include_directories(${JSON_INCLUDE_DIRS})
 endif(NOT JSON_FOUND)
 
-#HAWKEY
-PKG_CHECK_MODULES(HAWKEY hawkey  REQUIRED)
+#HAWKEY - 0.5.7
+PKG_CHECK_MODULES(HAWKEY hawkey REQUIRED)
 if(NOT HAWKEY_FOUND)
 	message(FATAL_ERROR "Library hawkey not found.")
 else (NOT HAWKEY_FOUND)
+          string(REGEX MATCH "[0-9]?$" HKY_REGEX ${HAWKEY_VERSION})
+          
+          math(EXPR HKY_NUM "${HKY_REGEX}+0")
+          if(${HKY_NUM} GREATER 3)#hawkey version is higher than 0.5.3
+            set(HKY_22 1)
+          else(${HKY_NUM} GREATER 3)#hawkey version is lower or equal to 0.5.3
+            set(HKY_22 0)
+          endif(${HKY_NUM} GREATER 3)
+          
+          add_definitions(-DVERSION_HAWKEY=${HKY_22})
 	include_directories(${HAWKEY_INCLUDE_DIRS})
 endif(NOT HAWKEY_FOUND)
 
@@ -58,6 +68,9 @@ endif(NOT LIBREPO_FOUND)
 find_package(Check REQUIRED)
 include_directories(${CHECKLIB_INCLUDE_DIRS})
 
+#HAWKEY VERSION
+configure_file(${PROJECT_SOURCE_DIR}/cmake/Config/version_conf.h.in ${PROJECT_SOURCE_DIR}/cmake/Config/version_conf.h)
+include_directories(${PROJECT_SOURCE_DIR}/cmake/Config)
 
 if(CMAKE_COMPILER_IS_GNUCC) 
 	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0")
@@ -109,6 +122,6 @@ target_link_libraries(
 )
 
 file(MAKE_DIRECTORY /tmp/ssds/)
-file(MAKE_DIRECTORY /var/cache/ssds/packages/)
+#file(MAKE_DIRECTORY /var/cache/ssds/packages/)
 enable_testing()
 add_subdirectory(tests)

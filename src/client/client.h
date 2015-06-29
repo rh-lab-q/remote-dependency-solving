@@ -15,6 +15,7 @@ extern "C"{
 #include "../common/params.h"
 #include "../common/json_handler.h"
 #include "../common/repo_handler.h"
+#include "../../cmake/Config/version_conf.h"
 
 /** path to package download directory */
 static const char *DOWNLOAD_TARGET = "/var/cache/ssds/packages/";
