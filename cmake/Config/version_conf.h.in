@@ -1,0 +1,6 @@
+#ifndef VERSION_CONF_H
+#define VERSION_CONF_H
+
+#define VERSION_HAWKEY @HKY_22@
+
+#endif // VERSION_CONF_H
