@@ -20,17 +20,17 @@
 
 #include "solving.h"
 
-HySack* ssds_solve_init()
-{
-  HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
-    
-  if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE))
-    return NULL;
-  
-  HySack* ret;
-  ret = &sack;
-  return ret;
-}
+// HySack* ssds_solve_init()
+// {
+//   HySack sack = hy_sack_create(NULL, NULL, NULL,HY_MAKE_CACHE_DIR);
+//     
+//   if(hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE))
+//     return NULL;
+//   
+//   HySack* ret;
+//   ret = &sack;
+//   return ret;
+// }
 
 void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
 {
