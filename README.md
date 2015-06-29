@@ -16,7 +16,7 @@ Required packages needed for successfull compilation and build.
 - hawkey-devel
 - glib2.0-devel
 - json-glib-1.0
-- check
+- check-devel
 
 Installation
 ============
