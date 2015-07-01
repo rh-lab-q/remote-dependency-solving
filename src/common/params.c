@@ -40,11 +40,11 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
   int opt_index=0;
   int seen=0;
   extern int optind;
-  
+  ssds_log(logINFO, "Option index: %d\n", optind);  
   while(1)
   {
     c = getopt_long(argc, argv, "vhd", long_options, &opt_index);
-    
+    ssds_log(logINFO, "c is %c\n",c); 
     switch(c)
     {
       case 0:
@@ -86,16 +86,17 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
     ssds_log(logERROR, "No command provided. The program will terminate now\n");
     exit(1);
   }
-  
+  ssds_log(logINFO, "optind %d and argc %d\n", optind, argc);
   if(optind < argc)
   {
     while(optind < argc)
     {
+      ssds_log(logINFO, "package %s\n",argv[optind]);
       params->pkgs = g_slist_append(params->pkgs, argv[optind++]);
       params->pkg_count++;
     }
   }
-  
+  ssds_log(logINFO,"PKG count %d\n", params->pkg_count);
   return 1;
 }
 
