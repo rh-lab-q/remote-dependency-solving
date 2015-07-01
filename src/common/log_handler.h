@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C"{
@@ -44,7 +45,7 @@ typedef enum LogClass{
 };        
   
 /** Contains severence level message for ssds_log function */
-extern const char* log_lvl_msg[4];
+extern const char* log_lvl_msg[5];
 
 /**
  * Used on global scope to indicate if verbose option is on. 

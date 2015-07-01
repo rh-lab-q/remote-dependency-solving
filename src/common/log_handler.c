@@ -20,22 +20,27 @@
 
 #include "log_handler.h"
 
-const char* log_lvl_msg[4] = {"INFO", "MESSAGE", "WARNING", "ERROR", "DEBUG"};
+const char* log_lvl_msg[5] = {"INFO", "MESSAGE", "WARNING", "ERROR", "DEBUG"};
 int __verbose = 0;
 int __debug = 0;
 
 void ssds_log(int log_level, const char *message, ...)
 {
   FILE *flog = fopen(LOG_FILE, "a");
+  time_t current_time = time(NULL);
+  struct tm *ts = localtime(&current_time);
   
   if(flog==NULL)
   {
-    fprintf(stderr, "SSDS: ERROR: Unable to open log file\n");
+    fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: ERROR: Unable to open log file \n",
+            ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
     exit(EXIT_FAILURE);
   }
   
   if(log_level!=logDEBUG)
-    fprintf(flog, "SSDS: %s: ", log_lvl_msg[log_level]);//beginning of every message
+    fprintf(flog, "(%d/%d/%d %02d:%02d:%02d) SSDS: %s: ", 
+            ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec,
+            log_lvl_msg[log_level]);//beginning of every message
   
   va_list args;
   va_start(args, message);
@@ -44,29 +49,34 @@ void ssds_log(int log_level, const char *message, ...)
     case logINFO:
       if(__verbose==1)
       {
-        fprintf(stderr, "SSDS: INFO: ");
+        fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: INFO: ", 
+                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
         vfprintf(stderr, message, args);
       }
       break;
     case logMESSAGE:
       if(__verbose==1)
       {
-        fprintf(stderr, "SSDS: MESSAGE: ");
+        fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: MESSAGE: ",
+                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
         vfprintf(stderr, message, args);
       }
       break;
     case logWARNING:
-      fprintf(stderr, "SSDS: WARNING: ");
+      fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: WARNING: ",
+              ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
       vfprintf(stderr, message, args);
       break;
     case logERROR:
-      fprintf(stderr, "SSDS: ERROR: ");
+      fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: ERROR: ",
+              ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
       vfprintf(stderr, message, args);
       break;
     case logDEBUG:
       if(__debug==1)
       {
-        fprintf(stderr, "SSDS: DEBUG: ");
+        fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: DEBUG: ",
+                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
         vfprintf(stderr, message, args);
       }
       break;
@@ -77,7 +87,6 @@ void ssds_log(int log_level, const char *message, ...)
     va_start(args, message);
     vfprintf(flog, message, args);
   }
-  
   fclose(flog);
   va_end(args);
 }
