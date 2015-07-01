@@ -8,112 +8,112 @@ int main(int argc, char* argv[]){
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
-  ssds_log(logINFO, "Client startup\n");
+  ssds_log(logDEBUG, "Client startup\n");
   
   ParamOptsCl* params = init_params_cl();
   
-  ssds_log(logINFO, "Client params initialized.\n");
+  ssds_log(logDEBUG, "Client params initialized.\n");
 
   if(parse_params_cl(argc, argv, params) == -1)
     return 1;
 
-  ssds_log(logINFO, "Client params parsed. Package count %d.\n", params->pkg_count);  
+  ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
   /*******************************************************************/
   /* Creating json with all the info*/
   /*******************************************************************/
 #ifndef DEBUG
 
-  ssds_log(logINFO, "Client JSON creating. Package count %d.\n", params->pkg_count);
+  ssds_log(logDEBUG, "Client JSON creating. Package count %d.\n", params->pkg_count);
 
   SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
-  ssds_log(logINFO, "Local repo info initialized on %d. Package count %d.\n", local_repo, params->pkg_count);
+  ssds_log(logDEBUG, "Local repo info initialized on %d. Package count %d.\n", local_repo, params->pkg_count);
   
   SsdsJsonCreate* json_gen = ssds_js_cr_init();
-  ssds_log(logINFO, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
+  ssds_log(logDEBUG, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
 
   SsdsJsonRead* json_read = ssds_json_read_init();
-  ssds_log(logINFO, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
+  ssds_log(logDEBUG, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
   
   ssds_js_insert_code(json_gen, 123); //insert code into json
-  ssds_log(logINFO, "Inserted code 123 into json. Package count %d.\n", params->pkg_count);
+  ssds_log(logDEBUG, "Inserted code 123 into json. Package count %d.\n", params->pkg_count);
 
   ssds_parse_default_repo(local_repo); //parsing local repo
-  ssds_log(logINFO, "Local repo is parsed. Package count %d.\n", params->pkg_count);
+  ssds_log(logDEBUG, "Local repo is parsed. Package count %d.\n", params->pkg_count);
 
   ssds_get_repo_urls(local_repo, json_gen);
-  ssds_log(logINFO, "Getting repo urls. Package count %d.\n", params->pkg_count);
+  ssds_log(logDEBUG, "Getting repo urls. Package count %d.\n", params->pkg_count);
   
-  ssds_log(logINFO, "Loop thrue required packages. Package count %d.\n", params->pkg_count);
+  ssds_log(logDEBUG, "Loop thrue required packages. Package count %d.\n", params->pkg_count);
   for(int i=0; i<params->pkg_count; i++)
   {
     char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
     ssds_js_add_package(json_gen, pkg);
-    ssds_log(logINFO, "Added %s package as %d in order.\n", pkg, i);
+    ssds_log(logDEBUG, "Added %s package as %d in order.\n", pkg, i);
   }
-  ssds_log(logINFO, "Loop is done.\n");
+  ssds_log(logDEBUG, "Loop is done.\n");
 
   char* output;
-  ssds_log(logINFO, "Generating output message to server.\n");
+  ssds_log(logDEBUG, "Generating output message to server.\n");
   output = ssds_js_to_string(json_gen);
-  ssds_log(logINFO, "Message generated.\n\n%s\n\nEND OF PARSING PART\n\n", output);
+  ssds_log(logDEBUG, "Message generated.\n\n%s\n\nEND OF PARSING PART\n\n", output);
   
 #if 1
   /***************************************************************/
   /* Networking part - sending data to server and recieving      */
   /***************************************************************/
-  ssds_log(logINFO, "Begin of networking part.\n");
+  ssds_log(logDEBUG, "Begin of networking part.\n");
 
   int socket_desc;
 //   const char * message = "Hello from client\n";
   socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  ssds_log(logINFO, "Setted up socket descriptor.\n");
+  ssds_log(logDEBUG, "Setted up socket descriptor.\n");
 
-  ssds_log(logINFO, "Setting up connection to server.\n");
+  ssds_log(logDEBUG, "Setting up connection to server.\n");
   struct sockaddr_in server;
   server.sin_addr.s_addr=inet_addr("127.0.0.1");
-  ssds_log(logINFO, "Set server address.\n");
+  ssds_log(logDEBUG, "Set server address.\n");
 
   server.sin_family=AF_INET;
-  ssds_log(logINFO, "Set comunication protocol.\n");
+  ssds_log(logDEBUG, "Set comunication protocol.\n");
 
   server.sin_port=htons(2345);
-  ssds_log(logINFO, "Set server port.\n");
+  ssds_log(logDEBUG, "Set server port.\n");
   
-  ssds_log(logINFO, "Socket controll.\n");
+  ssds_log(logDEBUG, "Socket controll.\n");
   if(socket_desc==-1)
   {
     ssds_log(logERROR, "Client encountered an error when creating socket for communication\n");
     return 1;
   }
-  ssds_log(logINFO, "Socket controll - OK\n"); 
+  ssds_log(logDEBUG, "Socket controll - OK\n"); 
   
-  ssds_log(logINFO, "Trying to connect to server...\n");
+  ssds_log(logDEBUG, "Trying to connect to server...\n");
   if(connect(socket_desc, (struct sockaddr *)&server, sizeof(server))<0)
   {  
-    ssds_log(logERROR, "Connection error\n");
+    ssds_log(logDEBUG, "Connection error\n");
     return 1;
   }
-  ssds_log(logINFO, "Connection to server is established.\n");
+  ssds_log(logDEBUG, "Connection to server is established.\n");
   
-  ssds_log(logINFO, "Sending message to server.\n");
+  ssds_log(logDEBUG, "Sending message to server.\n");
   write(socket_desc, output, strlen(output));
-  ssds_log(logINFO, "Message send.\n");
+  ssds_log(logDEBUG, "Message send.\n");
 
-  ssds_log(logINFO, "Reading answer fromserver.\n");
+  ssds_log(logDEBUG, "Reading answer fromserver.\n");
   char* buf=sock_recv(socket_desc);
-  ssds_log(logINFO, "Checking answer.\n");
+  ssds_log(logDEBUG, "Checking answer.\n");
   if(buf == NULL)
   {
     ssds_log(logERROR, "Error while recieving data\n");
     return 1;
   }
-  ssds_log(logINFO, "Answer is OK.\n\n%s\n\n");
+  ssds_log(logDEBUG, "Answer is OK.\n\n%s\n\n");
 
   /***********************************************************/
   /* Downloading packages part                               */
   /***********************************************************/
 
-  ssds_log(logINFO, "Begin downloading part. \n---- END OF MESSAGES ----\n");
+  ssds_log(logDEBUG, "Begin downloading part. \n---- END OF MESSAGES ----\n");
   // required variables
   gboolean return_status;
   LrHandle *handler;

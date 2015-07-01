@@ -81,7 +81,10 @@ void print_help_cl();
 
 void parse_params_srv(int argc,char* argv[]);
 
-
+/**
+ * Prints help for server usage
+ */
+void print_help_srv();
 
 #ifdef __cplusplus
 }

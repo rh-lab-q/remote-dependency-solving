@@ -44,9 +44,11 @@ void session(ip::tcp::socket sock,boost::system::error_code ec){
 #endif
 
 int main(int argc, char* argv[]) {
+  ssds_log(logDEBUG, "Server started.\n");
+  
   parse_params_srv(argc, argv);
     
-  
+  ssds_log(logDEBUG, "Params parsed.\n");
   /*************************************************************************
   * 
   * 	Establishing port, socket etc for the communication
@@ -55,7 +57,6 @@ int main(int argc, char* argv[]) {
   int socket_desc, new_sock;
   char* client_ip;
 
-  char client_msg[1000];
   socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   
   if(socket_desc==-1)
@@ -63,6 +64,8 @@ int main(int argc, char* argv[]) {
     ssds_log(logERROR, "Server encountered an error when creating socket for communication");
     return 1;
   }
+  
+  ssds_log(logDEBUG, "Socket ready.\n");
   
   struct sockaddr_in server, client;
   server.sin_family=AF_INET;
@@ -112,16 +115,33 @@ int main(int argc, char* argv[]) {
       continue;
     }
     
+    ssds_log(logDEBUG, "%s\n\n", buf);
+    
     /* Dependency solving part */
+    ssds_log(logDEBUG, "\n\nDEPENDENCY SOLVING.\n\n");
     
     SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
     ssds_read_get_packages(pkgs, json);
+    
+    ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
+    for(int i=0; i<pkgs->length; i++)
+    {
+      ssds_log(logDEBUG, "\t%s\n", pkgs->packages[i]);
+    }
+  
+    ssds_log(logDEBUG, "Getting repo info from client.\n");
   
     SsdsRepoInfoList* list = ssds_read_list_init();
     ssds_read_repo_info(json, list);
     
     guint len=g_slist_length(list->repoInfoList);
-    guint i;
+    
+    ssds_log(logDEBUG, "Repositories, count: %d: \n", len);
+    for(int i=0; i<len; i++)
+    {
+      SsdsRepoInfo* info = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
+      ssds_log(logDEBUG, "\t%d: %s\n", i, info->name);
+    }
     
     SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
     ssds_locate_repo_metadata(json, list, meta_list);
