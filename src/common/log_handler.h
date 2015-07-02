@@ -38,7 +38,7 @@ extern "C"{
  */
 typedef enum LogClass{
   logINFO=0,        /**< INFO is for general info messages - prints only when __verbose == 1 */
-  logMESSAGE,       /**< MESSAGE is for messages for user - prints only when __verbose == 1 */
+  logMESSAGE,       /**< MESSAGE is for messages for user */
   logWARNING,       /**< WARNING is for describing unorthodox or undefined behaviour */
   logERROR,         /**< ERROR is for fatal situations */
   logDEBUG          /**< DEBUG is only for debugging - prints only when __debug == 1*/

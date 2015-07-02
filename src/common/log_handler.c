@@ -49,27 +49,23 @@ void ssds_log(int log_level, const char *message, ...)
     case logINFO:
       if(__verbose==1)
       {
-        fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: INFO: ", 
-                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
+        fprintf(stderr, "SSDS: INFO: ");
         vfprintf(stderr, message, args);
       }
       break;
+
     case logMESSAGE:
-      if(__verbose==1)
-      {
-        fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: MESSAGE: ",
-                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
-        vfprintf(stderr, message, args);
-      }
-      break;
-    case logWARNING:
-      fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: WARNING: ",
-              ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
+      fprintf(stderr, "SSDS: MESSAGE: ");
       vfprintf(stderr, message, args);
       break;
+
+    case logWARNING:
+      fprintf(stderr, "SSDS: WARNING: ");
+      vfprintf(stderr, message, args);
+      break;
+
     case logERROR:
-      fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: ERROR: ",
-              ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
+      fprintf(stderr, "SSDS: ERROR: ");
       vfprintf(stderr, message, args);
       break;
     case logDEBUG:

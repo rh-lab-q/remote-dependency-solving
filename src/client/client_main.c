@@ -8,7 +8,7 @@ int main(int argc, char* argv[]){
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
-  ssds_log(logDEBUG, "Client startup\n");
+  ssds_log(logINFO, "Client startup\n");
   
   ParamOptsCl* params = init_params_cl();
   
@@ -18,6 +18,7 @@ int main(int argc, char* argv[]){
     return 1;
 
   ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
+  ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
   /*******************************************************************/
   /* Creating json with all the info*/
   /*******************************************************************/
@@ -55,15 +56,15 @@ int main(int argc, char* argv[]){
   char* output;
   ssds_log(logDEBUG, "Generating output message to server.\n");
   output = ssds_js_to_string(json_gen);
-  ssds_log(logDEBUG, "Message generated.\n\n%s\n\nEND OF PARSING PART\n\n", output);
+  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", output);
   
 #if 1
   /***************************************************************/
   /* Networking part - sending data to server and recieving      */
   /***************************************************************/
-  ssds_log(logDEBUG, "Begin of networking part.\n");
+  ssds_log(logDEBUG, "Begin of network part.\n");
 
-  int socket_desc;
+  int socket_desc, connection_try = 1;
 //   const char * message = "Hello from client\n";
   socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   ssds_log(logDEBUG, "Setted up socket descriptor.\n");
@@ -87,19 +88,24 @@ int main(int argc, char* argv[]){
   }
   ssds_log(logDEBUG, "Socket controll - OK\n"); 
   
-  ssds_log(logDEBUG, "Trying to connect to server...\n");
-  if(connect(socket_desc, (struct sockaddr *)&server, sizeof(server))<0)
+  ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
+  while((connect(socket_desc, (struct sockaddr *)&server, sizeof(server)) < 0) && (connection_try < 3))
   {  
-    ssds_log(logDEBUG, "Connection error\n");
+     ssds_log(logMESSAGE, "Unable to contact server. Trying that again above 5 sec.\n");
+     sleep(5);
+     ssds_log(logMESSAGE, "Trying to connect to server...(%d of 3)\n", ++connection_try);
+  }
+  if(connection_try == 3){
+    ssds_log(logERROR, "Unable to contact server. Please, check out your network connection and try it again later.\n");
     return 1;
   }
-  ssds_log(logDEBUG, "Connection to server is established.\n");
+  ssds_log(logMESSAGE, "Connection to server is established.\n");
   
-  ssds_log(logDEBUG, "Sending message to server.\n");
+  ssds_log(logMESSAGE, "Sending message to server.\n");
   write(socket_desc, output, strlen(output));
   ssds_log(logDEBUG, "Message send.\n");
 
-  ssds_log(logDEBUG, "Reading answer fromserver.\n");
+  ssds_log(logMESSAGE, "Reading answer from server.\n");
   char* buf=sock_recv(socket_desc);
   ssds_log(logDEBUG, "Checking answer.\n");
   if(buf == NULL)
@@ -113,7 +119,7 @@ int main(int argc, char* argv[]){
   /* Downloading packages part                               */
   /***********************************************************/
 
-  ssds_log(logDEBUG, "Begin downloading part. \n---- END OF MESSAGES ----\n");
+  ssds_log(logDEBUG, "Begin downloading part.\n");
   // required variables
   gboolean return_status;
   LrHandle *handler;
@@ -123,34 +129,48 @@ int main(int argc, char* argv[]){
   char **packages, **urls;
   
   // parse response
+  ssds_log(logDEBUG, "Parsing answer.\n");
   if(!ssds_read_parse(output,json_read)){
       ssds_log(logERROR, "Error while parsing recived data\n");
       return 1;
   }
+  ssds_log(logDEBUG, "Answer parsed.\n");
 
                                
   // TODO:
   // get available urls
+  // ssds_log(logDEBUG, "Reading URLs from answer.\n");
   // ssds_read_get_urls(urls, json_read);
   
   // get names of packages
+  // ssds_log(logDEBUG, "Reading packages name from answer.\n");
   int num_pkgs/* = ssds_read_get_packages_string(pkgs,packages,json_read)*/;
+  ssds_log(logMESSAGE, "Number of package to install: %d.\n", num_pkgs);
   
   printf("%s", buf);
-  
+  ssds_log(logDEBUG, "Downloading preparation.\n");
   handler = lr_handle_init();
+  ssds_log(logDEBUG, "Download handler initied.\n");
   lr_handle_setopt(handler, NULL, LRO_URLS, urls);
+  ssds_log(logDEBUG, "Array of URLs is setted.\n");
   lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
+  ssds_log(logDEBUG, "Array of packages is setted.\n");
   
+  ssds_log(logDEBUG, "Loop thrue all packages to download.\n");
+  ssds_log(logMESSAGE, "Package to download:\n");
   for(int i = 0; i < num_pkgs; i++){
   
      // Prepare list of target
+     ssds_log(logDEBUG, "Package name: %s as %d in order.\n", packages[i], i+1);
+     ssds_log(logMESSAGE, "\t%s\n", packages[i]);
      target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET, LR_CHECKSUM_UNKNOWN,
                                    NULL, 0, NULL, TRUE, NULL, NULL, &error);
      package_list = g_slist_append(package_list, target);
+     ssds_log(logDEBUG, "Package added to download list.\n");
   }
   
   // Download all packages        
+  ssds_log(logMESSAGE, "Downloading packages.\n");
   return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
   
   if(!return_status || error != NULL){
@@ -158,6 +178,8 @@ int main(int argc, char* argv[]){
       g_error_free(error);
       return 1;
   }
+
+  ssds_log(logMESSAGE, "All packages were downloaded successfully.  \n---- END OF MESSAGES ----\n");
   
 
   /*********************************************************/
