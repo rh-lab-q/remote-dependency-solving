@@ -19,6 +19,7 @@ int main(int argc, char* argv[]){
 
   ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
   ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
+
   /*******************************************************************/
   /* Creating json with all the info*/
   /*******************************************************************/
@@ -53,11 +54,26 @@ int main(int argc, char* argv[]){
   }
   ssds_log(logDEBUG, "Loop is done.\n");
 
-  char* output;
-  ssds_log(logDEBUG, "Generating output message to server.\n");
-  output = ssds_js_to_string(json_gen);
-  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", output);
+  char* repo_output;
+  ssds_log(logDEBUG, "Generating output message with repo info to server.\n");
+  repo_output = ssds_js_to_string(json_gen);
+  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", repo_output);
   
+  /*******************************************************************/
+  /* Creating json for communication with server*/
+  /* For now client only sends to server that he is going to send @system.solv file*/
+  /* TODO - create some client identification and store @system.solv file.*/
+  /*******************************************************************/
+
+  SsdsJsonCreate* json_msg = ssds_js_cr_init();
+  ssds_js_insert_code(json_msg, 10); //code for sending system.solv file, this code can change in time
+
+  char* msg_output;
+  ssds_log(logDEBUG, "Generating output message with info about sending @system.solv file to server.\n");
+  msg_output = ssds_js_to_string(json_msg);
+  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
+
+
 #if 1
   /***************************************************************/
   /* Networking part - sending data to server and recieving      */
@@ -101,9 +117,46 @@ int main(int argc, char* argv[]){
   }
   ssds_log(logMESSAGE, "Connection to server is established.\n");
   
-  ssds_log(logMESSAGE, "Sending message to server.\n");
-  write(socket_desc, output, strlen(output));
-  ssds_log(logDEBUG, "Message send.\n");
+  /***********************************************************/
+  /* Sending @System.solv file                               */
+  /***********************************************************/
+  ssds_log(logMESSAGE, "Sending message with info about sending @system.solv file to server.\n");
+  write(socket_desc, msg_output, strlen(msg_output));
+  ssds_log(logMESSAGE, "Message sent.\n");
+
+  char path[100];
+  ssds_resolve_dependency_file_path(path);
+  FILE * f;
+
+  ssds_log(logMESSAGE, "Path to sys.solv file : %s\n",path);
+  f = fopen(path,"rb");
+  if(f == NULL)
+  {
+      ssds_log(logERROR,"Error while opening file.\n");
+      return 1;
+  }
+  char buffer[1048576];
+  char* server_response;
+  int i = 0;
+  size_t bytes = 0;
+  while((bytes = fread(buffer, 1, 1048576, f)) != 0)
+  {
+      ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes, i);
+      i++;
+      write(socket_desc, buffer, bytes);
+      server_response = sock_recv(socket_desc);
+  }
+  msg_output = "@System.solv file sent";
+  write(socket_desc, msg_output, strlen(msg_output));
+
+
+
+  /***********************************************************/
+  /* Sending repo info to server                             */
+  /***********************************************************/
+  ssds_log(logMESSAGE, "Sending message with repo info to server.\n");
+  write(socket_desc, repo_output, strlen(repo_output));
+  ssds_log(logDEBUG, "Message sent.\n");
 
   ssds_log(logMESSAGE, "Reading answer from server.\n");
   char* buf=sock_recv(socket_desc);
@@ -130,7 +183,7 @@ int main(int argc, char* argv[]){
   
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
-  if(!ssds_read_parse(output,json_read)){
+  if(!ssds_read_parse(buf,json_read)){
       ssds_log(logERROR, "Error while parsing recived data\n");
       return 1;
   }

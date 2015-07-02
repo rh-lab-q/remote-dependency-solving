@@ -32,9 +32,9 @@ extern "C"{
 /**
  * Resolves path for @System.solv file depending on system version
  * @brief ssds_resolve_dependency_file_path
- * @return path to @System.solv file
+ * @param ret_val return value of function
  */
-char * ssds_resolve_dependency_file_path();
+void ssds_resolve_dependency_file_path(char* ret_val);
 
 
 #ifdef __cplusplus

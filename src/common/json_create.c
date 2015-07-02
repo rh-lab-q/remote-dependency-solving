@@ -52,7 +52,6 @@ void ssds_js_insert_code(SsdsJsonCreate* json, int code)
   json_node_set_int(json->codeNode, (gint64)code);
 }
 
-
 void ssds_js_add_package(SsdsJsonCreate* json,char* package)
 {
   //adding package for the first time

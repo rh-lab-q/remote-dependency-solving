@@ -110,6 +110,7 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/repo_handler.c
 		../src/common/log_handler.c
 		../src/common/network_util.c
+		../src/common/util.c
 		../src/common/params.c)
 target_link_libraries(
 	ssds-client

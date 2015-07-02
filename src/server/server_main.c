@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
   
   int addr_len = sizeof(server);
   char* buf;
+  int client_finished = 0;
   
   while(1)
   {
@@ -96,74 +97,104 @@ int main(int argc, char* argv[]) {
       ssds_log(logERROR, "Accept connection has failed");
       return 1;
     }
-    
-    buf=sock_recv(new_sock);
-    
-    if(buf == NULL)
+    //reading messages in loop and resolving them
+    while(!client_finished)
     {
-      ssds_log(logERROR, "Recieving of data has failed\n");
-      return 1;
-    }
     
-    client_ip=inet_ntoa(client.sin_addr);
-    ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);
-    
-    SsdsJsonRead* json = ssds_json_read_init();
-    if(!ssds_read_parse(buf, json))//parse incoming message
-    {
-      ssds_log(logERROR, "False data recieved from %s. Client rejected\n", client_ip);
-      continue;
-    }
-    
-    ssds_log(logDEBUG, "%s\n\n", buf);
-    
-    /* Dependency solving part */
-    ssds_log(logDEBUG, "\n\nDEPENDENCY SOLVING.\n\n");
-    
-    SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
-    ssds_read_get_packages(pkgs, json);
-    
-    ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
-    for(int i=0; i<pkgs->length; i++)
-    {
-      ssds_log(logDEBUG, "\t%s\n", pkgs->packages[i]);
-    }
-  
-    ssds_log(logDEBUG, "Getting repo info from client.\n");
-  
-    SsdsRepoInfoList* list = ssds_read_list_init();
-    ssds_read_repo_info(json, list);
-    
-    guint len=g_slist_length(list->repoInfoList);
-    
-    ssds_log(logDEBUG, "Repositories, count: %d: \n", len);
-    for(int i=0; i<len; i++)
-    {
-      SsdsRepoInfo* info = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
-      ssds_log(logDEBUG, "\t%d: %s\n", i, info->name);
-    }
-    
-    SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
-    ssds_locate_repo_metadata(json, list, meta_list);
-    
-    
-    //TODO - change this so that it doesn't need to be created manually
-    HySack sack;
-#if VERSION_HAWKEY
-      sack = hy_sack_create(NULL, NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
-#else
-      sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
-#endif
-    
-    hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
-    HySack* sack_p = &sack;
-    ssds_fill_sack(sack_p, meta_list);
+        buf=sock_recv(new_sock);
 
-    SsdsJsonCreate* answer = ssds_js_cr_init();
-    ssds_dep_answer(json, answer, sack_p);
-    
-    char* message = ssds_js_to_string(answer);
-    write(new_sock, message, strlen(message));
+        if(buf == NULL)
+        {
+          ssds_log(logERROR, "Recieving of data has failed\n");
+          return 1;
+        }
+
+        client_ip=inet_ntoa(client.sin_addr);
+        ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);
+
+        SsdsJsonRead* json = ssds_json_read_init();
+        if(!ssds_read_parse(buf, json))//parse incoming message
+        {
+          ssds_log(logERROR, "False data recieved from %s. Client rejected\n", client_ip);
+          continue;
+        }
+
+        ssds_log(logDEBUG, "%s\n\n", buf);
+        switch(ssds_read_get_code(json))
+        {
+        case 10:
+            ssds_log(logMESSAGE, "Got message with code 10(client is going to send @system.solv file).\n");
+            FILE *f = fopen("@System.solv","wb"); //for now the file is in the same directory as server
+            char* file_buffer = "";
+            size_t bytes;
+            while(1)
+            {
+                file_buffer = sock_recv(new_sock);
+                if(strcmp(file_buffer,"@System.solv file sent") == 0)
+                {
+                    break;
+                }
+                bytes = fwrite(file_buffer ,1 ,1048576 ,f);
+
+                write(new_sock, "OK", strlen("OK"));
+                ssds_log(logMESSAGE, "Writing %d bytes to @system.solv file.\n", bytes);
+            }
+            ssds_log(logMESSAGE, "Finished writing @System.Solv file.\n");
+            break;
+
+        case 123:
+
+            /* Dependency solving part */
+            ssds_log(logDEBUG, "\n\nDEPENDENCY SOLVING.\n\n");
+
+            SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
+            ssds_read_get_packages(pkgs, json);
+
+            ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
+            for(int i=0; i<pkgs->length; i++)
+            {
+              ssds_log(logDEBUG, "\t%s\n", pkgs->packages[i]);
+            }
+
+            ssds_log(logDEBUG, "Getting repo info from client.\n");
+
+            SsdsRepoInfoList* list = ssds_read_list_init();
+            ssds_read_repo_info(json, list);
+
+            guint len=g_slist_length(list->repoInfoList);
+
+            ssds_log(logDEBUG, "Repositories, count: %d: \n", len);
+            for(int i=0; i<len; i++)
+            {
+              SsdsRepoInfo* info = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
+              ssds_log(logDEBUG, "\t%d: %s\n", i, info->name);
+            }
+
+            SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
+            ssds_locate_repo_metadata(json, list, meta_list);
+
+
+            //TODO - change this so that it doesn't need to be created manually
+            HySack sack;
+            #if VERSION_HAWKEY
+              sack = hy_sack_create(NULL, NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
+            #else
+              sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
+            #endif
+
+            hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
+            HySack* sack_p = &sack;
+            ssds_fill_sack(sack_p, meta_list);
+
+            SsdsJsonCreate* answer = ssds_js_cr_init();
+            ssds_dep_answer(json, answer, sack_p);
+
+            char* message = ssds_js_to_string(answer);
+            write(new_sock, message, strlen(message));
+            client_finished = 1;
+            break;
+        }
+    }
   }
   //ssds_solving::solve solveHandler;
 

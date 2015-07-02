@@ -20,7 +20,7 @@
 
 #include "util.h"
 
-char * ssds_resolve_dependency_file_path()
+void ssds_resolve_dependency_file_path(char * ret_val)
 {
     system("uname -r > version.tmp"); //printing system info to file
 
@@ -28,7 +28,7 @@ char * ssds_resolve_dependency_file_path()
     int c, i = 0;
     char fedora_version[10]; //22 or 21 or any other
     char system_version[7]; //64bit(x86_64) or 32bit(i686)
-    char path[40];
+    //char* path;
 
     while((c = fgetc(f)) != 'c'); //skipping to fedora version
 
@@ -50,7 +50,7 @@ char * ssds_resolve_dependency_file_path()
     system_version[i] = '\0';
 
     //composing path to @System.solv file
-    snprintf(path, 40, "/var/cache/dnf/%s/%s/@System.solv",system_version, fedora_version);
+    snprintf(ret_val, 100, "/var/cache/dnf/%s/%s/@System.solv",system_version, fedora_version);
     fclose(f);
     system("rm version.tmp"); //removing temporary file
 }

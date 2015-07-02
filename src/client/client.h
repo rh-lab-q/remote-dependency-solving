@@ -15,6 +15,7 @@ extern "C"{
 #include "../common/params.h"
 #include "../common/json_handler.h"
 #include "../common/repo_handler.h"
+#include "../common/util.h"
 #include "../../cmake/Config/version_conf.h"
 
 /** path to package download directory */
