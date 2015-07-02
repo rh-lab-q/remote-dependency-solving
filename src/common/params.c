@@ -85,17 +85,17 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
     ssds_log(logERROR, "No command provided. The program will terminate now\n");
     exit(1);
   }
-  ssds_log(logDEBUG, "optind %d and argc %d\n", optind, argc);
+//   ssds_log(logDEBUG, "optind %d and argc %d\n", optind, argc);
   if(optind < argc)
   {
     while(optind < argc)
     {
-      ssds_log(logDEBUG, "package %s\n",argv[optind]);
+//       ssds_log(logDEBUG, "package %s\n",argv[optind]);
       params->pkgs = g_slist_append(params->pkgs, argv[optind++]);
       params->pkg_count++;
     }
   }
-  ssds_log(logDEBUG,"PKG count %d\n", params->pkg_count);
+//   ssds_log(logDEBUG,"PKG count %d\n", params->pkg_count);
   return 1;
 }
 

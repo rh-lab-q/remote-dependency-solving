@@ -33,6 +33,7 @@
 
 //SSDS
 #include "json_handler.h"
+#include "log_handler.h"
 
 //SOLVING
 #include <hawkey/types.h>
