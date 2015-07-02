@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
   
   while(1)
   {
+    client_finished = 0;
     if((new_sock=accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
     {
       ssds_log(logERROR, "Accept connection has failed");
