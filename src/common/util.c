@@ -22,35 +22,41 @@
 
 void ssds_resolve_dependency_file_path(char * ret_val)
 {
-    system("uname -r > version.tmp"); //printing system info to file
+    struct utsname *machine = (struct utsname *)malloc(sizeof(struct utsname));
 
-    FILE * f = fopen("version.tmp","r");
-    int c, i = 0;
-    char fedora_version[10]; //22 or 21 or any other
-    char system_version[7]; //64bit(x86_64) or 32bit(i686)
-    //char* path;
-
-    while((c = fgetc(f)) != 'c'); //skipping to fedora version
-
-    //reading fedora version
-    while(isdigit(c = fgetc(f)))
-    {
-        fedora_version[i] = c;
-        i++;
+    if(machine == NULL){
+	ssds_log(logERROR, "Not enough memory on heap.");
+        return;
     }
-    fedora_version[i] = '\0';
-    i = 0;
-
-    //reading system version
-    while(isalnum(c = fgetc(f)) || (c == '_'))
-    {
-        system_version[i] = c;
-        i++;
+    if(uname(machine) < 0){
+	ssds_log(logERROR, "Unable to found system type and computer architecture.");
+	free(machine);
+        return;
     }
-    system_version[i] = '\0';
+
+    char *end = strrchr(machine->release, '.');
+
+    if(end == NULL){
+	ssds_log(logERROR, "Internal error - unable to find dot in release string.");
+	free(machine);
+	return;
+    }
+
+    char *i = end-1;
+
+    while(i > machine->release && isdigit(i[0]))
+	i--;
+
+    int length = end - i;
+    char *fedora_version = (char *)malloc(length*sizeof(char));
+
+    i++; length--;
+
+    strncpy(fedora_version, i, length); //22 or 21 or any other
+    fedora_version[length] = '\0';
+
+    char *architecture = machine->machine; //64bit(x86_64) or 32bit(i686)
 
     //composing path to @System.solv file
-    snprintf(ret_val, 100, "/var/cache/dnf/%s/%s/@System.solv",system_version, fedora_version);
-    fclose(f);
-    system("rm version.tmp"); //removing temporary file
+    snprintf(ret_val, 100, "/var/cache/dnf/%s/%s/@System.solv",architecture,fedora_version);
 }

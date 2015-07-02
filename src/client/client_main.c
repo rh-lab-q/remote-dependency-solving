@@ -120,7 +120,7 @@ int main(int argc, char* argv[]){
   /***********************************************************/
   /* Sending @System.solv file                               */
   /***********************************************************/
-  ssds_log(logMESSAGE, "Sending message with info about sending @system.solv file to server.\n");
+  ssds_log(logMESSAGE, "Sending info about sending @System.solv file to server.\n");
   write(socket_desc, msg_output, strlen(msg_output));
   ssds_log(logMESSAGE, "Message sent.\n");
 
@@ -128,20 +128,21 @@ int main(int argc, char* argv[]){
   ssds_resolve_dependency_file_path(path);
   FILE * f;
 
-  ssds_log(logMESSAGE, "Path to sys.solv file : %s\n",path);
+  ssds_log(logDEBUG, "Path to sys.solv file : %s\n",path);
   f = fopen(path,"rb");
   if(f == NULL)
   {
-      ssds_log(logERROR,"Error while opening file.\n");
+      ssds_log(logERROR,"Error while opening @System.solv file.\n");
       return 1;
   }
+
   char buffer[1048576];
   char* server_response;
   int i = 0;
   size_t bytes = 0;
   while((bytes = fread(buffer, 1, 1048576, f)) != 0)
   {
-      ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes, i);
+      ssds_log(logDEBUG, "Read %d bytes of data for the %d time.\n",bytes, i);
       i++;
       write(socket_desc, buffer, bytes);
       server_response = sock_recv(socket_desc);

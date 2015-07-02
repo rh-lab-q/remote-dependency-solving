@@ -28,6 +28,9 @@ extern "C"{
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/utsname.h>
+#include "log_handler.h"
 
 /**
  * Resolves path for @System.solv file depending on system version
