@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <glib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -70,8 +71,9 @@ SsdsLocalRepoInfo* ssds_repo_parse_init();
  * Parses local .repo files. Function uses librepo class repoconf.h.
  * Information about repos are saved to SsdsLocalRepoInfo
  * @param repo      SsdsLocalRepoInfo
+ * @return          int
  */
-void ssds_parse_default_repo(SsdsLocalRepoInfo* repo);
+int ssds_parse_default_repo(SsdsLocalRepoInfo* repo);
 
 /**
  * Gets urls of local repos from SsdsLocalRepoInfo and inserts them
@@ -121,7 +123,7 @@ SsdsRepoMetadataList* ssds_repo_metadata_init();//
  * @param meta_list SsdsRepoMetadataList*
  * @return
  */
-int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list);//
+int ssds_locate_repo_metadata(/*SsdsJsonRead* json, */SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list);//
 
 /**
  * Function tries to locate metadata for one repo provided in repo.

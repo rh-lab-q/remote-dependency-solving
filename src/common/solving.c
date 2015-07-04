@@ -68,15 +68,15 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
   HyPackageList plist = hy_packagelist_create();
   plist = hy_query_run(query);
     
-  HyPackage test;
+  //HyPackage test;
   printf("pocet baliku nalezenych pomoci query: %d\n", hy_packagelist_count(plist));
   
-  int i;
+  /*int i;
   for(i=0; i<hy_packagelist_count(plist);i++)
   {
     test = hy_packagelist_get(plist, i);
 //       std::cout<< "baliky jsou na: " << hy_package_get_url(test) << ":"<< hy_package_get_location(test)<< std::endl;
-  }
+  }*/
     
   HyPackage pkg;
   pkg = hy_packagelist_get(plist, 0);

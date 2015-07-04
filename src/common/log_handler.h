@@ -36,7 +36,7 @@ extern "C"{
 /** 
  * Used for logging severence level
  */
-typedef enum LogClass{
+enum LogClass{
   logINFO=0,        /**< INFO is for general info messages - prints only when __verbose == 1 */
   logMESSAGE,       /**< MESSAGE is for messages for user */
   logWARNING,       /**< WARNING is for describing unorthodox or undefined behaviour */

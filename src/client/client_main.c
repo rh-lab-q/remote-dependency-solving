@@ -39,7 +39,10 @@ int main(int argc, char* argv[]){
   ssds_js_insert_code(json_gen, 123); //insert code into json
   ssds_log(logDEBUG, "Inserted code 123 into json. Package count %d.\n", params->pkg_count);
 
-  ssds_parse_default_repo(local_repo); //parsing local repo
+  // parsing local repo
+  if(!ssds_parse_default_repo(local_repo)){
+	return 1;
+  }
   ssds_log(logDEBUG, "Local repo is parsed. Package count %d.\n", params->pkg_count);
 
   ssds_get_repo_urls(local_repo, json_gen);
@@ -180,7 +183,7 @@ int main(int argc, char* argv[]){
   GSList *package_list = NULL;
   LrPackageTarget *target;
   GError *error = NULL;
-  char **packages, **urls;
+  char **packages = NULL, **urls = NULL;
   
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
@@ -198,7 +201,7 @@ int main(int argc, char* argv[]){
   
   // get names of packages
   // ssds_log(logDEBUG, "Reading packages name from answer.\n");
-  int num_pkgs/* = ssds_read_get_packages_string(pkgs,packages,json_read)*/;
+  int num_pkgs = /*ssds_read_get_packages_string(pkgs,packages,json_read)*/ 0;
   ssds_log(logMESSAGE, "Number of package to install: %d.\n", num_pkgs);
   
   printf("%s", buf);

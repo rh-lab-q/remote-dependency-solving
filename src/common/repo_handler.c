@@ -29,10 +29,15 @@ SsdsLocalRepoInfo* ssds_repo_parse_init()
 }
 
   
-void ssds_parse_default_repo(SsdsLocalRepoInfo* repo)
+int ssds_parse_default_repo(SsdsLocalRepoInfo* repo)
 {
   GError **err;
   gboolean ret = lr_yum_repoconfs_load_dir(repo->repoHandler, "/etc/yum.repos.d/", err);
+   if(!ret){
+	ssds_log(logERROR, "Unable to load default repo\n");
+        return 0;
+   }
+   return 1; 
 }
 
 void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
@@ -74,8 +79,6 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
         url = (char**)val; 
         type = SSDS_BASEURL;
       }
-      //std::cout << "name: " << name << "\nurl: " << url << std::endl;
-      
       
       LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", "21"); //"3.18.6-200.fc21"
       list = lr_urlvars_set(list, "basearch", "x86_64");

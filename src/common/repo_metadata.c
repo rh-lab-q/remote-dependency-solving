@@ -29,7 +29,7 @@ SsdsRepoMetadataList* ssds_repo_metadata_init()
 }
 
 
-int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list)
+int ssds_locate_repo_metadata(/*SsdsJsonRead* json, */SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list)
 {
   guint len = g_slist_length(info_list->repoInfoList);
   for(guint i=0;i<len;i++){
@@ -52,7 +52,8 @@ int ssds_locate_repo_metadata(SsdsJsonRead* json, SsdsRepoInfoList* info_list, S
 //     printf("ssds_locate_repo_metadata:\nrepomd: %s\nfilelists: %s\nprimary: %s\n", loc->repomd, loc->filelists, loc->primary);
 //     
 //   }
-  //TODO - return value
+  //TODO - update return value
+   return 1;
 }
 
 
@@ -97,7 +98,6 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
 
 char* full_path_to_metadata(char* repo_name)
 {
-  struct stat sb;
   const char* dest="/tmp/ssds/";
   int length=strlen(dest)+strlen(repo_name);
   char* full_path=(char*)malloc((length+1)*sizeof(char));

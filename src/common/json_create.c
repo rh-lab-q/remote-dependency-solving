@@ -237,7 +237,6 @@ char* ssds_js_to_string(SsdsJsonCreate* json)
 void ssds_js_dump(SsdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
 {
   gchar *data;
-  gsize len;
   json_generator_set_pretty(json->generator, 1);
   data = json_generator_to_data (json->generator, NULL);
   printf("%s\n", (char*)data);

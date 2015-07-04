@@ -165,14 +165,14 @@ int main(int argc, char* argv[]) {
             guint len=g_slist_length(list->repoInfoList);
 
             ssds_log(logDEBUG, "Repositories, count: %d: \n", len);
-            for(int i=0; i<len; i++)
+            for(unsigned int i=0; i<len; i++)
             {
               SsdsRepoInfo* info = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
               ssds_log(logDEBUG, "\t%d: %s\n", i, info->name);
             }
 
             SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
-            ssds_locate_repo_metadata(json, list, meta_list);
+            ssds_locate_repo_metadata(/*json, */list, meta_list);
 
 
             //TODO - change this so that it doesn't need to be created manually
