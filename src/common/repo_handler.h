@@ -23,7 +23,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <glib.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -148,6 +147,12 @@ char* full_path_to_metadata(char* repo_name);//
  */
 void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* list);
 
+/**
+ * Redeclaration of function strdup
+ * @param s	    const char*
+ * @return          char *
+ */
+char *strdup(const char *s);
 #ifdef __cplusplus
 }
 #endif
