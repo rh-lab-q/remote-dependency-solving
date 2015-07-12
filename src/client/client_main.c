@@ -139,21 +139,20 @@ int main(int argc, char* argv[]){
       return 1;
   }
 
-  char buffer[1048576];
-  char* server_response;
+  char buffer[131072];
+  char* server_response = sock_recv(socket_desc);;
   int i = 0;
   size_t bytes = 0;
-  while((bytes = fread(buffer, 1, 1048576, f)) != 0)
+  while((bytes = fread(buffer, 1, 131072, f)) != 0)
   {
-      ssds_log(logDEBUG, "Read %d bytes of data for the %d time.\n",bytes, i);
+      ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes, i);
       i++;
       write(socket_desc, buffer, bytes);
       server_response = sock_recv(socket_desc);
   }
   msg_output = "@System.solv file sent";
   write(socket_desc, msg_output, strlen(msg_output));
-
-
+  server_response = sock_recv(socket_desc);
 
   /***********************************************************/
   /* Sending repo info to server                             */

@@ -98,6 +98,9 @@ int main(int argc, char* argv[]) {
       ssds_log(logERROR, "Accept connection has failed");
       return 1;
     }
+    client_ip=inet_ntoa(client.sin_addr);
+    ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);
+
     //reading messages in loop and resolving them
     while(!client_finished)
     {
@@ -108,10 +111,7 @@ int main(int argc, char* argv[]) {
         {
           ssds_log(logERROR, "Recieving of data has failed\n");
           return 1;
-        }
-
-        client_ip=inet_ntoa(client.sin_addr);
-        ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);
+        }        
 
         SsdsJsonRead* json = ssds_json_read_init();
         if(!ssds_read_parse(buf, json))//parse incoming message
@@ -126,7 +126,8 @@ int main(int argc, char* argv[]) {
         case 10:
             ssds_log(logMESSAGE, "Got message with code 10(client is going to send @system.solv file).\n");
             FILE *f = fopen("@System.solv","wb"); //for now the file is in the same directory as server
-            char* file_buffer = "";
+            char* file_buffer;
+            write(new_sock, "OK", strlen("OK"));
             size_t bytes;
             while(1)
             {
@@ -135,11 +136,12 @@ int main(int argc, char* argv[]) {
                 {
                     break;
                 }
-                bytes = fwrite(file_buffer ,1 ,1048576 ,f);
+                bytes = fwrite(file_buffer ,1 ,131072 ,f);
 
                 write(new_sock, "OK", strlen("OK"));
                 ssds_log(logMESSAGE, "Writing %d bytes to @system.solv file.\n", bytes);
             }
+            write(new_sock, "OK", strlen("OK"));
             ssds_log(logMESSAGE, "Finished writing @System.Solv file.\n");
             break;
 
@@ -193,6 +195,8 @@ int main(int argc, char* argv[]) {
             char* message = ssds_js_to_string(answer);
             write(new_sock, message, strlen(message));
             client_finished = 1;
+            buf=sock_recv(new_sock);
+
             break;
         }
     }
