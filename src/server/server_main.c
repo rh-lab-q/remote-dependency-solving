@@ -161,6 +161,7 @@ int main(int argc, char* argv[]) {
             }
             char* data_buffer;
             char* comm_buffer;
+            char* end_ptr;
             size_t bytes_written, bytes_to_write;
             int i = 0;
 
@@ -173,7 +174,7 @@ int main(int argc, char* argv[]) {
                 }
                 data_buffer = sock_recv(data_sock);
 
-                bytes_to_write = atoi(comm_buffer);
+                bytes_to_write = strtol(comm_buffer, &end_ptr, 10);
                 bytes_written = fwrite(data_buffer ,1 ,bytes_to_write ,f);
 
                 write(comm_sock, "OK", strlen("OK"));
