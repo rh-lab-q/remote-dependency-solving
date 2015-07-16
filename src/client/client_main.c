@@ -83,24 +83,29 @@ int main(int argc, char* argv[]){
   /***************************************************************/
   ssds_log(logDEBUG, "Begin of network part.\n");
 
-  int socket_desc, connection_try = 1;
+  int data_sock, comm_sock, connection_try = 1;
 //   const char * message = "Hello from client\n";
-  socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  comm_sock=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  data_sock=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   ssds_log(logDEBUG, "Setted up socket descriptor.\n");
 
   ssds_log(logDEBUG, "Setting up connection to server.\n");
-  struct sockaddr_in server;
-  server.sin_addr.s_addr=inet_addr("127.0.0.1");
+  struct sockaddr_in server_data;
+  struct sockaddr_in server_comm;
+  server_comm.sin_addr.s_addr=inet_addr("127.0.0.1");
+  server_data.sin_addr.s_addr=inet_addr("127.0.0.1");
   ssds_log(logDEBUG, "Set server address.\n");
 
-  server.sin_family=AF_INET;
+  server_comm.sin_family=AF_INET;
+  server_data.sin_family=AF_INET;
   ssds_log(logDEBUG, "Set comunication protocol.\n");
 
-  server.sin_port=htons(2345);
+  server_comm.sin_port=htons(2345);
+  server_data.sin_port=htons(2346);
   ssds_log(logDEBUG, "Set server port.\n");
   
   ssds_log(logDEBUG, "Socket controll.\n");
-  if(socket_desc==-1)
+  if(comm_sock==-1)
   {
     ssds_log(logERROR, "Client encountered an error when creating socket for communication\n");
     return 1;
@@ -108,7 +113,7 @@ int main(int argc, char* argv[]){
   ssds_log(logDEBUG, "Socket controll - OK\n"); 
   
   ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
-  while((connect(socket_desc, (struct sockaddr *)&server, sizeof(server)) < 0) && (connection_try < 3))
+  while((connect(comm_sock, (struct sockaddr *)&server_comm, sizeof(server_comm)) < 0) && (connection_try < 3))
   {  
      ssds_log(logMESSAGE, "Unable to contact server. Trying that again above 5 sec.\n");
      sleep(5);
@@ -118,20 +123,30 @@ int main(int argc, char* argv[]){
     ssds_log(logERROR, "Unable to contact server. Please, check out your network connection and try it again later.\n");
     return 1;
   }
+  while((connect(data_sock,(struct sockaddr *)&server_data, sizeof(server_data)) < 0) && (connection_try < 3))
+  {
+      ssds_log(logERROR, "Unable to connect to data socket. Trying again in 5 sec.\n");
+      sleep(5);
+      ssds_log(logMESSAGE, "Trying to connect data socket...(%d of 3)\n", ++connection_try);
+  }
+  if(connection_try == 3){
+    ssds_log(logERROR, "Unable to connect data socket. Please, check out your network connection and try it again later.\n");
+    return 1;
+  }
   ssds_log(logMESSAGE, "Connection to server is established.\n");
   
   /***********************************************************/
   /* Sending @System.solv file                               */
   /***********************************************************/
   ssds_log(logMESSAGE, "Sending info about sending @System.solv file to server.\n");
-  write(socket_desc, msg_output, strlen(msg_output));
+  write(comm_sock, msg_output, strlen(msg_output));
   ssds_log(logMESSAGE, "Message sent.\n");
 
   char path[100];
   ssds_resolve_dependency_file_path(path);
-  FILE * f;
 
   ssds_log(logDEBUG, "Path to sys.solv file : %s\n",path);
+  FILE * f;
   f = fopen(path,"rb");
   if(f == NULL)
   {
@@ -140,29 +155,32 @@ int main(int argc, char* argv[]){
   }
 
   char buffer[131072];
-  char* server_response = sock_recv(socket_desc);;
+  char msg_length[10];
+  char* server_response;
   int i = 0;
-  size_t bytes = 0;
-  while((bytes = fread(buffer, 1, 131072, f)) != 0)
+  size_t bytes_read = 0;
+  while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
-      ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes, i);
+      snprintf(msg_length,10,"%d",bytes_read);
+      write(comm_sock, msg_length, strlen(msg_length));
+      write(data_sock, buffer, bytes_read);
+      server_response = sock_recv(comm_sock);
+
+      ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes_read, i);
       i++;
-      write(socket_desc, buffer, bytes);
-      server_response = sock_recv(socket_desc);
   }
   msg_output = "@System.solv file sent";
-  write(socket_desc, msg_output, strlen(msg_output));
-  server_response = sock_recv(socket_desc);
+  write(comm_sock, msg_output, strlen(msg_output));
 
   /***********************************************************/
   /* Sending repo info to server                             */
   /***********************************************************/
   ssds_log(logMESSAGE, "Sending message with repo info to server.\n");
-  write(socket_desc, repo_output, strlen(repo_output));
+  write(comm_sock, repo_output, strlen(repo_output));
   ssds_log(logDEBUG, "Message sent.\n");
 
   ssds_log(logMESSAGE, "Reading answer from server.\n");
-  char* buf=sock_recv(socket_desc);
+  char* buf=sock_recv(comm_sock);
   ssds_log(logDEBUG, "Checking answer.\n");
   if(buf == NULL)
   {

@@ -11,6 +11,8 @@ extern "C"{
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <stdio.h>
+
 //SSDS
 #include "../common/log_handler.h"
 #include "../common/network_util.h"

@@ -54,62 +54,90 @@ int main(int argc, char* argv[]) {
   * 	Establishing port, socket etc for the communication
   * 
   *************************************************************************/
-  int socket_desc, new_sock;
+  int comm_desc, comm_sock, data_desc, data_sock;
   char* client_ip;
 
-  socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  comm_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  data_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   
-  if(socket_desc==-1)
+  if(comm_desc==-1)
   {
     ssds_log(logERROR, "Server encountered an error when creating socket for communication");
+    return 1;
+  }
+  if(data_desc==-1)
+  {
+    ssds_log(logERROR, "Server encountered an error when creating socket for sending data");
     return 1;
   }
   
   ssds_log(logDEBUG, "Socket ready.\n");
   
-  struct sockaddr_in server, client;
-  server.sin_family=AF_INET;
-  server.sin_addr.s_addr=INADDR_ANY;
-  server.sin_port=htons(2345);
-  
-  if(bind(socket_desc, (struct sockaddr*)&server, sizeof(server)) <0)
+  struct sockaddr_in server_comm, server_data, client_comm, client_data;
+
+  server_comm.sin_family=AF_INET;
+  server_comm.sin_addr.s_addr=INADDR_ANY;
+  server_comm.sin_port=htons(2345);
+
+  server_data.sin_family=AF_INET;
+  server_data.sin_addr.s_addr=INADDR_ANY;
+  server_data.sin_port=htons(2346);
+
+  if(bind(comm_desc, (struct sockaddr*)&server_comm, sizeof(server_comm)) <0)
   {
-    ssds_log(logERROR, "Server wasn't able to bind with socket\n");
+    ssds_log(logERROR, "Server wasn't able to bind with communication socket\n");
     return 1;
   }
   
+  if(bind(data_desc, (struct sockaddr*)&server_data, sizeof(server_data)) <0)
+  {
+    ssds_log(logERROR, "Server wasn't able to bind with data socket\n");
+    return 1;
+  }
+
   ssds_log(logINFO, "Server started. Waiting for incoming connections\n");
   
-  if(listen(socket_desc, 5)!=0)
+  if(listen(comm_desc, 5)!=0)
   {
-    ssds_log(logERROR, "Listen failed on server\n");
+    ssds_log(logERROR, "Listen failed on communication socket on server\n");
+    return 1;
+  }
+
+  if(listen(data_desc, 5)!=0)
+  {
+    ssds_log(logERROR, "Listen failed on data socket on server\n");
     return 1;
   }
   
-  int addr_len = sizeof(server);
+  int comm_addr_len = sizeof(server_comm);
+  int data_addr_len = sizeof(server_data);
   char* buf;
   int client_finished = 0;
   
   while(1)
   {
     client_finished = 0;
-    if((new_sock=accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
+    if((comm_sock=accept(comm_desc, (struct sockaddr *) &client_comm, (socklen_t*)&comm_addr_len))<0)
     {
       ssds_log(logERROR, "Accept connection has failed");
       return 1;
     }
-    client_ip=inet_ntoa(client.sin_addr);
+    if((data_sock=accept(data_desc, (struct sockaddr *) &client_data, (socklen_t*)&data_addr_len))<0)
+    {
+      ssds_log(logERROR, "Accept on data socket has failed");
+      return 1;
+    }
+    client_ip=inet_ntoa(client_comm.sin_addr);
     ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);
 
     //reading messages in loop and resolving them
     while(!client_finished)
     {
-    
-        buf=sock_recv(new_sock);
+        buf=sock_recv(comm_sock);
 
         if(buf == NULL)
         {
-          ssds_log(logERROR, "Recieving of data has failed\n");
+          ssds_log(logERROR, "Recieving of message has failed\n");
           return 1;
         }        
 
@@ -125,23 +153,34 @@ int main(int argc, char* argv[]) {
         {
         case 10:
             ssds_log(logMESSAGE, "Got message with code 10(client is going to send @system.solv file).\n");
-            FILE *f = fopen("@System.solv","wb"); //for now the file is in the same directory as server
-            char* file_buffer;
-            write(new_sock, "OK", strlen("OK"));
-            size_t bytes;
+            FILE * f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
+            if(f == NULL)
+            {
+                ssds_log(logERROR,"Error while creating @System.solv file.\n");
+                return 1;
+            }
+            char* data_buffer;
+            char* comm_buffer;
+            size_t bytes_written, bytes_to_write;
+            int i = 0;
+
             while(1)
             {
-                file_buffer = sock_recv(new_sock);
-                if(strcmp(file_buffer,"@System.solv file sent") == 0)
+                comm_buffer = sock_recv(comm_sock);
+                if(strcmp(comm_buffer,"@System.solv file sent") == 0)
                 {
                     break;
                 }
-                bytes = fwrite(file_buffer ,1 ,131072 ,f);
+                data_buffer = sock_recv(data_sock);
 
-                write(new_sock, "OK", strlen("OK"));
-                ssds_log(logMESSAGE, "Writing %d bytes to @system.solv file.\n", bytes);
+                bytes_to_write = atoi(comm_buffer);
+                bytes_written = fwrite(data_buffer ,1 ,bytes_to_write ,f);
+
+                write(comm_sock, "OK", strlen("OK"));
+                ssds_log(logMESSAGE, "Writing %d bytes to @system.solv file for the %d. time.\n", bytes_written, i);
+                i++;
             }
-            write(new_sock, "OK", strlen("OK"));
+            fclose(f);
             ssds_log(logMESSAGE, "Finished writing @System.Solv file.\n");
             break;
 
@@ -193,9 +232,8 @@ int main(int argc, char* argv[]) {
             ssds_dep_answer(json, answer, sack_p);
 
             char* message = ssds_js_to_string(answer);
-            write(new_sock, message, strlen(message));
+            write(comm_sock, message, strlen(message));
             client_finished = 1;
-            buf=sock_recv(new_sock);
 
             break;
         }
