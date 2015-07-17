@@ -28,6 +28,7 @@ extern "C"{
 //SSDS
 #include "repo_handler.h"
 #include "json_handler.h"
+#include "log_handler.h"
 
 //GLIB
 #include <glib.h>

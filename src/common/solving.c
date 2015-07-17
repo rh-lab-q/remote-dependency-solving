@@ -69,7 +69,7 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
   plist = hy_query_run(query);
     
   //HyPackage test;
-  printf("pocet baliku nalezenych pomoci query: %d\n", hy_packagelist_count(plist));
+  ssds_log(logMESSAGE,"No. of packages found by query: %d\n", hy_packagelist_count(plist));
   
   /*int i;
   for(i=0; i<hy_packagelist_count(plist);i++)
@@ -85,7 +85,7 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
   HyGoal goal = hy_goal_create(*sack);
   hy_goal_install(goal, pkg);
   if(hy_goal_run(goal)==0)
-    printf("Dependencies solving true = dependence v poradku\n");
+    ssds_log(logMESSAGE, "Dependencies are ok.\n");
     
 //     answer.install_pkgs_init();
   ssds_js_pkgs_insert(answer, &goal, request);
@@ -95,15 +95,15 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
 
 void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack)
 {
-  printf("answer\n");
+  ssds_log(logDEBUG,"Dependencies answer.\n");
   SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
   ssds_read_get_packages(pkgs, client_data);
   
-  printf("answer za get_packages\n");
+  ssds_log(logDEBUG,"Answer after get_packages\n");
   int i;
   for(i=0; i<pkgs->length; i++)
   {
-    printf("answer for\n");
+    ssds_log(logDEBUG,"Answer in for loop.\n");
     ssds_dep_query(pkgs->packages[i], answer, sack);
 //     query(pkgs->packages[i], answer);
   }

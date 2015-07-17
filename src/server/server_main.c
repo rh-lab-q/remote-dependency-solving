@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
         switch(ssds_read_get_code(json))
         {
         case 10:
-            ssds_log(logMESSAGE, "Got message with code 10(client is going to send @system.solv file).\n");
+            ssds_log(logMESSAGE, "Got message with code 10 (client is going to send @System.solv file).\n");
             FILE * f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
             if(f == NULL)
             {
@@ -178,8 +178,7 @@ int main(int argc, char* argv[]) {
                 bytes_written = fwrite(data_buffer ,1 ,bytes_to_write ,f);
 
                 write(comm_sock, "OK", strlen("OK"));
-                ssds_log(logMESSAGE, "Writing %d bytes to @system.solv file for the %d. time.\n", bytes_written, i);
-                i++;
+                ssds_log(logMESSAGE, "Writing %d bytes to @System.solv file for the %d. time.\n", bytes_written, ++i);
             }
             fclose(f);
             ssds_log(logMESSAGE, "Finished writing @System.Solv file.\n");
