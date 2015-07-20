@@ -33,7 +33,7 @@ endif(NOT GLIB2_FOUND)
 #JSON-GLIB-1.0
 PKG_CHECK_MODULES(JSON json-glib-1.0 REQUIRED)
 if(NOT JSON_FOUND)
-	message(FATAL_ERROR "Library json-glib-1.0 not found.")
+        message(FATAL_ERROR "Library json-glib-devel not found.")
 else (NOT JSON_FOUND)
 	include_directories(${JSON_INCLUDE_DIRS})
 endif(NOT JSON_FOUND)
