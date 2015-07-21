@@ -90,7 +90,8 @@ add_executable(ssds-server ${SERVSRC}
 		../src/common/solving.c
 		../src/common/log_handler.c
 		../src/common/network_util.c
-		../src/common/params.c)
+		../src/common/params.c
+		../src/common/mem_management.c)
 
 target_link_libraries(
 	ssds-server
@@ -111,7 +112,8 @@ add_executable(ssds-client ${CLISRC}
 		../src/common/log_handler.c
 		../src/common/network_util.c
 		../src/common/util.c
-		../src/common/params.c)
+		../src/common/params.c
+		../src/common/mem_management.c)
 target_link_libraries(
 	ssds-client
 	${LIBS}
