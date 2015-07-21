@@ -63,11 +63,15 @@ int main(int argc, char* argv[]) {
   if(comm_desc==-1)
   {
     ssds_log(logERROR, "Server encountered an error when creating socket for communication");
+    close(comm_desc);
+    close(data_desc);
     return 1;
   }
   if(data_desc==-1)
   {
     ssds_log(logERROR, "Server encountered an error when creating socket for sending data");
+    close(comm_desc);
+    close(data_desc);
     return 1;
   }
   
@@ -86,12 +90,16 @@ int main(int argc, char* argv[]) {
   if(bind(comm_desc, (struct sockaddr*)&server_comm, sizeof(server_comm)) <0)
   {
     ssds_log(logERROR, "Server wasn't able to bind with communication socket\n");
+    close(comm_desc);
+    close(data_desc);
     return 1;
   }
   
   if(bind(data_desc, (struct sockaddr*)&server_data, sizeof(server_data)) <0)
   {
     ssds_log(logERROR, "Server wasn't able to bind with data socket\n");
+    close(comm_desc);
+    close(data_desc);
     return 1;
   }
 
@@ -100,12 +108,16 @@ int main(int argc, char* argv[]) {
   if(listen(comm_desc, 5)!=0)
   {
     ssds_log(logERROR, "Listen failed on communication socket on server\n");
+    close(comm_desc);
+    close(data_desc);
     return 1;
   }
 
   if(listen(data_desc, 5)!=0)
   {
     ssds_log(logERROR, "Listen failed on data socket on server\n");
+    close(comm_desc);
+    close(data_desc);
     return 1;
   }
   
@@ -120,11 +132,16 @@ int main(int argc, char* argv[]) {
     if((comm_sock=accept(comm_desc, (struct sockaddr *) &client_comm, (socklen_t*)&comm_addr_len))<0)
     {
       ssds_log(logERROR, "Accept connection has failed");
+      close(comm_desc);
+      close(data_desc);
       return 1;
     }
     if((data_sock=accept(data_desc, (struct sockaddr *) &client_data, (socklen_t*)&data_addr_len))<0)
     {
       ssds_log(logERROR, "Accept on data socket has failed");
+      close(comm_desc);
+      close(data_desc);
+      close(comm_sock);
       return 1;
     }
     client_ip=inet_ntoa(client_comm.sin_addr);
@@ -138,6 +155,10 @@ int main(int argc, char* argv[]) {
         if(buf == NULL)
         {
           ssds_log(logERROR, "Recieving of message has failed\n");
+          close(comm_desc);
+          close(data_desc);
+          close(comm_sock);
+          close(data_sock);
           return 1;
         }        
 
@@ -157,6 +178,10 @@ int main(int argc, char* argv[]) {
             if(f == NULL)
             {
                 ssds_log(logERROR,"Error while creating @System.solv file.\n");
+                close(comm_desc);
+                close(data_desc);
+                close(comm_sock);
+                close(data_sock);
                 return 1;
             }
             char* data_buffer;
@@ -164,7 +189,7 @@ int main(int argc, char* argv[]) {
             char* end_ptr;
             size_t bytes_written, bytes_to_write;
             int i = 0;
-
+            write(comm_sock, "OK", strlen("OK"));
             while(1)
             {
                 comm_buffer = sock_recv(comm_sock);
@@ -187,7 +212,7 @@ int main(int argc, char* argv[]) {
         case 123:
 
             /* Dependency solving part */
-            ssds_log(logDEBUG, "\n\nDEPENDENCY SOLVING.\n\n");
+            ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
 
             SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
             ssds_read_get_packages(pkgs, json);
@@ -238,6 +263,8 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
+  close(comm_sock);
+  close(data_sock);
   }
   //ssds_solving::solve solveHandler;
 

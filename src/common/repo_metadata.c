@@ -184,7 +184,7 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
   }
   
 //   ssds_log(logDEBUG, "download_repo_metadata_by_url beffore free\n");
-  lr_result_free(r);
-  lr_handle_free(h);
+//  lr_result_free(r);
+//  lr_handle_free(h);
 //   ssds_log(logDEBUG, "download_repo_metadata_by_url after free\n");
 }

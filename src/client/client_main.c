@@ -105,11 +105,14 @@ int main(int argc, char* argv[]){
   ssds_log(logDEBUG, "Set server port.\n");
   
   ssds_log(logDEBUG, "Socket controll.\n");
-  if(comm_sock == -1)
+  if(comm_sock == -1 || data_sock == -1)
   {
-    ssds_log(logERROR, "Client encountered an error when creating socket for communication\n");
+    ssds_log(logERROR, "Client encountered an error when creating sockets for communication and data.\n");
+    close(comm_sock);
+    close(data_sock);
     return 1;
   }
+
   ssds_log(logDEBUG, "Socket controll - OK\n"); 
   
   ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
@@ -122,6 +125,8 @@ int main(int argc, char* argv[]){
 
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect comm. socket on server. Please, check out your network connection and try it again later.\n");
+    close(comm_sock);
+    close(data_sock);
     return 1;
   }
 
@@ -136,6 +141,8 @@ int main(int argc, char* argv[]){
   }
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect data socket on server. Please, check out your network connection and try it again later.\n");
+    close(comm_sock);
+    close(data_sock);
     return 1;
   }
   ssds_log(logMESSAGE, "Connection to server is established.\n");
@@ -156,6 +163,8 @@ int main(int argc, char* argv[]){
   if(f == NULL)
   {
       ssds_log(logERROR,"Error while opening @System.solv file.\n");
+      close(comm_sock);
+      close(data_sock);
       return 1;
   }
 
@@ -164,6 +173,7 @@ int main(int argc, char* argv[]){
   char* server_response;
   int i = 0;
   size_t bytes_read = 0;
+  server_response = sock_recv(comm_sock);
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
       snprintf(msg_length,10,"%d",bytes_read);
@@ -171,7 +181,7 @@ int main(int argc, char* argv[]){
       write(data_sock, buffer, bytes_read);
       server_response = sock_recv(comm_sock);
 
-      ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes_read, ++i);
+      //ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes_read, ++i);
   }
   msg_output = "@System.solv file sent";
   write(comm_sock, msg_output, strlen(msg_output));
@@ -189,6 +199,8 @@ int main(int argc, char* argv[]){
   if(buf == NULL)
   {
     ssds_log(logERROR, "Error while recieving data\n");
+    close(comm_sock);
+    close(data_sock);
     return 1;
   }
   ssds_log(logDEBUG, "Answer is OK.\n\n%s\n\n");
@@ -210,6 +222,8 @@ int main(int argc, char* argv[]){
   ssds_log(logDEBUG, "Parsing answer.\n");
   if(!ssds_read_parse(buf,json_read)){
       ssds_log(logERROR, "Error while parsing recived data\n");
+      close(comm_sock);
+      close(data_sock);
       return 1;
   }
   ssds_log(logDEBUG, "Answer parsed.\n");
@@ -254,6 +268,8 @@ int main(int argc, char* argv[]){
   if(!return_status || error != NULL){
       ssds_log(logERROR, "%d: %s\n", error->code, error->message);
       g_error_free(error);
+      close(comm_sock);
+      close(data_sock);
       return 1;
   }
 
