@@ -46,5 +46,9 @@ Now everything should be in order to build ssds:
 	-to test type in build/ dir:
 
 		$ctest
+		
+	-alternatively (if $ctest runs only one test) you can run test from build/tests/ dir:
+	
+		$./test_main
   
 Enjoy :)
