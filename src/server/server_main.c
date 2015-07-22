@@ -44,8 +44,17 @@ void session(ip::tcp::socket sock,boost::system::error_code ec){
 #endif
 
 int main(int argc, char* argv[]) {
-  ssds_log(logDEBUG, "Server started.\n");
+  /*******************************************************************/
+  /* Setting up garbage collector and setting callback functions */
+  /*******************************************************************/
   ssds_gc_init();
+  signal(SIGINT, ssds_signal_handler);
+  signal(SIGBUS, ssds_signal_handler);
+  signal(SIGSEGV, ssds_signal_handler);
+  signal(SIGTERM, ssds_signal_handler);
+
+  ssds_log(logDEBUG, "Server started.\n");
+
   parse_params_srv(argc, argv);
     
   ssds_log(logDEBUG, "Params parsed.\n");

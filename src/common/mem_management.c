@@ -22,6 +22,12 @@
 
 Ssds_gc * global_gc = NULL;
 
+void ssds_signal_handler(int signum)
+{
+	ssds_gc_cleanup();
+	exit(signum);
+}
+
 void ssds_gc_cleanup()
 {
 	Ssds_gc_item * next = NULL;

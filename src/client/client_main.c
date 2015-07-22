@@ -4,12 +4,22 @@
 //for debugging
 //#define DEBUG
 
+
 int main(int argc, char* argv[]){
+  /*******************************************************************/
+  /* Setting up garbage collector and setting callback functions */
+  /*******************************************************************/
+  ssds_gc_init();
+  signal(SIGINT, ssds_signal_handler);
+  signal(SIGBUS, ssds_signal_handler);
+  signal(SIGSEGV, ssds_signal_handler);
+  signal(SIGTERM, ssds_signal_handler);
+
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
   ssds_log(logINFO, "Client startup\n");
-  ssds_gc_init();
+
   ParamOptsCl* params = init_params_cl();
   
   ssds_log(logDEBUG, "Client params initialized.\n");

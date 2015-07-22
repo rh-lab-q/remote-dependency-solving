@@ -58,6 +58,11 @@ typedef struct s_gc
 }Ssds_gc;
 
 /**
+ * Function called when termination signals are recieved.
+ */
+void ssds_signal_handler(int signum);
+
+/**
  * Deletes everything in the garbage collector including garbage collector.
  */
 void ssds_gc_cleanup();

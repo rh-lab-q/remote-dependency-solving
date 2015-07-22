@@ -12,6 +12,7 @@ extern "C"{
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <signal.h>
 
 //SSDS
 #include "../common/log_handler.h"
