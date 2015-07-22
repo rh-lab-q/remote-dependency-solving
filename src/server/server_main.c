@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
   * 	Establishing port, socket etc for the communication
   * 
   *************************************************************************/
-  int comm_desc, comm_sock, data_desc, data_sock;
+  int comm_desc, comm_sock, data_desc, data_sock, enable = 1;
   char* client_ip;
 
   comm_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
@@ -94,10 +94,24 @@ int main(int argc, char* argv[]) {
     close(data_desc);
     return 1;
   }
-  
+ 
+  if(setsockopt(comm_desc, SOL_SOCKET, SO_REUSEADDR, (char *)&enable, sizeof(enable)) < 0){
+    ssds_log(logERROR, "Server wasn't able to set communication socket option.\n");
+    close(comm_desc);
+    close(data_desc);
+    return 1;
+  }
+
   if(bind(data_desc, (struct sockaddr*)&server_data, sizeof(server_data)) <0)
   {
     ssds_log(logERROR, "Server wasn't able to bind with data socket\n");
+    close(comm_desc);
+    close(data_desc);
+    return 1;
+  }
+  
+  if(setsockopt(data_desc, SOL_SOCKET, SO_REUSEADDR, (char *)&enable, sizeof(enable)) < 0){
+    ssds_log(logERROR, "Server wasn't able to set data socket option.\n");
     close(comm_desc);
     close(data_desc);
     return 1;
