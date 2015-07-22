@@ -40,7 +40,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
   {
     HyRepo repo = hy_repo_create("solving");
     SsdsMetadataFilesLoc* file = (SsdsMetadataFilesLoc*)g_slist_nth_data(list->files_locations, i);
-    ssds_log(logDEBUG, "repomd: %s\n filelists: %s\nprimary: %s\n", file->repomd, file->filelists, file->primary);
+//     ssds_log(logDEBUG, "repomd: %s\n filelists: %s\nprimary: %s\n", file->repomd, file->filelists, file->primary);
     
     int path_len = strlen(file->repomd)+strlen("/repodata/repomd.xml");
     char* repomd_path = (char*)malloc((path_len+1)*sizeof(char));

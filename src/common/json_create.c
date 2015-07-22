@@ -179,13 +179,13 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
   json_node_take_array(new_inside, new_arr);
   
   int i;
-  for(i=0; i<hy_packagelist_count(goal_pkgs); i++)
+  for(i=hy_packagelist_count(goal_pkgs)-1; i>=0; i--)
   {
     pkg=hy_packagelist_get(goal_pkgs, i);
-    int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_version(pkg)) + strlen(hy_package_get_release(pkg)) + strlen(hy_package_get_arch(pkg));
-    char* full_name = (char*) malloc((name_length+4)*sizeof(char));
+    int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_arch(pkg));
+    char* full_name = (char*) malloc((name_length+3)*sizeof(char));
     
-    sprintf(full_name ,"%s-%s-%s-%s", hy_package_get_name(pkg), hy_package_get_version(pkg), hy_package_get_release(pkg), hy_package_get_arch(pkg));
+    sprintf(full_name ,"%s.%s", hy_package_get_name(pkg), hy_package_get_arch(pkg));
     //std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
     json_array_add_string_element(new_arr, full_name);
   }

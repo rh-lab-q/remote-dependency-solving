@@ -22,7 +22,6 @@
 
 int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 {
-  return -1;
   if(argc==1)
   {
     ssds_log(logERROR, "No command provided. The program will terminate now\n");

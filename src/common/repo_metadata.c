@@ -38,7 +38,7 @@ int ssds_locate_repo_metadata(/*SsdsJsonRead* json, */SsdsRepoInfoList* info_lis
     
     if(!local_repo_metadata(repo, meta_list))
     {
-//       ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if\n");
+      ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if\n");
       download_repo_metadata_by_url(repo, meta_list);
 //       ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if after download\n");
     }
@@ -64,7 +64,7 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
   LrHandle *h = lr_handle_init();
   LrResult *r = lr_result_init();
   
-//   ssds_log(logDEBUG, "%s\n", local_path);
+  ssds_log(logDEBUG, "%s\n", local_path);
   
   char** handle_urls=(char**)malloc(2*sizeof(char*));
   handle_urls[0]=local_path;
