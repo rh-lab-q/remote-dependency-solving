@@ -22,6 +22,7 @@
 
 int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 {
+  return -1;
   if(argc==1)
   {
     ssds_log(logERROR, "No command provided. The program will terminate now\n");
@@ -85,17 +86,14 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
     ssds_log(logERROR, "No command provided. The program will terminate now\n");
     exit(1);
   }
-//   ssds_log(logDEBUG, "optind %d and argc %d\n", optind, argc);
   if(optind < argc)
   {
     while(optind < argc)
     {
-//       ssds_log(logDEBUG, "package %s\n",argv[optind]);
       params->pkgs = g_slist_append(params->pkgs, argv[optind++]);
       params->pkg_count++;
     }
   }
-//   ssds_log(logDEBUG,"PKG count %d\n", params->pkg_count);
   return 1;
 }
 
@@ -106,6 +104,13 @@ ParamOptsCl* init_params_cl()
   new->command=-1;
   new->pkgs=NULL;
   return new;
+}
+
+
+void free_params_cl(ParamOptsCl* params)
+{
+  g_slist_free_full(params->pkgs, (GDestroyNotify) free); //only *char in the list so free will suffice
+  free(params);
 }
 
 

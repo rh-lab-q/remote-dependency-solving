@@ -70,6 +70,8 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params);
  */
 ParamOptsCl* init_params_cl();
 
+void free_params_cl(ParamOptsCl* params);
+
 /**
  * Prints help for client users
  */
