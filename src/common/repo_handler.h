@@ -43,6 +43,8 @@
 #include <hawkey/goal.h>
 #include <hawkey/repo.h>
 
+#include "mem_management.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif

@@ -46,6 +46,7 @@ extern "C"{
 #include <stdio.h>
 #include <unistd.h>
 
+#include "mem_management.h"
 
 /** Type of url from .repo file located in /etc/yum.repos.d/ */
 typedef enum {

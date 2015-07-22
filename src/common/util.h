@@ -31,6 +31,7 @@ extern "C"{
 #include <string.h>
 #include <sys/utsname.h>
 #include "log_handler.h"
+#include "mem_management.h"
 
 /**
  * Resolves path for @System.solv file depending on system version

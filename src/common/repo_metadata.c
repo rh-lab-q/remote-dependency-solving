@@ -23,7 +23,7 @@
 
 SsdsRepoMetadataList* ssds_repo_metadata_init()
 {
-  SsdsRepoMetadataList* new = (SsdsRepoMetadataList*) malloc(sizeof(SsdsRepoMetadataList));
+  SsdsRepoMetadataList* new = (SsdsRepoMetadataList*) ssds_malloc(sizeof(SsdsRepoMetadataList));
   new->files_locations = NULL;
   return new;
 }
@@ -66,7 +66,7 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
   
   ssds_log(logDEBUG, "%s\n", local_path);
   
-  char** handle_urls=(char**)malloc(2*sizeof(char*));
+  char** handle_urls=(char**)ssds_malloc(2*sizeof(char*));
   handle_urls[0]=local_path;
   handle_urls[1]=NULL;
   lr_handle_setopt(h, NULL, LRO_URLS, handle_urls);//look for repo locally
@@ -81,7 +81,7 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
     LrYumRepo* repo = lr_yum_repo_init();
     lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &repo);
     
-    SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)malloc(sizeof(SsdsMetadataFilesLoc));
+    SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)ssds_malloc(sizeof(SsdsMetadataFilesLoc));
     loc->repomd = local_path;
     loc->filelists = strdup(lr_yum_repo_path(repo,"filelists"));
     loc->primary = strdup(lr_yum_repo_path(repo,"primary"));
@@ -100,7 +100,7 @@ char* full_path_to_metadata(char* repo_name)
 {
   const char* dest="/tmp/ssds/";
   int length=strlen(dest)+strlen(repo_name);
-  char* full_path=(char*)malloc((length+1)*sizeof(char));
+  char* full_path=(char*)ssds_malloc((length+1)*sizeof(char));
   
   strncpy(full_path, dest, strlen(dest)+1);
   strncat(full_path, repo_name, strlen(repo_name));
@@ -163,7 +163,7 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
     
 //     ssds_log(logDEBUG, "Lr_result contains all the info now\n");
     
-    SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)malloc(sizeof(SsdsMetadataFilesLoc));
+    SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)ssds_malloc(sizeof(SsdsMetadataFilesLoc));
     
     loc->repomd = destdir;
     

@@ -29,6 +29,7 @@ extern "C"{
 #include "repo_handler.h"
 #include "json_handler.h"
 #include "log_handler.h"
+#include "mem_management.h"
 
 //GLIB
 #include <glib.h>

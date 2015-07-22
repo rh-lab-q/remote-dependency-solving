@@ -22,6 +22,7 @@
 #define _NETWORK_UTIL_H
 
 #include "log_handler.h"
+#include "mem_management.h"
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>

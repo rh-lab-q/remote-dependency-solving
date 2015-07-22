@@ -24,6 +24,7 @@
 #include <glib.h>
 #include <stdio.h>
 #include "log_handler.h"
+#include "mem_management.h"
 #include <unistd.h>
 #include <getopt.h>
 #include <stdlib.h>

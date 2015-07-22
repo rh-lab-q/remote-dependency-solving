@@ -23,7 +23,7 @@
 
 SsdsJsonCreate* ssds_js_cr_init()
 {
-  SsdsJsonCreate* new=(SsdsJsonCreate*)malloc(sizeof(SsdsJsonCreate));
+  SsdsJsonCreate* new=(SsdsJsonCreate*)ssds_malloc(sizeof(SsdsJsonCreate));
   
   new->generator = json_generator_new();
   new->rootNode = json_node_new(JSON_NODE_OBJECT);
@@ -183,7 +183,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
   {
     pkg=hy_packagelist_get(goal_pkgs, i);
     int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_arch(pkg));
-    char* full_name = (char*) malloc((name_length+3)*sizeof(char));
+    char* full_name = (char*) ssds_malloc((name_length+3)*sizeof(char));
     
     sprintf(full_name ,"%s.%s", hy_package_get_name(pkg), hy_package_get_arch(pkg));
     //std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
@@ -200,7 +200,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
   {
     pkg=hy_packagelist_get(goal_pkgs, i);
     int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_arch(pkg));
-    char* full_name = (char*) malloc((name_length+4)*sizeof(char));
+    char* full_name = (char*) ssds_malloc((name_length+4)*sizeof(char));
     
     sprintf(full_name ,"%s.%s", hy_package_get_name(pkg), hy_package_get_arch(pkg));
 //     std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
@@ -217,7 +217,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
   {
     pkg=hy_packagelist_get(goal_pkgs, i);
     int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_arch(pkg));
-    char* full_name = (char*) malloc((name_length+4)*sizeof(char));
+    char* full_name = (char*) ssds_malloc((name_length+4)*sizeof(char));
     
     sprintf(full_name ,"%s.%s", hy_package_get_name(pkg), hy_package_get_arch(pkg));
     json_array_add_string_element(new_arr, full_name);
