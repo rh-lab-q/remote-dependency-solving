@@ -18,85 +18,117 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
- #include "mem_management.h"
+#include "mem_management.h"
 
- ssds_gc * global_gc = NULL;
+Ssds_gc * global_gc = NULL;
 
- void ssds_gc_cleanup()
+void ssds_gc_cleanup()
 {
-	ssds_gc_item * next = NULL;
-	ssds_gc_item * item = global_gc->top;
+	Ssds_gc_item * next = NULL;
+	Ssds_gc_item * item = global_gc->top;
 	while(item != NULL)
 	{
 		next = item->next;
-		if(item->ptr != NULL)
+		switch(item->type)
 		{
-			free(item->ptr);
+			case SOCKET:
+				close(item->data.sock_fd);
+				break;
+			case PTR:
+				if(item->data.ptr != NULL)
+				{
+					free(item->data.ptr);
+				}
+				break;
+			default:
+				break;
 		}
+
 		free(item);
 		item = next;
 	}
 	free(global_gc);
 }
 
-int ssds_gc_search(void * ptr)
+Ssds_gc_item * ssds_gc_search(Alloc_data data, int type)
 {
-	for (ssds_gc_item * tmp = global_gc->top; tmp != NULL; tmp = tmp->next)
+	for (Ssds_gc_item * tmp = global_gc->top; tmp != NULL; tmp = tmp->next)
 	{
-		if(tmp->ptr == ptr)
+		switch(type)
 		{
-			return 1;
+			case SOCKET:
+				if(tmp->data.sock_fd == data.sock_fd)
+				{
+					return tmp;
+				}
+				break;
+			case PTR:
+				if(tmp->data.ptr == data.ptr)
+				{
+					return tmp;
+				}
+				break;
+			default:
+				break;
 		}
 	}
-	return 0;
+	return NULL;
 }
 
-void ssds_gc_remove(void * ptr)
+void ssds_gc_remove(Alloc_data data, int type)
 {
-	for (ssds_gc_item * item = global_gc->top; item != NULL; item = item->next)
+	Ssds_gc_item * item = ssds_gc_search(data, type); 
+	if(item != NULL)
 	{
-		if(item->ptr == ptr)
+		if(item->next == NULL && item->prev == NULL) //only item in gc
 		{
-			if(item->next == NULL && item->prev == NULL) //only item in gc
-			{
-				global_gc->top = NULL;
-			}
-			else if(item->next == NULL && item->prev != NULL) //item on the end of gc
-			{
-				item->prev->next = NULL;
-			}
-			else if(item->next != NULL && item->prev == NULL) //item on the start of gc
-			{
-				item->next->prev = NULL;
-				global_gc->top = item->next;
-			}
-			else if(item->next != NULL && item->prev != NULL) //item in between two other items
-			{
-				item->prev->next = item->next;
-				item->next->prev = item->prev;
-			}
-			free(item);
-			return;
+			global_gc->top = NULL;
 		}
+		else if(item->next == NULL && item->prev != NULL) //item on the end of gc
+		{
+			item->prev->next = NULL;
+		}
+		else if(item->next != NULL && item->prev == NULL) //item on the start of gc
+		{
+			item->next->prev = NULL;
+			global_gc->top = item->next;
+		}
+		else if(item->next != NULL && item->prev != NULL) //item in between two other items
+		{
+			item->prev->next = item->next;
+			item->next->prev = item->prev;
+		}
+		free(item);
 	}
 }
 
-void ssds_gc_push(void * ptr)
+void ssds_gc_push(Alloc_data data, int type)
 {
-	if(ssds_gc_search(ptr) == 1)
+	if(ssds_gc_search(data, type) != NULL)
 	{
 		return;
 	}
-	ssds_gc_item * new_item = (ssds_gc_item *) malloc(sizeof(ssds_gc_item));
+	Ssds_gc_item * new_item = (Ssds_gc_item *) malloc(sizeof(Ssds_gc_item));
 	if(new_item == NULL)
 	{
-		ssds_log(logERROR, "Failed to allocate new item in ssds_gc_push.\n");
+		fprintf(stderr, "Failed to allocate new item in ssds_gc_push.\n");
 		ssds_gc_cleanup();
 		exit(1);
 	}
-	new_item->ptr = ptr;
+	new_item->type = type;
 	new_item->next = NULL;
 	new_item->prev = NULL;
+	switch(type)
+	{
+		case SOCKET:
+			new_item->data.sock_fd = data.sock_fd;
+			break;
+		case PTR:
+			new_item->data.ptr = data.ptr;
+		default:
+			break;
+
+	}
 	if(global_gc->top == NULL)
 	{
 		global_gc->top = new_item;
@@ -107,6 +139,34 @@ void ssds_gc_push(void * ptr)
 		new_item->next = global_gc->top;
 		global_gc->top = new_item;
 	}
+}
+
+void ssds_gc_push_ptr(void * ptr)
+{
+	Alloc_data data;
+	data.ptr = ptr;
+	ssds_gc_push(data, PTR);
+}
+
+void ssds_gc_push_socket(int socket)
+{
+	Alloc_data data;
+	data.sock_fd = socket;
+	ssds_gc_push(data,SOCKET);
+}
+
+void ssds_gc_remove_ptr(void * ptr)
+{
+	Alloc_data data;
+	data.ptr = ptr;
+	ssds_gc_remove(data, PTR);
+}
+
+void ssds_gc_remove_socket(int socket)
+{
+	Alloc_data data;
+	data.sock_fd = socket;
+	ssds_gc_remove(data,SOCKET);
 }
 
 void * ssds_realloc(void * old_ptr, int size)
@@ -120,8 +180,8 @@ void * ssds_realloc(void * old_ptr, int size)
 	}
 	if(new_ptr != old_ptr)
 	{
-		ssds_gc_remove(old_ptr);
-		ssds_gc_push(new_ptr);
+		ssds_gc_remove_ptr(old_ptr);
+		ssds_gc_push_ptr(new_ptr);
 	}
 	return new_ptr;
 }
@@ -135,7 +195,7 @@ void * ssds_malloc(int size)
 		ssds_gc_cleanup();
 		exit(1);
 	}
-	ssds_gc_push(new_ptr);
+	ssds_gc_push_ptr(new_ptr);
 	return new_ptr;
 }
 
@@ -148,14 +208,14 @@ void * ssds_calloc(int n_items, int size)
 		ssds_gc_cleanup();
 		exit(1);
 	}
-	ssds_gc_push(new_ptr);
+	ssds_gc_push_ptr(new_ptr);
 	return new_ptr;
 }
 
 
 void ssds_gc_init()
 {
-	global_gc = (ssds_gc *) malloc(sizeof(ssds_gc));
+	global_gc = (Ssds_gc *) malloc(sizeof(Ssds_gc));
 	if(global_gc == NULL)
 	{
 		ssds_log(logERROR, "Failed to allocate garbace collector.\n");
@@ -163,4 +223,30 @@ void ssds_gc_init()
 		exit(1);
 	}
 	global_gc->top = NULL;
+}
+
+int ssds_socket(int domain, int type, int protocol)
+{
+	int new_socket = socket(domain, type, protocol);
+	if(new_socket < 0)
+	{
+		ssds_log(logERROR, "Failed to open socket.\n");
+		ssds_gc_cleanup();
+		exit(1);
+	}
+	ssds_gc_push_socket(new_socket);
+	return new_socket;
+}
+
+int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len)
+{
+	int new_socket = accept(socket, address, address_len);
+	if(new_socket < 0)
+	{
+		ssds_log(logERROR, "Failed to accept socket.\n");
+		ssds_gc_cleanup();
+		exit(1);
+	}
+	ssds_gc_push_socket(new_socket);
+	return new_socket;
 }
