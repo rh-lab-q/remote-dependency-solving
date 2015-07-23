@@ -5,6 +5,7 @@
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmcli.h>
+#include <rpm/rpmdb.h>
 
 static void log_handler_cb(const gchar *log_domain G_GNUC_UNUSED, GLogLevelFlags log_level G_GNUC_UNUSED, const gchar *message, gpointer user_data G_GNUC_UNUSED){
 
@@ -25,9 +26,9 @@ int main(){
 //	g_log_set_handler("librepo-test", G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL | G_LOG_LEVEL_DEBUG | G_LOG_LEVEL_WARNING, log_handler_cb, NULL);
 
 	// prepare handle
-	
-	char *urls[] = {"http://beaker-project.org/yum/client-testing/Fedora19/", NULL};
-	char *name = "beaker-0.15.2-1.fc18.src.rpm";
+	system("ls");	
+	char *urls[] = {"http://why.lri.fr/", "https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64","https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",NULL};
+	char *name = "w/why-xemacs-el-2.34-13.fc21.noarch.rpm";
 	h = lr_handle_init();
 	lr_handle_setopt(h, NULL, LRO_URLS, urls);
 	lr_handle_setopt(h, NULL, LRO_REPOTYPE, LR_YUMREPO);
@@ -54,8 +55,7 @@ int main(){
 	// TODO: need to init rpmdb connection
 	rpmts ts = rpmtsCreate();
 	rpmprobFilterFlags ignoreSet = 0;
-	rpmtsSetRootDir(ts, rpmcliRootDir);
-
+	rpmtsSetRootDir(ts, NULL);
 	for(GSList *elem = packages; elem; elem = g_slist_next(elem)){
                 LrPackageTarget *t = (LrPackageTarget *)elem->data;
                 printf("%s: %s\n", t->local_path, t->err ? t->err : "OK");

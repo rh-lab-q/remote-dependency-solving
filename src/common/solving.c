@@ -75,7 +75,7 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
   for(i=0; i<hy_packagelist_count(plist);i++)
   {
     test = hy_packagelist_get(plist, i);
-//       std::cout<< "baliky jsou na: " << hy_package_get_url(test) << ":"<< hy_package_get_location(test)<< std::endl;
+    printf("baliky jsou na: %s %s\n",hy_package_get_baseurl(test),hy_package_get_location(test));
   }*/
     
   HyPackage pkg;

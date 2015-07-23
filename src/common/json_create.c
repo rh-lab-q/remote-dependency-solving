@@ -23,7 +23,7 @@
 
 SsdsJsonCreate* ssds_js_cr_init()
 {
-  SsdsJsonCreate* new=(SsdsJsonCreate*)ssds_malloc(sizeof(SsdsJsonCreate));
+  SsdsJsonCreate* new = (SsdsJsonCreate*)ssds_malloc(sizeof(SsdsJsonCreate));
   
   new->generator = json_generator_new();
   new->rootNode = json_node_new(JSON_NODE_OBJECT);
@@ -94,13 +94,13 @@ void ssds_js_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int
     json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"repolist");
   }
   
-  JsonNode* new_repo=json_node_new(JSON_NODE_OBJECT);
-  JsonObject* new_repo_obj=json_object_new();
+  JsonNode* new_repo = json_node_new(JSON_NODE_OBJECT);
+  JsonObject* new_repo_obj = json_object_new();
   json_node_take_object(new_repo, new_repo_obj);
   json_array_add_object_element(json->currArray, new_repo_obj);
   json->currObj = new_repo_obj;
   
-  JsonNode* new_inside=json_node_new(JSON_NODE_ARRAY);
+  JsonNode* new_inside = json_node_new(JSON_NODE_ARRAY);
   json_object_set_member(json->currObj, (gchar*)"repo_url", new_inside);
   json->currNode = new_inside;
   
@@ -108,10 +108,10 @@ void ssds_js_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int
   json_node_take_array(new_inside, new_array);
   json->currArray = new_array;
   
-  if(type==1)
+  if(type == 1)
   {
     int i;
-    for(i=0; i<url_count; i++)
+    for(i = 0; i < url_count; i++)
     {
       json_array_add_string_element(json->currArray, (gchar*)url[i]);
     }
@@ -119,7 +119,7 @@ void ssds_js_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int
   else
     json_array_add_string_element(json->currArray, (gchar*)url[0]);
   
-  JsonNode* repo_name=json_node_new(JSON_NODE_VALUE);
+  JsonNode* repo_name = json_node_new(JSON_NODE_VALUE);
   json_node_set_string(repo_name, (gchar*)name);
   json_object_set_member(json->currObj, (gchar*)"name", repo_name);
   
@@ -160,66 +160,66 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
   json_node_take_object(new_node, new_obj);
   
   json_array_add_object_element(json->currArray, new_obj);
-  json->currObj=new_obj;
+  json->currObj = new_obj;
   
   HyPackageList goal_pkgs = hy_packagelist_create();
   HyPackage pkg;
   
   goal_pkgs = hy_goal_list_installs(*goal);
-  JsonNode* new_inside=json_node_new(JSON_NODE_ARRAY);
+  JsonNode* new_inside = json_node_new(JSON_NODE_ARRAY);
   json_object_set_member(json->currObj, (gchar*)"name", new_inside);
   JsonArray* new_arr = json_array_new();
   json_node_take_array(new_inside, new_arr);
   json_array_add_string_element(new_arr, name);
   
   goal_pkgs = hy_goal_list_installs(*goal);
-  new_inside=json_node_new(JSON_NODE_ARRAY);
+  new_inside = json_node_new(JSON_NODE_ARRAY);
   json_object_set_member(json->currObj, (gchar*)"install", new_inside);
   new_arr = json_array_new();
   json_node_take_array(new_inside, new_arr);
   
   int i;
-  for(i=hy_packagelist_count(goal_pkgs)-1; i>=0; i--)
+  for(i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
   {
-    pkg=hy_packagelist_get(goal_pkgs, i);
-    int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_arch(pkg));
+    pkg = hy_packagelist_get(goal_pkgs, i);
+    int name_length = strlen(hy_package_get_location(pkg)) + strlen(hy_package_get_arch(pkg));
     char* full_name = (char*) ssds_malloc((name_length+3)*sizeof(char));
     
-    sprintf(full_name ,"%s.%s", hy_package_get_name(pkg), hy_package_get_arch(pkg));
+    sprintf(full_name ,"%s.%s", hy_package_get_location(pkg), hy_package_get_arch(pkg));
     //std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
     json_array_add_string_element(new_arr, full_name);
   }
   
   goal_pkgs = hy_goal_list_erasures(*goal);
-  new_inside=json_node_new(JSON_NODE_ARRAY);
+  new_inside = json_node_new(JSON_NODE_ARRAY);
   json_object_set_member(json->currObj, (gchar*)"erase", new_inside);
   new_arr = json_array_new();
   json_node_take_array(new_inside, new_arr);
   
-  for(i=hy_packagelist_count(goal_pkgs)-1; i>=0; i--)
+  for(i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
   {
-    pkg=hy_packagelist_get(goal_pkgs, i);
-    int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_arch(pkg));
+    pkg = hy_packagelist_get(goal_pkgs, i);
+    int name_length = strlen(hy_package_get_location(pkg)) + strlen(hy_package_get_arch(pkg));
     char* full_name = (char*) ssds_malloc((name_length+4)*sizeof(char));
     
-    sprintf(full_name ,"%s.%s", hy_package_get_name(pkg), hy_package_get_arch(pkg));
+    sprintf(full_name ,"%s.%s", hy_package_get_location(pkg), hy_package_get_arch(pkg));
 //     std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
     json_array_add_string_element(new_arr, full_name);
   }
   
   goal_pkgs = hy_goal_list_upgrades(*goal);
-  new_inside=json_node_new(JSON_NODE_ARRAY);
+  new_inside = json_node_new(JSON_NODE_ARRAY);
   json_object_set_member(json->currObj, (gchar*)"upgrade", new_inside);
   new_arr = json_array_new();
   json_node_take_array(new_inside, new_arr);
   
-  for(i=hy_packagelist_count(goal_pkgs)-1; i>=0; i--)
+  for(i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
   {
-    pkg=hy_packagelist_get(goal_pkgs, i);
-    int name_length = strlen(hy_package_get_name(pkg)) + strlen(hy_package_get_arch(pkg));
+    pkg = hy_packagelist_get(goal_pkgs, i);
+    int name_length = strlen(hy_package_get_location(pkg)) + strlen(hy_package_get_arch(pkg));
     char* full_name = (char*) ssds_malloc((name_length+4)*sizeof(char));
     
-    sprintf(full_name ,"%s.%s", hy_package_get_name(pkg), hy_package_get_arch(pkg));
+    sprintf(full_name ,"%s.%s", hy_package_get_location(pkg), hy_package_get_arch(pkg));
     json_array_add_string_element(new_arr, full_name);
   }
 }
