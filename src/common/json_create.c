@@ -185,7 +185,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     int name_length = strlen(hy_package_get_location(pkg)) + strlen(hy_package_get_arch(pkg));
     char* full_name = (char*) ssds_malloc((name_length+3)*sizeof(char));
     
-    sprintf(full_name ,"%s.%s", hy_package_get_location(pkg), hy_package_get_arch(pkg));
+    sprintf(full_name ,"%s", hy_package_get_location(pkg));
     //std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
     json_array_add_string_element(new_arr, full_name);
   }
@@ -202,7 +202,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     int name_length = strlen(hy_package_get_location(pkg)) + strlen(hy_package_get_arch(pkg));
     char* full_name = (char*) ssds_malloc((name_length+4)*sizeof(char));
     
-    sprintf(full_name ,"%s.%s", hy_package_get_location(pkg), hy_package_get_arch(pkg));
+    sprintf(full_name ,"%s", hy_package_get_location(pkg));
 //     std::string full_pkg = hy_package_get_name(pkg)+(std::string)"-"+hy_package_get_version(pkg)+(std::string)"-" + hy_package_get_release(pkg)+ (std::string)"-" + hy_package_get_arch(pkg);
     json_array_add_string_element(new_arr, full_name);
   }
@@ -219,7 +219,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     int name_length = strlen(hy_package_get_location(pkg)) + strlen(hy_package_get_arch(pkg));
     char* full_name = (char*) ssds_malloc((name_length+4)*sizeof(char));
     
-    sprintf(full_name ,"%s.%s", hy_package_get_location(pkg), hy_package_get_arch(pkg));
+    sprintf(full_name ,"%s", hy_package_get_location(pkg));
     json_array_add_string_element(new_arr, full_name);
   }
 }
