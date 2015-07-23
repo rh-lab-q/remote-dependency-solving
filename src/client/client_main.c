@@ -238,12 +238,7 @@ int main(int argc, char* argv[]){
   // TODO:
   // get available urls
   // ssds_log(logDEBUG, "Reading URLs from answer.\n");
-  // ssds_read_get_urls(urls, json_read);
-  
-  // get names of packages
-  // ssds_log(logDEBUG, "Reading packages name from answer.\n");
-  int num_pkgs = /*ssds_read_get_packages_string(pkgs,packages,json_read)*/ 0;
-  ssds_log(logMESSAGE, "Number of package to install: %d.\n", num_pkgs);
+  // ssds_read_get_download_urls(urls, json_read);
   
   printf("%s", buf);
   ssds_log(logDEBUG, "Downloading preparation.\n");
@@ -255,13 +250,35 @@ int main(int argc, char* argv[]){
   ssds_log(logDEBUG, "Array of packages is setted.\n");
   
   ssds_log(logDEBUG, "Loop thrue all packages to download.\n");
-  ssds_log(logMESSAGE, "Package to download:\n");
+  ssds_log(logMESSAGE, "Package to download and install:\n");
+ 
+  // get names of packages
+  // ssds_log(logDEBUG, "Reading packages name for install from answer.\n");
+  int num_pkgs = /*ssds_read_get_packages_to_install(pkgs,packages,json_read)*/ 0;
+  ssds_log(logMESSAGE, "Number of package to install: %d.\n", num_pkgs);     
+
   for(int i = 0; i < num_pkgs; i++){
   
      // Prepare list of target
-     ssds_log(logDEBUG, "Package name: %s as %d in order.\n", packages[i], i+1);
+     ssds_log(logDEBUG, "Package name: %s as %d in order for install.\n", packages[i], i+1);
      ssds_log(logMESSAGE, "\t%s\n", packages[i]);
-     target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET, LR_CHECKSUM_UNKNOWN,
+     target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
+                                   NULL, 0, NULL, TRUE, NULL, NULL, &error);
+     package_list = g_slist_append(package_list, target);
+     ssds_log(logDEBUG, "Package added to download list.\n");
+  }
+
+  // get names of packages
+  // ssds_log(logDEBUG, "Reading packages name for update from answer.\n");
+  num_pkgs = /*ssds_read_get_packages_to_update(pkgs,packages,json_read)*/ 0;
+  ssds_log(logMESSAGE, "Number of package to update: %d.\n", num_pkgs);            
+
+  for(int i = 0; i < num_pkgs; i++){
+  
+     // Prepare list of target
+     ssds_log(logDEBUG, "Package name: %s as %d in order for update.\n", packages[i], i+1);
+     ssds_log(logMESSAGE, "\t%s\n", packages[i]);
+     target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET_UPDATE, LR_CHECKSUM_UNKNOWN,
                                    NULL, 0, NULL, TRUE, NULL, NULL, &error);
      package_list = g_slist_append(package_list, target);
      ssds_log(logDEBUG, "Package added to download list.\n");

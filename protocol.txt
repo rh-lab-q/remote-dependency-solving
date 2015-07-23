@@ -76,7 +76,8 @@ Example:
           "update" : [pkg1, pkg2, pkg3 ...]
       	},
       	{}...
-      ]
+      ],
+      "download_address" : [addr1, addr2, addr3 ...]
     
     
 Example coresponding to client example above:
@@ -110,6 +111,11 @@ Example coresponding to client example above:
         "erase" : [],
         "upgrade" : []
       }
+    ],
+    "download_address":
+    [
+      "https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",
+      "https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64"
     ]
   }
 }

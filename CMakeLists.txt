@@ -125,6 +125,7 @@ target_link_libraries(
 )
 
 file(MAKE_DIRECTORY /tmp/ssds/)
-#file(MAKE_DIRECTORY /var/cache/ssds/packages/)
+#file(MAKE_DIRECTORY /var/cache/ssds/packages/install/)
+#file(MAKE_DIRECTORY /var/cache/ssds/packages/update/)
 enable_testing()
 add_subdirectory(tests)

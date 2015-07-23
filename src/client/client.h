@@ -22,7 +22,8 @@ extern "C"{
 #include "../../cmake/Config/version_conf.h"
 
 /** path to package download directory */
-static const char *DOWNLOAD_TARGET = "/var/cache/ssds/packages/";
+static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
+static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
 
 #ifdef __cplusplus
 }
