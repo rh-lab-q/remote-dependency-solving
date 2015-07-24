@@ -10,7 +10,7 @@ extern "C"{
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <signal.h>
-
+#include <librepo/librepo.h>
 //SSDS
 #include "../common/log_handler.h"
 #include "../common/network_util.h"
@@ -24,6 +24,9 @@ extern "C"{
 /** path to package download directory */
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
 static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
+
+static int progress_callback(void *data, double total, double downloaded);
+static int end_callback(void *data, LrTransferStatus status, const char *msg);
 
 #ifdef __cplusplus
 }

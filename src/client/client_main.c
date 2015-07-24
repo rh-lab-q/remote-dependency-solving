@@ -3,7 +3,22 @@
 // #define VERSION_HAWKEY @HKY_22@
 //for debugging
 //#define DEBUG
+static int progress_callback(void *data, double total, double downloaded){
+        if(total > 0){
+                printf("\r%s\t\t%.0f%%",data, (downloaded/total)*100);
+                fflush(stdout);
+        }
+        return 0;
+}
 
+static int end_callback(void *data, LrTransferStatus status, const char *msg){
+        if(status == LR_TRANSFER_SUCCESSFUL){
+                printf("\r%s\t\t%s\n",data,"100% - Downloaded.");
+        }else{
+                printf("\r%s\t\t%s\n",data,msg);
+        }
+        return status;
+}
 
 int main(int argc, char* argv[]){
   /*******************************************************************/
@@ -247,8 +262,11 @@ int main(int argc, char* argv[]){
   lr_handle_setopt(handler, NULL, LRO_URLS, urls);
   ssds_log(logDEBUG, "Array of URLs is setted.\n");
   lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
-  ssds_log(logDEBUG, "Array of packages is setted.\n");
-  
+  ssds_log(logDEBUG, "Repo type is setted.\n");
+  lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
+  ssds_log(logDEBUG, "Progress callback is setted.\n");
+
+
   ssds_log(logDEBUG, "Loop thrue all packages to download.\n");
   ssds_log(logMESSAGE, "Package to download and install:\n");
  
@@ -262,8 +280,8 @@ int main(int argc, char* argv[]){
      // Prepare list of target
      ssds_log(logDEBUG, "Package name: %s as %d in order for install.\n", packages[i], i+1);
      ssds_log(logMESSAGE, "\t%s\n", packages[i]);
-     target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
-                                   NULL, 0, NULL, TRUE, NULL, NULL, &error);
+     target = lr_packagetarget_new_v2(handler, packages[i], DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
+                                   NULL, 0, NULL, TRUE, progress_callback, packages[i], end_callback, NULL, &error);
      package_list = g_slist_append(package_list, target);
      ssds_log(logDEBUG, "Package added to download list.\n");
   }
@@ -278,8 +296,8 @@ int main(int argc, char* argv[]){
      // Prepare list of target
      ssds_log(logDEBUG, "Package name: %s as %d in order for update.\n", packages[i], i+1);
      ssds_log(logMESSAGE, "\t%s\n", packages[i]);
-     target = lr_packagetarget_new(handler, packages[i], DOWNLOAD_TARGET_UPDATE, LR_CHECKSUM_UNKNOWN,
-                                   NULL, 0, NULL, TRUE, NULL, NULL, &error);
+     target = lr_packagetarget_new_v2(handler, packages[i], DOWNLOAD_TARGET_UPDATE, LR_CHECKSUM_UNKNOWN,
+                                   NULL, 0, NULL, TRUE, progress_callback, packages[i], end_callback, NULL, &error);
      package_list = g_slist_append(package_list, target);
      ssds_log(logDEBUG, "Package added to download list.\n");
   }
