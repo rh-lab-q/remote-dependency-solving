@@ -104,6 +104,11 @@ Example coresponding to client example above:
 	],
 	"erase" : [],
 	"upgrade" : []
+	"download_address":
+    	[
+      		"https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",
+      		"https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64"
+    	]
       },
       {
         "name" : "abakus",
@@ -112,11 +117,6 @@ Example coresponding to client example above:
         "upgrade" : []
       }
     ],
-    "download_address":
-    [
-      "https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",
-      "https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64"
-    ]
   }
 }
 ================================================================================================
