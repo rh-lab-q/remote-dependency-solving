@@ -338,7 +338,6 @@ int main(int argc, char* argv[]){
   g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
   lr_handle_free(handler);
   
-  free(buf);
   ssds_gc_cleanup();
   return 0;
 }
