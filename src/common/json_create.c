@@ -185,6 +185,27 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     json_array_add_string_element(new_arr, hy_package_get_location(pkg));
   }
   
+  new_inside = json_node_new(JSON_NODE_ARRAY);
+  json_object_set_member(json->currObj, (gchar*)"download_address", new_inside);
+  new_arr = json_array_new();
+  json_node_take_array(new_inside, new_arr);
+  
+  GSList* possible_urls = NULL;
+  for(i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
+  {
+    pkg = hy_packagelist_get(goal_pkgs, i);
+    if(hy_package_get_baseurl(pkg)==NULL)
+    {
+      if(g_slist_find_custom(possible_urls, hy_package_get_reponame(pkg), strcmp)==NULL)
+      {
+        json_array_add_string_element(new_arr, hy_package_get_reponame(pkg));
+        possible_urls = g_slist_append(possible_urls ,hy_package_get_reponame(pkg));
+      }
+    }
+    else
+      json_array_add_string_element(new_arr, hy_package_get_baseurl(pkg));
+  }
+  
   goal_pkgs = hy_goal_list_erasures(*goal);
   new_inside = json_node_new(JSON_NODE_ARRAY);
   json_object_set_member(json->currObj, (gchar*)"erase", new_inside);

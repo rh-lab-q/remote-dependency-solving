@@ -68,6 +68,10 @@ int main(int argc, char* argv[]) {
 
   comm_desc=ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   data_desc=ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  int yes=1;
+
+  setsockopt(comm_desc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+  setsockopt(data_desc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
   
   if(comm_desc==-1)
   {
@@ -262,7 +266,9 @@ int main(int argc, char* argv[]) {
             SsdsJsonCreate* answer = ssds_js_cr_init();
             ssds_dep_answer(json, answer, sack_p);
 
+            
             char* message = ssds_js_to_string(answer);
+            printf("%s\n\n", message);
             write(comm_sock, message, strlen(message));
             client_finished = 1;
 

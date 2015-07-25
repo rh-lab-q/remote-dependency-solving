@@ -106,6 +106,7 @@ struct SsdsMetadataFilesLoc{
   char* repomd;     /**< path to repomod.xml file */
   char* filelists;  /**< path to filelists.xml */
   char* primary;    /**< path to primary.xml */
+  char* repo_name;  /**< name of repo for later use */
 };
 
 /**

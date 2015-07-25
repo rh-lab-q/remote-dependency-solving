@@ -38,8 +38,8 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
   guint i;
   for(i=0; i<g_slist_length(list->files_locations); i++)
   {
-    HyRepo repo = hy_repo_create("solving");
     SsdsMetadataFilesLoc* file = (SsdsMetadataFilesLoc*)g_slist_nth_data(list->files_locations, i);
+    HyRepo repo = hy_repo_create(file->repo_name);
 //     ssds_log(logDEBUG, "repomd: %s\n filelists: %s\nprimary: %s\n", file->repomd, file->filelists, file->primary);
     
     int path_len = strlen(file->repomd)+strlen("/repodata/repomd.xml");
@@ -51,6 +51,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
     hy_repo_set_string(repo, HY_REPO_MD_FN, repomd_path);
     hy_repo_set_string(repo, HY_REPO_PRIMARY_FN, file->primary);
     hy_repo_set_string(repo, HY_REPO_FILELISTS_FN, file->filelists);
+    hy_repo_set_string(repo, HY_REPO_NAME, file->repo_name);
     
     hy_sack_load_yum_repo(*sack, repo, 0);
     ssds_log(logDEBUG, "One repo loaded to sack\n");
@@ -68,15 +69,15 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
   HyPackageList plist = hy_packagelist_create();
   plist = hy_query_run(query);
     
-  //HyPackage test;
+  HyPackage test;
   ssds_log(logMESSAGE,"No. of packages found by query: %d\n", hy_packagelist_count(plist));
   
-  /*int i;
-  for(i=0; i<hy_packagelist_count(plist);i++)
+  for(int i=0; i<hy_packagelist_count(plist);i++)
   {
     test = hy_packagelist_get(plist, i);
-    printf("baliky jsou na: %s %s\n",hy_package_get_baseurl(test),hy_package_get_location(test));
-  }*/
+    if(hy_package_get_baseurl(test)==NULL)
+      printf("baliky jsou z: %s \n",hy_package_get_reponame(test));
+  }
     
   HyPackage pkg;
   pkg = hy_packagelist_get(plist, 0);

@@ -57,9 +57,9 @@ int ssds_locate_repo_metadata(/*SsdsJsonRead* json, */SsdsRepoInfoList* info_lis
 }
 
 
-int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
+int local_repo_metadata(SsdsRepoInfo* repos, SsdsRepoMetadataList* list)
 {
-  char* local_path=full_path_to_metadata(repo->name);
+  char* local_path=full_path_to_metadata(repos->name);
   GError *tmp_err = NULL;
   LrHandle *h = lr_handle_init();
   LrResult *r = lr_result_init();
@@ -78,16 +78,17 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
   if(ret)
   {
 //     ssds_log(logINFO,"Local metadata for %s found at %s. Using local copy.\n", repo->name, local_path);
-    LrYumRepo* repo = lr_yum_repo_init();
-    lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &repo);
+    LrYumRepo* local_repo = lr_yum_repo_init();
+    lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &local_repo);
     
     SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)ssds_malloc(sizeof(SsdsMetadataFilesLoc));
     loc->repomd = local_path;
-    loc->filelists = strdup(lr_yum_repo_path(repo,"filelists"));
-    loc->primary = strdup(lr_yum_repo_path(repo,"primary"));
+    loc->filelists = strdup(lr_yum_repo_path(local_repo,"filelists"));
+    loc->primary = strdup(lr_yum_repo_path(local_repo,"primary"));
+    loc->repo_name = strdup(repos->urls[0]);
     
     list->files_locations = g_slist_append(list->files_locations, loc);
-    lr_yum_repo_free(repo);
+    lr_yum_repo_free(local_repo);
     return 1;
   }
     
