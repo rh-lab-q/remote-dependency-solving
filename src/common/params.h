@@ -21,13 +21,9 @@
 #ifndef _PARAMS_H
 #define _PARAMS_H
 
-#include <glib.h>
-#include <stdio.h>
+#include "includes.h"
 #include "log_handler.h"
 #include "mem_management.h"
-#include <unistd.h>
-#include <getopt.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C"{

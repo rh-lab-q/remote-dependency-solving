@@ -34,17 +34,7 @@ extern "C"{
 #include <hawkey/repo.h>
 #include <hawkey/package.h>
 
-//JSON-GLIB-1.0
-#include <json-glib/json-glib.h>
-#include <json-glib/json-types.h>
-
-//GLIB-2.0
-#include <glib.h>
-
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "includes.h" 
 
 #include "mem_management.h"
 

@@ -21,11 +21,7 @@
 #ifndef _REPO_HANDLER_H
 #define _REPO_HANDLER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <glib.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include "includes.h"
 
 //LIBREPO
 #include <librepo/repoconf.h>

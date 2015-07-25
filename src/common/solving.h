@@ -32,7 +32,7 @@ extern "C"{
 #include "mem_management.h"
 
 //GLIB
-#include <glib.h>
+#include "includes.h"
 
 //SOLVING
 #include <hawkey/types.h>

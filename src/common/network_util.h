@@ -23,9 +23,7 @@
 
 #include "log_handler.h"
 #include "mem_management.h"
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include "includes.h"
 
 #ifdef __cplusplus
 extern "C"{

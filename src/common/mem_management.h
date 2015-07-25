@@ -21,10 +21,7 @@
 #ifndef _MEM_MANAGEMENT_H
 #define _MEM_MANAGEMENT_H
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
+#include "includes.h"
 #include "log_handler.h"
 
 

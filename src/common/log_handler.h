@@ -21,11 +21,7 @@
 #ifndef _LOG_HANDLER_H
 #define _LOG_HANDLER_H
   
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <time.h>
-
+#include "includes.h"
 #ifdef __cplusplus
 extern "C"{
 #endif
