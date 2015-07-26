@@ -219,14 +219,43 @@ int main(int argc, char* argv[]){
   ssds_log(logMESSAGE, "Reading answer from server.\n");
   char* buf = sock_recv(comm_sock);
   ssds_log(logDEBUG, "Checking answer.\n");
+  printf("%s\n", buf);
+  
   if(buf == NULL)
   {
     ssds_log(logERROR, "Error while recieving data\n");
     ssds_gc_cleanup();
     return 1;
   }
-  ssds_log(logDEBUG, "Answer is OK.\n\n%s\n\n");
+  ssds_log(logDEBUG, "Answer is OK.\n\n");
 
+  /***********/
+  /*attempt to parse answer from json */
+  /**********/
+  
+  if(!ssds_read_parse(buf, json_read))
+  {
+    ssds_log(logERROR, "Error while parsing answer from the server\n");
+    return 1;
+  }
+  
+  SsdsJsonAnswer* answer_from_srv = ssds_json_answer_init();
+  ssds_parse_answer(answer_from_srv, json_read);
+  
+  for(guint i=0; i<g_slist_length(answer_from_srv->answerList); i++)
+  {
+    SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->answerList, i);
+    printf("name: %s\ninstall:\n", inst->pkg_name);
+    
+    for(guint j=0; j<g_slist_length(inst->install); j++)
+      printf("\t%s\n", (char*)g_slist_nth_data(inst->install, j));
+    
+    printf("urls: \n");
+    for(guint j=0; j<g_slist_length(inst->urls); j++)
+      printf("\t%s\n", (char*)g_slist_nth_data(inst->urls, j));
+  }
+  
+  
   /***********************************************************/
   /* Downloading packages part                               */
   /***********************************************************/
@@ -319,9 +348,8 @@ int main(int argc, char* argv[]){
   /*********************************************************/
   /* Installing packages                                   */
   /*********************************************************/
-
+  
   for(GSList *elem = package_list; elem; elem = g_slist_next(elem)){
-
       char command[300];
       LrPackageTarget *target = (LrPackageTarget *)elem->data;
 
@@ -335,9 +363,11 @@ int main(int argc, char* argv[]){
 
   }
  
-  g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
-  lr_handle_free(handler);
+//   g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
+//   lr_handle_free(handler);
   
-  ssds_gc_cleanup();
+//   ssds_gc_cleanup();
+
   return 0;
+  
 }

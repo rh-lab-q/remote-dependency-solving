@@ -166,15 +166,13 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
   HyPackage pkg;
   
   goal_pkgs = hy_goal_list_installs(*goal);
-  JsonNode* new_inside = json_node_new(JSON_NODE_ARRAY);
-  json_object_set_member(json->currObj, (gchar*)"name", new_inside);
-  JsonArray* new_arr = json_array_new();
-  json_node_take_array(new_inside, new_arr);
-  json_array_add_string_element(new_arr, name);
+  json_object_set_string_member(json->currObj, (gchar*)"name", name);
   
   goal_pkgs = hy_goal_list_installs(*goal);
+  JsonNode* new_inside = json_node_new(JSON_NODE_ARRAY);
   new_inside = json_node_new(JSON_NODE_ARRAY);
   json_object_set_member(json->currObj, (gchar*)"install", new_inside);
+  JsonArray* new_arr = json_array_new();
   new_arr = json_array_new();
   json_node_take_array(new_inside, new_arr);
   

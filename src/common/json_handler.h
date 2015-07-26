@@ -154,6 +154,16 @@ typedef struct SsdsRepoInfoList SsdsRepoInfoList;
  */
 typedef struct SsdsJsonRead SsdsJsonRead;
 
+/**
+ * GSList of SsdsJsonInstall
+ */
+typedef struct SsdsJsonAnswer SsdsJsonAnswer;
+
+/**
+ * Structure used for parsing incoming answer from server
+ */
+typedef struct SsdsJsonInstall SsdsJsonInstall;
+
 struct SsdsPkgInfo{
   char** packages;  /**< names of packages requested by user */
   int length;       /**< number of packages */
@@ -177,6 +187,18 @@ struct SsdsJsonRead{
   JsonNode* dataNode;         /** < data node - often used */
   JsonObject* currObj;        /** < currently used object */
   JsonObject* dataObj;        /** < data object - often used for adding new objects */
+};
+
+struct SsdsJsonAnswer{
+  GSList* answerList; /** < holds list of SsdsJsonInstall */
+};
+
+struct SsdsJsonInstall{
+  char* pkg_name;   /** < name of requested package */
+  GSList* install;  /** < list of packages to install */
+  GSList* upgrade;  /** < list of packages to upgrade */
+  GSList* erase;    /** < list of packages to erase */
+  GSList* urls;     /** < list of urls used for download packages */
 };
 
 /**
@@ -232,6 +254,13 @@ SsdsRepoInfo* ssds_read_repoinfo_init();
  * @return          SsdsRepoInfoList*
  */
 SsdsRepoInfoList* ssds_read_list_init();
+
+
+
+SsdsJsonAnswer* ssds_json_answer_init();
+SsdsJsonInstall* ssds_json_install_init();
+
+void ssds_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json);
   
 
 #ifdef __cplusplus

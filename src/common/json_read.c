@@ -132,3 +132,64 @@ SsdsRepoInfoList* ssds_read_list_init()
   new->repoInfoList=NULL;
   return new;
 }
+
+/**********************/
+/* mainly client part */
+/**********************/
+SsdsJsonAnswer* ssds_json_answer_init()
+{
+  SsdsJsonAnswer* new = (SsdsJsonAnswer*)ssds_malloc(sizeof(SsdsJsonAnswer));
+  new->answerList = NULL;
+  return new;
+}
+
+SsdsJsonInstall* ssds_json_install_init()
+{
+  SsdsJsonInstall* new = (SsdsJsonInstall*)ssds_malloc(sizeof(SsdsJsonInstall));
+  new->pkg_name=NULL;
+  new->install=NULL;
+  new->upgrade=NULL;
+  new->erase=NULL;
+  new->urls=NULL;
+};
+
+void ssds_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json)
+{
+  JsonArray*array = json_object_get_array_member(json->dataObj, "install_pkgs");
+  guint len=json_array_get_length(array);
+  
+  //through all the packages/*
+  for(guint i=0; i<len; i++)
+  {
+    SsdsJsonInstall* install=ssds_json_install_init();
+    
+    JsonObject* obj = json_array_get_object_element(array, i);
+    
+    //name of requested package
+    char* currName=(char*)json_object_get_string_member(obj, "name");
+    install->pkg_name=(char*)ssds_malloc((strlen(currName)+1)*sizeof(char));
+    strcpy(install->pkg_name, currName);
+    
+    //names of packages to install
+    JsonArray* curr_arr = json_object_get_array_member(obj, (gchar*)"install");
+    int arr_len = json_array_get_length(curr_arr);
+    
+    for(int j=0; j<arr_len; j++)
+    {
+      char* pkg = (char*)json_array_get_string_element(curr_arr, j);
+      install->install = g_slist_append(install->install, pkg);
+    }
+    
+    //urls used for download
+    curr_arr = json_object_get_array_member(obj, (gchar*)"download_address");
+    arr_len = json_array_get_length(curr_arr);
+    
+    for(int j=0; j<arr_len; j++)
+    {
+      char* url = (char*)json_array_get_string_element(curr_arr, j);
+      install->urls = g_slist_append(install->urls, url);
+    }
+    
+    ans_list->answerList=g_slist_append(ans_list->answerList, install);
+  }
+}
