@@ -228,34 +228,21 @@ int main(int argc, char* argv[]){
     return 1;
   }
   ssds_log(logDEBUG, "Answer is OK.\n\n");
-
-  /***********/
-  /*attempt to parse answer from json */
-  /**********/
   
+  // parse response
+  ssds_log(logDEBUG, "Parsing answer.\n");
   if(!ssds_read_parse(buf, json_read))
   {
     ssds_log(logERROR, "Error while parsing answer from the server\n");
+  //  ssds_gc_cleanup();
     return 1;
   }
-  
+
   SsdsJsonAnswer* answer_from_srv = ssds_json_answer_init();
   ssds_parse_answer(answer_from_srv, json_read);
-  
-  for(guint i=0; i<g_slist_length(answer_from_srv->answerList); i++)
-  {
-    SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->answerList, i);
-    printf("name: %s\ninstall:\n", inst->pkg_name);
-    
-    for(guint j=0; j<g_slist_length(inst->install); j++)
-      printf("\t%s\n", (char*)g_slist_nth_data(inst->install, j));
-    
-    printf("urls: \n");
-    for(guint j=0; j<g_slist_length(inst->urls); j++)
-      printf("\t%s\n", (char*)g_slist_nth_data(inst->urls, j));
-  }
-  
-  
+
+  ssds_log(logDEBUG, "Answer parsed.\n");
+             
   /***********************************************************/
   /* Downloading packages part                               */
   /***********************************************************/
@@ -267,58 +254,50 @@ int main(int argc, char* argv[]){
   GSList *package_list = NULL;
   LrPackageTarget *target;
   GError *error = NULL;
-  char **packages = NULL, **urls = NULL;
-  
-  // parse response
-  ssds_log(logDEBUG, "Parsing answer.\n");
-  if(!ssds_read_parse(buf,json_read)){
-    ssds_log(logERROR, "Error while parsing recived data\n");
-    ssds_gc_cleanup();
-    return 1;
-  }
-  ssds_log(logDEBUG, "Answer parsed.\n");
+  char **urls = NULL;
 
-                               
-  // TODO:
   // get available urls
-  // ssds_log(logDEBUG, "Reading URLs from answer.\n");
-  // ssds_read_get_download_urls(urls, json_read);
-  
-  printf("%s", buf);
-  ssds_log(logDEBUG, "Downloading preparation.\n");
-  handler = lr_handle_init();
-  ssds_log(logDEBUG, "Download handler initied.\n");
-  lr_handle_setopt(handler, NULL, LRO_URLS, urls);
-  ssds_log(logDEBUG, "Array of URLs is setted.\n");
-  lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
-  ssds_log(logDEBUG, "Repo type is setted.\n");
-  lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
-  ssds_log(logDEBUG, "Progress callback is setted.\n");
+  for(guint i=0; i<g_slist_length(answer_from_srv->answerList); i++){
 
-
-  ssds_log(logDEBUG, "Loop thrue all packages to download.\n");
-  ssds_log(logMESSAGE, "Package to download and install:\n");
+     SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->answerList, i);
+     ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
+   
+     urls = (char *)ssds_malloc(g_slist_length(inst->urls)*sizeof(char*));
  
-  // get names of packages
-  // ssds_log(logDEBUG, "Reading packages name for install from answer.\n");
-  int num_pkgs = /*ssds_read_get_packages_to_install(pkgs,packages,json_read)*/ 0;
-  ssds_log(logMESSAGE, "Number of package to install: %d.\n", num_pkgs);     
+     for(guint j=0; j<g_slist_length(inst->urls); j++){
+ 	urls[j] = (char*)g_slist_nth_data(inst->urls, j);
+     }
+ 
+     ssds_log(logDEBUG, "Downloading preparation.\n");
+     handler = lr_handle_init();
+     ssds_log(logDEBUG, "Download handler initied.\n");
+     lr_handle_setopt(handler, NULL, LRO_URLS, urls);
+     ssds_log(logDEBUG, "Array of URLs is setted.\n");
+     lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
+     ssds_log(logDEBUG, "Repo type is setted.\n");
+     lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
+     ssds_log(logDEBUG, "Progress callback is setted.\n");
 
-  for(int i = 0; i < num_pkgs; i++){
+
+     ssds_log(logDEBUG, "Loop thrue all packages to download.\n");
+     ssds_log(logMESSAGE, "Package to download and install:\n");
+ 
+    // get names of packages
+    for(guint j = 0; j < g_slist_length(inst->install); j++){
   
      // Prepare list of target
-     ssds_log(logDEBUG, "Package name: %s as %d in order for install.\n", packages[i], i+1);
-     ssds_log(logMESSAGE, "\t%s\n", packages[i]);
-     target = lr_packagetarget_new_v2(handler, packages[i], DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
-                                   NULL, 0, NULL, TRUE, progress_callback, packages[i], end_callback, NULL, &error);
+     ssds_log(logDEBUG, "Package name: %s as %d in order for install.\n", (char*)g_slist_nth_data(inst->install, j), j+1);
+     ssds_log(logMESSAGE, "\t%s\n", (char*)g_slist_nth_data(inst->install, j));
+     target = lr_packagetarget_new_v2(handler, (char*)g_slist_nth_data(inst->install, j), DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
+                                   NULL, 0, NULL, TRUE, progress_callback, (char*)g_slist_nth_data(inst->install, j), end_callback, NULL, &error);
      package_list = g_slist_append(package_list, target);
      ssds_log(logDEBUG, "Package added to download list.\n");
   }
 
   // get names of packages
   // ssds_log(logDEBUG, "Reading packages name for update from answer.\n");
-  num_pkgs = /*ssds_read_get_packages_to_update(pkgs,packages,json_read)*/ 0;
-  ssds_log(logMESSAGE, "Number of package to update: %d.\n", num_pkgs);            
+ // num_pkgs = /*ssds_read_get_packages_to_update(pkgs,packages,json_read)*/ 0;
+  /*ssds_log(logMESSAGE, "Number of package to update: %d.\n", num_pkgs);            
 
   for(int i = 0; i < num_pkgs; i++){
   
@@ -329,7 +308,7 @@ int main(int argc, char* argv[]){
                                    NULL, 0, NULL, TRUE, progress_callback, packages[i], end_callback, NULL, &error);
      package_list = g_slist_append(package_list, target);
      ssds_log(logDEBUG, "Package added to download list.\n");
-  }
+  }*/
   
   // Download all packages        
   ssds_log(logMESSAGE, "Downloading packages.\n");
@@ -363,10 +342,12 @@ int main(int argc, char* argv[]){
 
   }
  
-//   g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
-//   lr_handle_free(handler);
+   g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
+   lr_handle_free(handler);
+   free(urls);
+  }  
   
-//   ssds_gc_cleanup();
+  ssds_gc_cleanup();
 
   return 0;
   
