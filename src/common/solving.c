@@ -43,7 +43,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
 //     ssds_log(logDEBUG, "repomd: %s\n filelists: %s\nprimary: %s\n", file->repomd, file->filelists, file->primary);
     
     int path_len = strlen(file->repomd)+strlen("/repodata/repomd.xml");
-    char* repomd_path = (char*)ssds_malloc((path_len+1)*sizeof(char));
+    char* repomd_path = (char*)malloc((path_len+1)*sizeof(char));
     memset(repomd_path, '\0', path_len+1);
     strcpy(repomd_path, file->repomd);
     strcat(repomd_path, "/repodata/repomd.xml");

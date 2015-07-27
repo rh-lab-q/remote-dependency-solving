@@ -98,7 +98,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 
 ParamOptsCl* init_params_cl()
 {
-  ParamOptsCl* new = (ParamOptsCl*)ssds_malloc(sizeof(ParamOptsCl));
+  ParamOptsCl* new = (ParamOptsCl*)malloc(sizeof(ParamOptsCl));
   new->pkg_count=0;
   new->command=-1;
   new->pkgs=NULL;

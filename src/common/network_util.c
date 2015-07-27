@@ -22,7 +22,7 @@
 
 char* sock_recv(int sock_fd)
 {
-  char* reply=(char*)ssds_malloc(MAX_INPUT_LEN*sizeof(char));
+  char* reply=(char*)malloc(MAX_INPUT_LEN*sizeof(char));
   memset(reply, 0, MAX_INPUT_LEN);
   ssize_t ret = read(sock_fd, reply , MAX_INPUT_LEN);
   
@@ -35,7 +35,7 @@ char* sock_recv(int sock_fd)
   
   if(ret==MAX_INPUT_LEN)
   {
-    char* buffer=(char*)ssds_malloc(BUFF_SIZE*sizeof(char));
+    char* buffer=(char*)malloc(BUFF_SIZE*sizeof(char));
     memset(buffer, 0, BUFF_SIZE);
     
     int read_count = 0;

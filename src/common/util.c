@@ -22,7 +22,7 @@
 
 void ssds_resolve_dependency_file_path(char * ret_val)
 {
-    struct utsname *machine = (struct utsname *)ssds_malloc(sizeof(struct utsname));
+    struct utsname *machine = (struct utsname *)malloc(sizeof(struct utsname));
 
     if(machine == NULL){
 	ssds_log(logERROR, "Not enough memory on heap.\n");
@@ -48,7 +48,7 @@ void ssds_resolve_dependency_file_path(char * ret_val)
 	i--;
 
     int length = end - i;
-    char *fedora_version = (char *)ssds_malloc(length*sizeof(char));
+    char *fedora_version = (char *)malloc(length*sizeof(char));
 
     if(fedora_version == NULL){
 	ssds_log(logERROR, "Not enough memory on heap.\n");

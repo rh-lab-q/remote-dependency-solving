@@ -22,7 +22,7 @@
 
 SsdsLocalRepoInfo* ssds_repo_parse_init()
 { //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch
-  SsdsLocalRepoInfo* new = (SsdsLocalRepoInfo*) ssds_malloc(sizeof(SsdsLocalRepoInfo));
+  SsdsLocalRepoInfo* new = (SsdsLocalRepoInfo*)malloc(sizeof(SsdsLocalRepoInfo));
   new->repoHandler = lr_yum_repoconfs_init(); 
   
   return new;
@@ -87,7 +87,7 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       while(url[k]!=NULL)
         k++;
       
-      char **url_subst_list=(char**)ssds_malloc((k+1)*sizeof(char*));
+      char **url_subst_list=(char**)malloc((k+1)*sizeof(char*));
       char* url_copy;
       char* url_subst;
       
