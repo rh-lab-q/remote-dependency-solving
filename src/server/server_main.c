@@ -249,7 +249,6 @@ int main(int argc, char* argv[]) {
 
             SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
             ssds_locate_repo_metadata(/*json, */list, meta_list);
-            ssds_log(logDEBUG, "after metadata location\n");
 
             //TODO - change this so that it doesn't need to be created manually
             HySack sack;
@@ -259,19 +258,12 @@ int main(int argc, char* argv[]) {
               sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
             #endif
 
-            ssds_log(logDEBUG, "after sack creation\n");  
-            
             hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
-            ssds_log(logDEBUG, "after sack default repo load\n");
             HySack* sack_p = &sack;
             ssds_fill_sack(sack_p, meta_list);
 
-            ssds_log(logDEBUG, "after fill sack\n");
-            
             SsdsJsonCreate* answer = ssds_js_cr_init();
             ssds_dep_answer(json, answer, sack_p);
-            
-            ssds_log(logDEBUG, "after answer create\n");
             
             char* message = ssds_js_to_string(answer);
             printf("%s\n\n", message);
