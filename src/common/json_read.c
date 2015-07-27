@@ -152,7 +152,7 @@ SsdsJsonInstall* ssds_json_install_init()
   new->erase=NULL;
   new->urls=NULL;
   return new;
-};
+}
 
 void ssds_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json)
 {

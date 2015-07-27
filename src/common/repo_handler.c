@@ -46,8 +46,8 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
   GSList* list = lr_yum_repoconfs_get_list(repo->repoHandler, &err);
   
   for(unsigned int i=0; i<g_slist_length(list); i++){
-    char** url;
-    char* name;
+    char** url = (char **)malloc(sizeof(char*));
+    char* name = NULL;
     short type = 0;
     void * val;
     
@@ -76,6 +76,7 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       err = NULL;
       //void ** val2;
       if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != 0){
+ 	free(url);
         url = (char**)val; 
         type = SSDS_BASEURL;
       }
@@ -102,7 +103,7 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       url_subst_list[k]=NULL;
       
       ssds_js_add_repo(json,url_subst_list, name, type, k);
-      
+      free(url);      
       for(int j=0; j<=k; j++)
         free(url_subst_list[j]);
       
