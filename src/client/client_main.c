@@ -25,11 +25,11 @@ int main(int argc, char* argv[]){
   /* Setting up garbage collector and setting callback functions */
   /*******************************************************************/
 //   ssds_gc_init();
-  signal(SIGINT, ssds_signal_handler);
+/*  signal(SIGINT, ssds_signal_handler);
   signal(SIGBUS, ssds_signal_handler);
   signal(SIGSEGV, ssds_signal_handler);
   signal(SIGTERM, ssds_signal_handler);
-
+*/
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
@@ -112,8 +112,8 @@ int main(int argc, char* argv[]){
 
   int data_sock, comm_sock, connection_try = 1;
 //   const char * message = "Hello from client\n";
-  comm_sock = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  data_sock = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  comm_sock = socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  data_sock = socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   ssds_log(logDEBUG, "Setted up socket descriptor.\n");
 
   ssds_log(logDEBUG, "Setting up connection to server.\n");

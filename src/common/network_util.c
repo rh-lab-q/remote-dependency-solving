@@ -48,7 +48,7 @@ char* sock_recv(int sock_fd)
       memset(reply, 0, MAX_INPUT_LEN);      
       
       if(read_count*MAX_INPUT_LEN >= buff_size*BUFF_SIZE)
-        buffer=ssds_realloc(buffer, ++buff_size*BUFF_SIZE);
+        buffer=realloc(buffer, ++buff_size*BUFF_SIZE);
       
       ret = read(sock_fd, reply , MAX_INPUT_LEN);
       memcpy(buffer+read_count*MAX_INPUT_LEN, reply, MAX_INPUT_LEN);
