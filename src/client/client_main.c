@@ -231,6 +231,7 @@ int main(int argc, char* argv[]){
   
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
+  printf("%s\n", buf);
   if(!ssds_read_parse(buf, json_read))
   {
     ssds_log(logERROR, "Error while parsing answer from the server\n");

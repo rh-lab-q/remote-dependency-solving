@@ -38,20 +38,13 @@ int ssds_locate_repo_metadata(/*SsdsJsonRead* json, */SsdsRepoInfoList* info_lis
     
     if(!local_repo_metadata(repo, meta_list))
     {
-      ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if\n");
+//       ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if\n");
       download_repo_metadata_by_url(repo, meta_list);
-//       ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if after download\n");
+      ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if after download\n");
     }
     
   }
-  
-//   guint j = g_slist_length(meta_list->files_locations);
-//   for(guint i=0; i<j; i++)
-//   {
-//     SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)g_slist_nth_data(meta_list->files_locations, i);
-//     printf("ssds_locate_repo_metadata:\nrepomd: %s\nfilelists: %s\nprimary: %s\n", loc->repomd, loc->filelists, loc->primary);
-//     
-//   }
+
   //TODO - update return value
    return 1;
 }
@@ -170,6 +163,7 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
     
     loc->filelists = strdup(lr_yum_repo_path(lrRepo,"filelists"));
     loc->primary = strdup(lr_yum_repo_path(lrRepo,"primary"));
+    loc->repo_name = strdup(repo->urls[0]);
 //     
 //     printf("download_repo_metadata_by_url:\nrepomd: %s\nfilelists: %s\nprimary: %s\n", loc->repomd, loc->filelists, loc->primary);
     
