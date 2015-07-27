@@ -5,7 +5,7 @@
 //#define DEBUG
 static int progress_callback(void *data, double total, double downloaded){
         if(total > 0){
-                printf("\r%s\t\t%.0f%%",data, (downloaded/total)*100);
+                printf("\r%s\t\t%.0f%%",(char *)data, (downloaded/total)*100);
                 fflush(stdout);
         }
         return 0;
@@ -13,9 +13,9 @@ static int progress_callback(void *data, double total, double downloaded){
 
 static int end_callback(void *data, LrTransferStatus status, const char *msg){
         if(status == LR_TRANSFER_SUCCESSFUL){
-                printf("\r%s\t\t%s\n",data,"100% - Downloaded.");
+                printf("\r%s\t\t%s\n",(char *)data,"100% - Downloaded.");
         }else{
-                printf("\r%s\t\t%s\n",data,msg);
+                printf("\r%s\t\t%s\n",(char *)data,msg);
         }
         return status;
 }
@@ -194,16 +194,15 @@ int main(int argc, char* argv[]){
   char buffer[131072];
   char msg_length[10];
   char* server_response;
-  int i = 0;
   size_t bytes_read = 0;
   server_response = sock_recv(comm_sock);
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
-      snprintf(msg_length,10,"%d",bytes_read);
+      snprintf(msg_length,10,"%d",(int)bytes_read);
       write(comm_sock, msg_length, strlen(msg_length));
       write(data_sock, buffer, bytes_read);
       server_response = sock_recv(comm_sock);
-
+      if(strcmp(server_response,"OK") != 0){}
       //ssds_log(logMESSAGE, "Read %d bytes of data for the %d time.\n",bytes_read, ++i);
   }
   msg_output = "@System.solv file sent";
@@ -263,16 +262,17 @@ int main(int argc, char* argv[]){
      SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->answerList, i);
      ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
    
-     urls = (char *)malloc(g_slist_length(inst->urls)*sizeof(char*));
+     urls = (char **)malloc(g_slist_length(inst->urls)*sizeof(char*));
  
      for(guint j=0; j<g_slist_length(inst->urls); j++){
- 	urls[j] = (char*)g_slist_nth_data(inst->urls, j);
+        urls[j] = (char*)malloc((strlen(g_slist_nth_data(inst->urls, j))+1)*sizeof(char));
+ 	sprintf(urls[j],"%s",(char*)g_slist_nth_data(inst->urls, j));
      }
  
      ssds_log(logDEBUG, "Downloading preparation.\n");
      handler = lr_handle_init();
      ssds_log(logDEBUG, "Download handler initied.\n");
-     lr_handle_setopt(handler, NULL, LRO_URLS, urls);
+     lr_handle_setopt(handler, NULL, LRO_METALINKURL, urls[0]);
      ssds_log(logDEBUG, "Array of URLs is setted.\n");
      lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
      ssds_log(logDEBUG, "Repo type is setted.\n");
@@ -343,6 +343,9 @@ int main(int argc, char* argv[]){
 
   }
  
+   for(guint j=0; j<g_slist_length(inst->urls); j++){
+     free(urls[j]);
+   }
    g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
    lr_handle_free(handler);
    free(urls);
