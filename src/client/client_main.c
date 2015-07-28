@@ -5,7 +5,7 @@
 //#define DEBUG
 static int progress_callback(void *data, double total, double downloaded){
         if(total > 0){
-                printf("\r%s\t\t%.0f%%",(char *)data, (downloaded/total)*100);
+                printf("\r%.40s\t%.0f%%",(char *)data, (downloaded/total)*100);
                 fflush(stdout);
         }
         return 0;
@@ -13,9 +13,9 @@ static int progress_callback(void *data, double total, double downloaded){
 
 static int end_callback(void *data, LrTransferStatus status, const char *msg){
         if(status == LR_TRANSFER_SUCCESSFUL){
-                printf("\r%s\t\t%s\n",(char *)data,"100% - Downloaded.");
+                printf("\r%.40s\t%s\n",(char *)data,"100% - Downloaded.");
         }else{
-                printf("\r%s\t\t%s\n",(char *)data,msg);
+                printf("\r%.40s\t%s\n",(char *)data,msg);
         }
         return status;
 }
@@ -287,7 +287,6 @@ int main(int argc, char* argv[]){
     for(guint j = 0; j < g_slist_length(inst->install); j++){
   
      // Prepare list of target
-     ssds_log(logDEBUG, "Package name: %s as %d in order for install.\n", (char*)g_slist_nth_data(inst->install, j), j+1);
      ssds_log(logMESSAGE, "\t%s\n", (char*)g_slist_nth_data(inst->install, j));
      target = lr_packagetarget_new_v2(handler, (char*)g_slist_nth_data(inst->install, j), DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
                                    NULL, 0, NULL, TRUE, progress_callback, (char*)g_slist_nth_data(inst->install, j), end_callback, NULL, &error);
@@ -300,13 +299,12 @@ int main(int argc, char* argv[]){
  // num_pkgs = /*ssds_read_get_packages_to_update(pkgs,packages,json_read)*/ 0;
   /*ssds_log(logMESSAGE, "Number of package to update: %d.\n", num_pkgs);            
 
-  for(int i = 0; i < num_pkgs; i++){
+  for(int j = 0; j < num_pkgs; j++){
   
      // Prepare list of target
-     ssds_log(logDEBUG, "Package name: %s as %d in order for update.\n", packages[i], i+1);
-     ssds_log(logMESSAGE, "\t%s\n", packages[i]);
-     target = lr_packagetarget_new_v2(handler, packages[i], DOWNLOAD_TARGET_UPDATE, LR_CHECKSUM_UNKNOWN,
-                                   NULL, 0, NULL, TRUE, progress_callback, packages[i], end_callback, NULL, &error);
+     ssds_log(logMESSAGE, "\t%s\n", packages[j]);
+     target = lr_packagetarget_new_v2(handler, packages[j], DOWNLOAD_TARGET_UPDATE, LR_CHECKSUM_UNKNOWN,
+                                   NULL, 0, NULL, TRUE, progress_callback, packages[j], end_callback, NULL, &error);
      package_list = g_slist_append(package_list, target);
      ssds_log(logDEBUG, "Package added to download list.\n");
   }*/
