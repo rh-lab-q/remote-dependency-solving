@@ -194,10 +194,10 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     pkg = hy_packagelist_get(goal_pkgs, i);
     if(hy_package_get_baseurl(pkg)==NULL)
     {
-      if(g_slist_find_custom(possible_urls, hy_package_get_reponame(pkg), strcmp)==NULL)
+      if(g_slist_find_custom(possible_urls, hy_package_get_reponame(pkg), ssds_strcmp)==NULL)
       {
         json_array_add_string_element(new_arr, hy_package_get_reponame(pkg));
-        possible_urls = g_slist_append(possible_urls ,hy_package_get_reponame(pkg));
+        possible_urls = g_slist_append(possible_urls ,(char *)hy_package_get_reponame(pkg));
       }
     }
     else
@@ -244,4 +244,11 @@ void ssds_js_dump(SsdsJsonCreate* json)//this will always dump error when some a
   json_generator_set_pretty(json->generator, 1);
   data = json_generator_to_data (json->generator, NULL);
   printf("%s\n", (char*)data);
+}
+
+int ssds_strcmp(gconstpointer a, gconstpointer b){
+
+   char *s_a = (char *)a;
+   char *s_b = (char *)b;
+   return strcmp(s_a, s_b);	
 }
