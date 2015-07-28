@@ -66,3 +66,21 @@ void ssds_resolve_dependency_file_path(char * ret_val)
     free(machine);
     free(fedora_version);
 }
+
+int progress_callback(void *data, double total, double downloaded){
+        if(total > 0){
+                printf("\r%.40s\t%.0f%%",(char *)data, (downloaded/total)*100);
+                fflush(stdout);
+        }
+        return 0;
+}
+
+int end_callback(void *data, LrTransferStatus status, const char *msg){
+        if(status == LR_TRANSFER_SUCCESSFUL){
+                printf("\r%.40s\t%s\n",(char *)data,"100% - Downloaded.");
+        }else{
+                printf("\r%.40s\t%s\n",(char *)data,msg);
+        }
+        return status;
+}
+

@@ -27,6 +27,7 @@ extern "C"{
 
 #include "includes.h"
 #include "log_handler.h"
+#include <librepo/librepo.h>
 //#include "mem_management.h"
 
 /**
@@ -35,6 +36,24 @@ extern "C"{
  * @param ret_val return value of function
  */
 void ssds_resolve_dependency_file_path(char* ret_val);
+
+/**
+ * Callback function for downloading packages
+ * @param data		void*
+ * @param total 	double
+ * @param downloaded	double
+ * @return		0
+ */
+int progress_callback(void *data, double total, double downloaded);
+
+/**
+ * Callback function called after package download
+ * @param data		void*
+ * @param status	LrTransferStatus
+ * @param msg		const char*
+ * @return 		status	
+ */
+int end_callback(void *data, LrTransferStatus status, const char *msg);
 
 
 #ifdef __cplusplus

@@ -3,22 +3,6 @@
 // #define VERSION_HAWKEY @HKY_22@
 //for debugging
 //#define DEBUG
-static int progress_callback(void *data, double total, double downloaded){
-        if(total > 0){
-                printf("\r%.40s\t%.0f%%",(char *)data, (downloaded/total)*100);
-                fflush(stdout);
-        }
-        return 0;
-}
-
-static int end_callback(void *data, LrTransferStatus status, const char *msg){
-        if(status == LR_TRANSFER_SUCCESSFUL){
-                printf("\r%.40s\t%s\n",(char *)data,"100% - Downloaded.");
-        }else{
-                printf("\r%.40s\t%s\n",(char *)data,msg);
-        }
-        return status;
-}
 
 int main(int argc, char* argv[]){
   /*******************************************************************/
@@ -334,7 +318,7 @@ int main(int argc, char* argv[]){
       if(!target->err){
           sprintf(command, "rpm --install --nodeps %s", target->local_path);
           printf("%s\n",command);
-          system(command);
+ //         system(command);
       }else{
           ssds_log(logERROR, "Package Error: %s\n", target->err);
       }

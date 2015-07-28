@@ -21,9 +21,6 @@ extern "C"{
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
 static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
 
-static int progress_callback(void *data, double total, double downloaded);
-static int end_callback(void *data, LrTransferStatus status, const char *msg);
-
 #ifdef __cplusplus
 }
 #endif
