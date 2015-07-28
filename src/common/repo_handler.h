@@ -140,6 +140,15 @@ int local_repo_metadata(SsdsRepoInfo* repo, SsdsRepoMetadataList* list);//
 char* full_path_to_metadata(char* repo_name);//
 
 /**
+ * Callback function for downloading metadata
+ * @param data	void*
+ * @param total double
+ * @param now	double
+ * @return      0
+ */
+int metadata_progress(G_GNUC_UNUSED void *data, double total, double now);
+
+/**
  * Function tries to download metadata for repo by using full url of repository
  * @param repo      SsdsRepoInfo*
  * @param list      SsdsRepoMetadataList*

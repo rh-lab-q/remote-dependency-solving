@@ -105,6 +105,13 @@ char* full_path_to_metadata(char* repo_name)
   return full_path;
 }
 
+int metadata_progress(G_GNUC_UNUSED void *data, double total, double now){
+	if(total > 0){
+	   printf("\r%s\t - %.0f%%", (char *) data, (now/total)*100);
+	   fflush(stdout);
+	}
+	return 0;
+}
 
 void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
 {
@@ -140,10 +147,11 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
   lr_handle_setopt(h, NULL, LRO_REPOTYPE, LR_YUMREPO);
   lr_handle_setopt(h, NULL, LRO_CONNECTTIMEOUT, (long)10);
   lr_handle_setopt(h, NULL, LRO_DESTDIR, full_path);
-  
+  lr_handle_setopt(h, NULL, LRO_PROGRESSCB, metadata_progress);  
+  lr_handle_setopt(h, NULL, LRO_PROGRESSDATA, repo->name);
 //   printf("Performing handle on repo name: %s, repo type: %d\n", repo->name, repo->type);
   gboolean ret = lr_handle_perform(h, r, &tmp_err);
-  
+  printf("\n"); 
   char *destdir;
   lr_handle_getinfo(h, NULL, LRI_DESTDIR, &destdir);
   
