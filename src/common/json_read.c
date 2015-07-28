@@ -30,9 +30,9 @@ SsdsJsonRead* ssds_json_read_init()
 
 gboolean ssds_read_parse(char* buffer, SsdsJsonRead* json)
 {
-  GError **error;
+  GError *error = NULL;
     
-  gboolean ret = json_parser_load_from_data(json->parser, (const gchar*)buffer, -1, error);
+  gboolean ret = json_parser_load_from_data(json->parser, (const gchar*)buffer, -1, &error);
   if(!ret)
     return EXIT_FAILURE;
   

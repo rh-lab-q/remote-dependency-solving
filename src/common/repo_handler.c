@@ -31,8 +31,8 @@ SsdsLocalRepoInfo* ssds_repo_parse_init()
   
 int ssds_parse_default_repo(SsdsLocalRepoInfo* repo)
 {
-  GError **err;
-  gboolean ret = lr_yum_repoconfs_load_dir(repo->repoHandler, "/etc/yum.repos.d/", err);
+  GError *err = NULL;
+  gboolean ret = lr_yum_repoconfs_load_dir(repo->repoHandler, "/etc/yum.repos.d/", &err);
    if(!ret){
 	ssds_log(logERROR, "Unable to load default repo\n");
         return 0;
@@ -43,55 +43,74 @@ int ssds_parse_default_repo(SsdsLocalRepoInfo* repo)
 void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
 {
   GError* err = NULL;
+ 
+  ssds_log(logDEBUG,"Getting repoconfs list.\n");
   GSList* list = lr_yum_repoconfs_get_list(repo->repoHandler, &err);
   
+  ssds_log(logDEBUG, "Loop over repoconf list.\n");
   for(unsigned int i=0; i<g_slist_length(list); i++){
-    char** url = (char **)malloc(sizeof(char*));
+    char** url = (char **)malloc(1*sizeof(char*));
     char* name = NULL;
     short type = 0;
     void * val;
-    
+    int k = 0;
+
+    ssds_log(logDEBUG,"Getting repo configuration.\n");   
     LrYumRepoConf * conf = (LrYumRepoConf*)g_slist_nth_data(list, i);
     
+    ssds_log(logDEBUG,"Getting repo info.\n"); 
     lr_yum_repoconf_getinfo(conf, &err, LR_YRC_ENABLED, &val);
     
     if((long int)val){
       err = NULL;
       if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_ID, &val) != 0){
+	ssds_log(logDEBUG,"Getting repo name.\n"); 
         name = (char*)val;
+        ssds_log(logDEBUG,"Name: %s.\n",name); 
       }
       
       err = NULL;
       if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_MIRRORLIST, &val) != 0){
-        url[0] = (char*)val;
+        ssds_log(logDEBUG,"Getting mirrorlist url.\n"); 
+	url[0] = (char*)val;
+	k = 1;
+	ssds_log(logDEBUG,"URL: %s.\n", url[0]); 
         type = SSDS_MIRRORLIST;
       }
       
       err = NULL;
       if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_METALINK, &val) != 0){
-        url[0] = (char*)val;
+        ssds_log(logDEBUG,"Getting metalink url.\n"); 
+	url[0] = (char*)val;
+	k = 1;
+	ssds_log(logDEBUG,"URL: %s.\n", url[0]); 
         type = SSDS_METALINK;
       }
       
       err = NULL;
       //void ** val2;
       if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != 0){
- 	free(url);
+	ssds_log(logDEBUG,"Getting base urls.\n");  
+	free(url);
         url = (char**)val; 
+	while(url[k]!=NULL)
+	    k++;
         type = SSDS_BASEURL;
       }
       
+      ssds_log(logDEBUG,"Setting url var - releaseserver.\n"); 
       LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", "21"); //"3.18.6-200.fc21"
+      ssds_log(logDEBUG,"Setting url var - basearch.\n"); 
       list = lr_urlvars_set(list, "basearch", "x86_64");
       
-      int k=0;
-      while(url[k]!=NULL)
-        k++;
+      ssds_log(logDEBUG,"Getting URL size.\n"); 
+      ssds_log(logDEBUG,"Size: %d.\n",k); 
       
       char **url_subst_list=(char**)malloc((k+1)*sizeof(char*));
       char* url_copy;
       char* url_subst;
-      
+ 	
+      ssds_log(logDEBUG,"Setting urls into json.\n");      
       for(int j=0; j<k; j++)
       { 
         url_copy = strdup(url[j]);
