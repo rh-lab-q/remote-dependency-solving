@@ -190,15 +190,15 @@ struct SsdsJsonRead{
 };
 
 struct SsdsJsonAnswer{
-  GSList* answerList; /** < holds list of SsdsJsonInstall */
+  char* name;       /** < name of app that was requested for install */
+  GSList* pkgList;  /** < holds list of SsdsJsonInstall */
 };
 
 struct SsdsJsonInstall{
   char* pkg_name;   /** < name of requested package */
-  GSList* install;  /** < list of packages to install */
-  GSList* upgrade;  /** < list of packages to upgrade */
-  GSList* erase;    /** < list of packages to erase */
-  GSList* urls;     /** < list of urls used for download packages */
+  char* pkg_loc;    /** < location of package on repository */
+  char* base_url;   /** < base_url for package download or null */
+  char* metalink;   /** < metalink or null */
 };
 
 /**

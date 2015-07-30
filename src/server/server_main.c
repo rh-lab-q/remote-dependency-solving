@@ -265,8 +265,9 @@ int main(int argc, char* argv[]) {
             SsdsJsonCreate* answer = ssds_js_cr_init();
             ssds_dep_answer(json, answer, sack_p);
             
+            ssds_js_dump(answer);
             char* message = ssds_js_to_string(answer);
-            printf("%s\n\n", message);
+//             printf("%s\n\n", message);
             write(comm_sock, message, strlen(message));
             client_finished = 1;
 

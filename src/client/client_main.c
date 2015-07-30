@@ -221,8 +221,10 @@ int main(int argc, char* argv[]){
   //  ssds_gc_cleanup();
     return 1;
   }
-
+  
+  ssds_log(logDEBUG, "parse init.\n");
   SsdsJsonAnswer* answer_from_srv = ssds_json_answer_init();
+  ssds_log(logDEBUG, "parse answer.\n");
   ssds_parse_answer(answer_from_srv, json_read);
 
   ssds_log(logDEBUG, "Answer parsed.\n");
@@ -241,9 +243,23 @@ int main(int argc, char* argv[]){
   char **urls = NULL;
 
   // get available urls
-  for(guint i=0; i<g_slist_length(answer_from_srv->answerList); i++){
-
-     SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->answerList, i);
+  /**************************/
+  /* new parsing */
+  /************************/
+  printf("app name: %s\n", answer_from_srv->name);
+  guint len = g_slist_length(answer_from_srv->pkgList);//tady je seznam baliku pro stazeni
+  for(guint i=0; i<len; i++)
+  {
+    SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
+    printf("\tpkg_name: %s\n", inst->pkg_name);
+    printf("\tpkg_loc : %s\n", inst->pkg_loc);
+    printf("\tbase_url: %s\n", inst->base_url);
+    printf("\tmetalink: %s\n", inst->metalink);
+  }
+  
+#if 0
+  for(guint i=0; i<g_slist_length(answer_from_srv->pkgList); i++){
+     SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
      ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
    
      urls = (char **)malloc(g_slist_length(inst->urls)*sizeof(char*));
@@ -334,7 +350,7 @@ int main(int argc, char* argv[]){
   }  
   
 //   ssds_gc_cleanup();
-
+#endif
   return 0;
   
 }

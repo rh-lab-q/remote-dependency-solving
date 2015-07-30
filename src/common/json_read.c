@@ -139,58 +139,64 @@ SsdsRepoInfoList* ssds_read_list_init()
 SsdsJsonAnswer* ssds_json_answer_init()
 {
   SsdsJsonAnswer* new = (SsdsJsonAnswer*)malloc(sizeof(SsdsJsonAnswer));
-  new->answerList = NULL;
+  new->name = NULL;
+  new->pkgList = NULL;
   return new;
 }
 
 SsdsJsonInstall* ssds_json_install_init()
 {
   SsdsJsonInstall* new = (SsdsJsonInstall*)malloc(sizeof(SsdsJsonInstall));
-  new->pkg_name=NULL;
-  new->install=NULL;
-  new->upgrade=NULL;
-  new->erase=NULL;
-  new->urls=NULL;
+  new->pkg_name = NULL;
+  new->pkg_loc = NULL;
+  new->base_url = NULL;
+  new->metalink = NULL;
   return new;
 }
 
 void ssds_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json)
 {
+  //TODO - multiple apps in answer
+  //right now only one app can be parsed at a time
   JsonArray*array = json_object_get_array_member(json->dataObj, "install_pkgs");
-  guint len=json_array_get_length(array);
   
-  //through all the packages/*
+  JsonObject* main_obj = json_array_get_object_element(array, 0);
+  char* name = (char*)json_object_get_string_member(main_obj, "name");
+  ans_list->name = (char*)malloc((strlen(name)+1)*sizeof(char));
+  strcpy(ans_list->name, name);
+  
+  JsonArray* inner_array = json_object_get_array_member(main_obj, "install");
+  guint len=json_array_get_length(inner_array);
+  //through all the packages for one app
   for(guint i=0; i<len; i++)
   {
     SsdsJsonInstall* install=ssds_json_install_init();
+    JsonObject* obj = json_array_get_object_element(inner_array, i);
     
-    JsonObject* obj = json_array_get_object_element(array, i);
+    //name of one package to install
+    char* pkg_name=(char*)json_object_get_string_member(obj, "pkg_name");
+    install->pkg_name=(char*)malloc((strlen(pkg_name)+1)*sizeof(char));
+    strcpy(install->pkg_name, pkg_name);
     
-    //name of requested package
-    char* currName=(char*)json_object_get_string_member(obj, "name");
-    install->pkg_name=(char*)malloc((strlen(currName)+1)*sizeof(char));
-    strcpy(install->pkg_name, currName);
+    //name of package location on repository
+    char* pkg_loc=(char*)json_object_get_string_member(obj, "pkg_loc");
+    install->pkg_loc=(char*)malloc((strlen(pkg_loc)+1)*sizeof(char));
+    strcpy(install->pkg_loc, pkg_loc);
     
-    //names of packages to install
-    JsonArray* curr_arr = json_object_get_array_member(obj, (gchar*)"install");
-    int arr_len = json_array_get_length(curr_arr);
-    
-    for(int j=0; j<arr_len; j++)
+    //baseurl or null
+    if(json_object_get_null_member(obj, "base_url"))
     {
-      char* pkg = (char*)json_array_get_string_element(curr_arr, j);
-      install->install = g_slist_append(install->install, pkg);
+      char* meta = (char*)json_object_get_string_member(obj, "metalink");
+      install->metalink = (char*)malloc((strlen(meta)+1)*sizeof(char));
+      strcpy(install->metalink, meta);
+    }
+    else
+    {
+      char* base = (char*)json_object_get_string_member(obj, "base_url");
+      install->base_url = (char*)malloc((strlen(base)+1)*sizeof(char));
+      strcpy(install->base_url, base);
     }
     
-    //urls used for download
-    curr_arr = json_object_get_array_member(obj, (gchar*)"download_address");
-    arr_len = json_array_get_length(curr_arr);
-    
-    for(int j=0; j<arr_len; j++)
-    {
-      char* url = (char*)json_array_get_string_element(curr_arr, j);
-      install->urls = g_slist_append(install->urls, url);
-    }
-    
-    ans_list->answerList=g_slist_append(ans_list->answerList, install);
+    ans_list->pkgList=g_slist_append(ans_list->pkgList, install);
   }
 }
