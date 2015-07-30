@@ -22,20 +22,20 @@
 
 char* sock_recv(int sock_fd)
 {
-  char* reply=(char*)malloc(MAX_INPUT_LEN*sizeof(char));
+  char* reply=(char*)ssds_malloc(MAX_INPUT_LEN*sizeof(char));
   memset(reply, 0, MAX_INPUT_LEN);
   ssize_t ret = read(sock_fd, reply , MAX_INPUT_LEN);
   
   if(ret==-1)
   {
     ssds_log(logERROR, "Unable to read data from socket\n");
-    free(reply);
+    ssds_free(reply);
     return NULL;
   }
   
   if(ret==MAX_INPUT_LEN)
   {
-    char* buffer=(char*)malloc(BUFF_SIZE*sizeof(char));
+    char* buffer=(char*)ssds_malloc(BUFF_SIZE*sizeof(char));
     memset(buffer, 0, BUFF_SIZE);
     
     int read_count = 0;
@@ -56,7 +56,7 @@ char* sock_recv(int sock_fd)
       
     }while(!(ret<MAX_INPUT_LEN));
     
-    free(reply);
+    ssds_free(reply);
     return buffer;
   }
   //no buffer is needed for very short messages

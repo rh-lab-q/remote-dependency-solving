@@ -47,12 +47,12 @@ int main(int argc, char* argv[]) {
   /*******************************************************************/
   /* Setting up garbage collector and setting callback functions */
   /*******************************************************************/
-  /*ssds_gc_init();
+  ssds_gc_init();
   signal(SIGINT, ssds_signal_handler);
   signal(SIGBUS, ssds_signal_handler);
   signal(SIGSEGV, ssds_signal_handler);
   signal(SIGTERM, ssds_signal_handler);
-  */
+  
   ssds_log(logDEBUG, "Server started.\n");
 
   parse_params_srv(argc, argv);
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
   int comm_desc, comm_sock, data_desc, data_sock, enable = 1;
   char* client_ip;
 
-  comm_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  comm_desc=ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   data_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   int yes=1;
 
@@ -76,13 +76,13 @@ int main(int argc, char* argv[]) {
   if(comm_desc==-1)
   {
     ssds_log(logERROR, "Server encountered an error when creating socket for communication");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
   if(data_desc==-1)
   {
     ssds_log(logERROR, "Server encountered an error when creating socket for sending data");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
   
@@ -101,26 +101,26 @@ int main(int argc, char* argv[]) {
   if(bind(comm_desc, (struct sockaddr*)&server_comm, sizeof(server_comm)) <0)
   {
     ssds_log(logERROR, "Server wasn't able to bind with communication socket\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
  
   if(setsockopt(comm_desc, SOL_SOCKET, SO_REUSEADDR, (char *)&enable, sizeof(enable)) < 0){
     ssds_log(logERROR, "Server wasn't able to set communication socket option.\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
 
   if(bind(data_desc, (struct sockaddr*)&server_data, sizeof(server_data)) <0)
   {
     ssds_log(logERROR, "Server wasn't able to bind with data socket\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
   
   if(setsockopt(data_desc, SOL_SOCKET, SO_REUSEADDR, (char *)&enable, sizeof(enable)) < 0){
     ssds_log(logERROR, "Server wasn't able to set data socket option.\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
 
@@ -129,14 +129,14 @@ int main(int argc, char* argv[]) {
   if(listen(comm_desc, 5)!=0)
   {
     ssds_log(logERROR, "Listen failed on communication socket on server\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
 
   if(listen(data_desc, 5)!=0)
   {
     ssds_log(logERROR, "Listen failed on data socket on server\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
   
@@ -151,13 +151,13 @@ int main(int argc, char* argv[]) {
     if((comm_sock=accept(comm_desc, (struct sockaddr *) &client_comm, (socklen_t*)&comm_addr_len))<0)
     {
       ssds_log(logERROR, "Accept connection has failed");
-  //    ssds_gc_cleanup();
+      ssds_gc_cleanup();
       return 1;
     }
     if((data_sock=accept(data_desc, (struct sockaddr *) &client_data, (socklen_t*)&data_addr_len))<0)
     {
       ssds_log(logERROR, "Accept on data socket has failed");
-     // ssds_gc_cleanup();
+      ssds_gc_cleanup();
       return 1;
     }
     client_ip=inet_ntoa(client_comm.sin_addr);
@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
         if(buf == NULL)
         {
           ssds_log(logERROR, "Recieving of message has failed\n");
-     //     ssds_gc_cleanup();
+          ssds_gc_cleanup();
           return 1;
         }        
 
@@ -191,7 +191,7 @@ int main(int argc, char* argv[]) {
             if(f == NULL)
             {
                 ssds_log(logERROR,"Error while creating @System.solv file.\n");
-       //         ssds_gc_cleanup();
+                ssds_gc_cleanup();
                 return 1;
             }
             char* data_buffer;
@@ -275,9 +275,9 @@ int main(int argc, char* argv[]) {
         }
     }
   //ssds_gc_remove_socket(comm_sock);
-  close(comm_sock);
+  ssds_close(comm_sock);
   //ssds_gc_remove_socket(data_sock);
-  close(data_sock);
+  ssds_close(data_sock);
   }
   //ssds_solving::solve solveHandler;
 
@@ -326,5 +326,6 @@ int main(int argc, char* argv[]) {
   }
 
 #endif
+  ssds_gc_cleanup();
   return 0;
 }

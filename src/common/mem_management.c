@@ -104,7 +104,7 @@ void ssds_gc_remove(Alloc_data data, int type)
 			item->prev->next = item->next;
 			item->next->prev = item->prev;
 		}
-//		free(item);
+		free(item);
 	}
 }
 
@@ -193,8 +193,9 @@ void * ssds_realloc(void * old_ptr, int size)
 	if(new_ptr == NULL)
 	{
 		ssds_log(logERROR, "Failed to reallocate pointer in ssds_realloc.\n");
-		ssds_gc_cleanup();
-		exit(1);
+		return NULL;
+		//ssds_gc_cleanup();
+		//exit(1);
 	}
 	if(new_ptr != old_ptr)
 	{
@@ -210,8 +211,9 @@ void * ssds_malloc(int size)
 	if(new_ptr == NULL)
 	{
 		ssds_log(logERROR, "Failed to allocate pointer in ssds_malloc.\n");
-		ssds_gc_cleanup();
-		exit(1);
+		return NULL;
+		//ssds_gc_cleanup();
+		//exit(1);
 	}
 	ssds_gc_push_ptr(new_ptr);
 	return new_ptr;
@@ -223,8 +225,9 @@ void * ssds_calloc(int n_items, int size)
 	if(new_ptr == NULL)
 	{
 		ssds_log(logERROR, "Failed to allocate pointer in ssds_malloc.\n");
-		ssds_gc_cleanup();
-		exit(1);
+		return NULL;
+		//ssds_gc_cleanup();
+		//exit(1);
 	}
 	ssds_gc_push_ptr(new_ptr);
 	return new_ptr;
@@ -249,8 +252,9 @@ int ssds_socket(int domain, int type, int protocol)
 	if(new_socket < 0)
 	{
 		ssds_log(logERROR, "Failed to open socket.\n");
-		ssds_gc_cleanup();
-		exit(1);
+		return -1;
+		//ssds_gc_cleanup();
+		//exit(1);
 	}
 	ssds_gc_push_socket(new_socket);
 	return new_socket;
@@ -262,8 +266,9 @@ int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restri
 	if(new_socket < 0)
 	{
 		ssds_log(logERROR, "Failed to accept socket.\n");
-		ssds_gc_cleanup();
-		exit(1);
+		return -1;
+		//ssds_gc_cleanup();
+		//exit(1);
 	}
 	ssds_gc_push_socket(new_socket);
 	return new_socket;

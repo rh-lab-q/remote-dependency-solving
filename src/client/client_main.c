@@ -8,7 +8,7 @@ int main(int argc, char* argv[]){
   /*******************************************************************/
   /* Setting up garbage collector and setting callback functions */
   /*******************************************************************/
-//   ssds_gc_init();
+   ssds_gc_init();
 /*  signal(SIGINT, ssds_signal_handler);
   signal(SIGBUS, ssds_signal_handler);
   signal(SIGSEGV, ssds_signal_handler);
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
 
   if(parse_params_cl(argc, argv, params) == -1)
   {
-//     ssds_gc_cleanup();
+     ssds_gc_cleanup();
     return 1;
   }
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
   // parsing local repo
   if(!ssds_parse_default_repo(local_repo))
   {
-//     ssds_gc_cleanup();
+     ssds_gc_cleanup();
 	  return 1;
   }
   ssds_log(logDEBUG, "Local repo is parsed. Package count %d.\n", params->pkg_count);
@@ -119,7 +119,7 @@ int main(int argc, char* argv[]){
   if(comm_sock == -1 || data_sock == -1)
   {
     ssds_log(logERROR, "Client encountered an error when creating sockets for communication and data.\n");
-//     ssds_gc_cleanup();
+     ssds_gc_cleanup();
     return 1;
   }
 
@@ -135,7 +135,7 @@ int main(int argc, char* argv[]){
 
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect comm. socket on server. Please, check out your network connection and try it again later.\n");
-//     ssds_gc_cleanup();
+     ssds_gc_cleanup();
     return 1;
   }
 
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]){
   }
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect data socket on server. Please, check out your network connection and try it again later.\n");
-//     ssds_gc_cleanup();
+     ssds_gc_cleanup();
     return 1;
   }
   ssds_log(logMESSAGE, "Connection to server is established.\n");
@@ -171,7 +171,7 @@ int main(int argc, char* argv[]){
   if(f == NULL)
   {
     ssds_log(logERROR,"Error while opening @System.solv file.\n");
-//     ssds_gc_cleanup();
+     ssds_gc_cleanup();
     return 1;
   }
 
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]){
   if(buf == NULL)
   {
     ssds_log(logERROR, "Error while recieving data\n");
-//     ssds_gc_cleanup();
+     ssds_gc_cleanup();
     return 1;
   }
   ssds_log(logDEBUG, "Answer is OK.\n\n");
@@ -218,7 +218,7 @@ int main(int argc, char* argv[]){
   if(!ssds_read_parse(buf, json_read))
   {
     ssds_log(logERROR, "Error while parsing answer from the server\n");
-  //  ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
   
@@ -351,6 +351,7 @@ int main(int argc, char* argv[]){
   
 //   ssds_gc_cleanup();
 #endif
+  ssds_gc_cleanup();
   return 0;
   
 }
