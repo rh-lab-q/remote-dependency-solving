@@ -140,6 +140,18 @@ void ssds_gc_remove_ptr(void * ptr);
 void ssds_gc_remove_socket(int socket);
 
 /**
+ * Removes pointer from garbage collector and calls free on it.
+ * @param ptr       freed pointer
+ */
+void ssds_free(void * ptr);
+
+/**
+ * Removes socket from garbage collector and closes it.
+ * @param socket    closed socket
+ */
+void ssds_close(int socket);
+
+/**
  * Creates a socket and pushes it into garbage collector.
  * @param domain    parameteor of socket
  * @param type      parameteor of socket

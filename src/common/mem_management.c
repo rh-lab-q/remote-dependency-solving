@@ -43,17 +43,17 @@ void ssds_gc_cleanup()
 			case PTR:
 				if(item->data.ptr != NULL)
 				{
-//					free(item->data.ptr);
+					free(item->data.ptr);
 				}
 				break;
 			default:
 				break;
 		}
 
-//		free(item);
+		free(item);
 		item = next;
 	}
-//	free(global_gc);
+	free(global_gc);
 }
 
 Ssds_gc_item * ssds_gc_search(Alloc_data data, int type)
@@ -159,6 +159,18 @@ void ssds_gc_push_socket(int socket)
 	Alloc_data data;
 	data.sock_fd = socket;
 	ssds_gc_push(data,SOCKET);
+}
+
+void ssds_free(void * ptr)
+{
+	ssds_gc_remove_ptr(ptr);
+	free(ptr);
+}
+
+void ssds_close(int socket)
+{
+	ssds_gc_remove_socket(socket);
+	close(socket);
 }
 
 void ssds_gc_remove_ptr(void * ptr)
