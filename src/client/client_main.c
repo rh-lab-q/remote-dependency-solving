@@ -240,13 +240,12 @@ int main(int argc, char* argv[]){
   GSList *package_list = NULL;
   LrPackageTarget *target;
   GError *error = NULL;
-  char **urls = NULL;
 
   // get available urls
   /**************************/
   /* new parsing */
   /************************/
-  printf("app name: %s\n", answer_from_srv->name);
+ /* printf("app name: %s\n", answer_from_srv->name);
   guint len = g_slist_length(answer_from_srv->pkgList);//tady je seznam baliku pro stazeni
   for(guint i=0; i<len; i++)
   {
@@ -257,22 +256,15 @@ int main(int argc, char* argv[]){
     printf("\tmetalink: %s\n", inst->metalink);
   }
   
-#if 0
+*/
   for(guint i=0; i<g_slist_length(answer_from_srv->pkgList); i++){
      SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
      ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
    
-     urls = (char **)malloc(g_slist_length(inst->urls)*sizeof(char*));
- 
-     for(guint j=0; j<g_slist_length(inst->urls); j++){
-        urls[j] = (char*)malloc((strlen(g_slist_nth_data(inst->urls, j))+1)*sizeof(char));
- 	sprintf(urls[j],"%s",(char*)g_slist_nth_data(inst->urls, j));
-     }
- 
      ssds_log(logDEBUG, "Downloading preparation.\n");
      handler = lr_handle_init();
      ssds_log(logDEBUG, "Download handler initied.\n");
-     lr_handle_setopt(handler, NULL, LRO_METALINKURL, urls[0]);
+     lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
      ssds_log(logDEBUG, "Array of URLs is setted.\n");
      lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
      ssds_log(logDEBUG, "Repo type is setted.\n");
@@ -280,20 +272,11 @@ int main(int argc, char* argv[]){
      ssds_log(logDEBUG, "Progress callback is setted.\n");
 
 
-     ssds_log(logDEBUG, "Loop thrue all packages to download.\n");
-     ssds_log(logMESSAGE, "Package to download and install:\n");
- 
-    // get names of packages
-    for(guint j = 0; j < g_slist_length(inst->install); j++){
-  
+     // get names of packages
      // Prepare list of target
-     ssds_log(logMESSAGE, "\t%s\n", (char*)g_slist_nth_data(inst->install, j));
-     target = lr_packagetarget_new_v2(handler, (char*)g_slist_nth_data(inst->install, j), DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
-                                   NULL, 0, NULL, TRUE, progress_callback, (char*)g_slist_nth_data(inst->install, j), end_callback, NULL, &error);
+     target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
+                                   NULL, 0, inst->base_url, TRUE, progress_callback, inst->pkg_name, end_callback, NULL, &error);
      package_list = g_slist_append(package_list, target);
-     ssds_log(logDEBUG, "Package added to download list.\n");
-  }
-
   // get names of packages
   // ssds_log(logDEBUG, "Reading packages name for update from answer.\n");
  // num_pkgs = /*ssds_read_get_packages_to_update(pkgs,packages,json_read)*/ 0;
@@ -308,7 +291,7 @@ int main(int argc, char* argv[]){
      package_list = g_slist_append(package_list, target);
      ssds_log(logDEBUG, "Package added to download list.\n");
   }*/
-  
+  }
   // Download all packages        
   ssds_log(logMESSAGE, "Downloading packages.\n");
   return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
@@ -321,7 +304,6 @@ int main(int argc, char* argv[]){
   }
 
   ssds_log(logMESSAGE, "All packages were downloaded successfully.  \n---- END OF MESSAGES ----\n");
-  
 
   /*********************************************************/
   /* Installing packages                                   */
@@ -334,23 +316,18 @@ int main(int argc, char* argv[]){
       if(!target->err){
           sprintf(command, "rpm --install --nodeps %s", target->local_path);
           printf("%s\n",command);
- //         system(command);
+          system(command);
+	  unlink(target->local_path);
       }else{
           ssds_log(logERROR, "Package Error: %s\n", target->err);
       }
 
   }
  
-   for(guint j=0; j<g_slist_length(inst->urls); j++){
-     free(urls[j]);
-   }
    g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
-   lr_handle_free(handler);
-   free(urls);
-  }  
+    
   
 //   ssds_gc_cleanup();
-#endif
   return 0;
   
 }
