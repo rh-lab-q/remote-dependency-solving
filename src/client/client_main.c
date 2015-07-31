@@ -17,7 +17,7 @@ int main(int argc, char* argv[]){
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
-  ssds_log(logINFO, "Client startup\n");
+  ssds_log(logINFO, "Client startup.\n");
 
   ParamOptsCl* params = init_params_cl();
   
@@ -111,8 +111,8 @@ int main(int argc, char* argv[]){
   server_data.sin_family = AF_INET;
   ssds_log(logDEBUG, "Set comunication protocol.\n");
 
-  server_comm.sin_port=htons(2345);
-  server_data.sin_port=htons(2346);
+  server_comm.sin_port = htons(2345);
+  server_data.sin_port = htons(2346);
   ssds_log(logDEBUG, "Set server port.\n");
   
   ssds_log(logDEBUG, "Socket controll.\n");
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]){
     return 1;
   }
 
-  ssds_log(logDEBUG, "Socket controll - OK\n"); 
+  ssds_log(logDEBUG, "Socket controll - OK.\n"); 
   
   ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
   while((connect(comm_sock, (struct sockaddr *)&server_comm, sizeof(server_comm)) < 0) && (connection_try < 3))
@@ -202,7 +202,6 @@ int main(int argc, char* argv[]){
   ssds_log(logMESSAGE, "Reading answer from server.\n");
   char* buf = sock_recv(comm_sock);
   ssds_log(logDEBUG, "Checking answer.\n");
-  printf("%s\n", buf);
   
   if(buf == NULL)
   {
@@ -210,11 +209,11 @@ int main(int argc, char* argv[]){
 //     ssds_gc_cleanup();
     return 1;
   }
-  ssds_log(logDEBUG, "Answer is OK.\n\n");
+  ssds_log(logDEBUG, "Answer is OK.\n\n%s\n\n", buf);
   
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
-  printf("%s\n", buf);
+
   if(!ssds_read_parse(buf, json_read))
   {
     ssds_log(logERROR, "Error while parsing answer from the server\n");
@@ -222,9 +221,9 @@ int main(int argc, char* argv[]){
     return 1;
   }
   
-  ssds_log(logDEBUG, "parse init.\n");
+  ssds_log(logDEBUG, "Parse init.\n");
   SsdsJsonAnswer* answer_from_srv = ssds_json_answer_init();
-  ssds_log(logDEBUG, "parse answer.\n");
+  ssds_log(logDEBUG, "Parse answer.\n");
   ssds_parse_answer(answer_from_srv, json_read);
 
   ssds_log(logDEBUG, "Answer parsed.\n");
@@ -241,23 +240,7 @@ int main(int argc, char* argv[]){
   LrPackageTarget *target;
   GError *error = NULL;
 
-  // get available urls
-  /**************************/
-  /* new parsing */
-  /************************/
- /* printf("app name: %s\n", answer_from_srv->name);
-  guint len = g_slist_length(answer_from_srv->pkgList);//tady je seznam baliku pro stazeni
-  for(guint i=0; i<len; i++)
-  {
-    SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
-    printf("\tpkg_name: %s\n", inst->pkg_name);
-    printf("\tpkg_loc : %s\n", inst->pkg_loc);
-    printf("\tbase_url: %s\n", inst->base_url);
-    printf("\tmetalink: %s\n", inst->metalink);
-  }
-  
-*/
-  for(guint i=0; i<g_slist_length(answer_from_srv->pkgList); i++){
+  for(guint i = 0; i < g_slist_length(answer_from_srv->pkgList); i++){
      SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
      ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
    
@@ -271,27 +254,13 @@ int main(int argc, char* argv[]){
      lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
      ssds_log(logDEBUG, "Progress callback is setted.\n");
 
-
-     // get names of packages
      // Prepare list of target
      target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
-                                   NULL, 0, inst->base_url, TRUE, progress_callback, inst->pkg_name, end_callback, NULL, &error);
+                                      NULL, 0, inst->base_url, TRUE, progress_callback, inst->pkg_name, 
+        			      end_callback, NULL, &error);
      package_list = g_slist_append(package_list, target);
-  // get names of packages
-  // ssds_log(logDEBUG, "Reading packages name for update from answer.\n");
- // num_pkgs = /*ssds_read_get_packages_to_update(pkgs,packages,json_read)*/ 0;
-  /*ssds_log(logMESSAGE, "Number of package to update: %d.\n", num_pkgs);            
-
-  for(int j = 0; j < num_pkgs; j++){
-  
-     // Prepare list of target
-     ssds_log(logMESSAGE, "\t%s\n", packages[j]);
-     target = lr_packagetarget_new_v2(handler, packages[j], DOWNLOAD_TARGET_UPDATE, LR_CHECKSUM_UNKNOWN,
-                                   NULL, 0, NULL, TRUE, progress_callback, packages[j], end_callback, NULL, &error);
-     package_list = g_slist_append(package_list, target);
-     ssds_log(logDEBUG, "Package added to download list.\n");
-  }*/
   }
+  
   // Download all packages        
   ssds_log(logMESSAGE, "Downloading packages.\n");
   return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
@@ -303,19 +272,20 @@ int main(int argc, char* argv[]){
       return 1;
   }
 
-  ssds_log(logMESSAGE, "All packages were downloaded successfully.  \n---- END OF MESSAGES ----\n");
+  ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
 
   /*********************************************************/
   /* Installing packages                                   */
   /*********************************************************/
-  
+ 
+  ssds_log(logMESSAGE, "Installing packages.\n"); 
   for(GSList *elem = package_list; elem; elem = g_slist_next(elem)){
       char command[300];
       LrPackageTarget *target = (LrPackageTarget *)elem->data;
 
       if(!target->err){
           sprintf(command, "rpm --install --nodeps %s", target->local_path);
-          printf("%s\n",command);
+          ssds_log(logMESSAGE,"Installing package: %s\n",(char *)target->cbdata);
           system(command);
 	  unlink(target->local_path);
       }else{
@@ -323,7 +293,8 @@ int main(int argc, char* argv[]){
       }
 
   }
- 
+  
+  ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\nEnd of ssds-client.\n\n",answer_from_srv->name); 
    g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
     
   

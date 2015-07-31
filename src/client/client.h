@@ -19,7 +19,7 @@ extern "C"{
 
 /** path to package download directory */
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
-static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
+//static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
 
 #ifdef __cplusplus
 }
