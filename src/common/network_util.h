@@ -22,7 +22,7 @@
 #define _NETWORK_UTIL_H
 
 #include "log_handler.h"
-//#include "mem_management.h"
+#include "mem_management.h"
 #include "includes.h"
 
 #ifdef __cplusplus

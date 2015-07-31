@@ -22,7 +22,7 @@
 
 SsdsJsonRead* ssds_json_read_init()
 {
-  SsdsJsonRead* new = (SsdsJsonRead*)malloc(sizeof(SsdsJsonRead));
+  SsdsJsonRead* new = (SsdsJsonRead*)ssds_malloc(sizeof(SsdsJsonRead));
   new->parser = json_parser_new();
   return new;
 }
@@ -59,12 +59,12 @@ void ssds_read_get_packages(struct SsdsPkgInfo* pkgs, SsdsJsonRead* json)
 {
   JsonArray* array = json_object_get_array_member(json->dataObj, "req_pkgs");
   guint len = json_array_get_length(array);
-  pkgs->packages = (char**)malloc(len*sizeof(char*));
+  pkgs->packages = (char**)ssds_malloc(len*sizeof(char*));
   
   guint i;
   for(i = 0; i < len; i++)
   {
-    pkgs->packages[i] = (char*)malloc((strlen((char*)json_array_get_string_element(array,i)) + 1)*sizeof(char));
+    pkgs->packages[i] = (char*)ssds_malloc((strlen((char*)json_array_get_string_element(array,i)) + 1)*sizeof(char));
     char* word = (char*)json_array_get_string_element(array, i);
     strcpy(pkgs->packages[i], word);
     pkgs->length++;
@@ -86,18 +86,18 @@ void ssds_read_repo_info(SsdsJsonRead* json, SsdsRepoInfoList* list)
     repo->type = (int)json_object_get_int_member(obj, "type");
     
     char* currName = (char*)json_object_get_string_member(obj, "name");
-    repo->name = (char*)malloc((strlen(currName)+1)*sizeof(char));
+    repo->name = (char*)ssds_malloc((strlen(currName)+1)*sizeof(char));
     strcpy(repo->name, currName);
     
     JsonArray* url_arr = json_object_get_array_member(obj, (gchar*)"repo_url");
     int arr_len = json_array_get_length(url_arr);
-    repo->urls = (char**)malloc(arr_len*(sizeof(char*)));
+    repo->urls = (char**)ssds_malloc(arr_len*(sizeof(char*)));
     
     int j;
     for(j = 0; j < arr_len; j++)
     {
       char* word = (char*)json_array_get_string_element(url_arr, j);
-      repo->urls[j] = (char*)malloc((strlen(word)+1)*sizeof(char));
+      repo->urls[j] = (char*)ssds_malloc((strlen(word)+1)*sizeof(char));
       strcpy(repo->urls[j], word);
       repo->count++;
     }
@@ -109,7 +109,7 @@ void ssds_read_repo_info(SsdsJsonRead* json, SsdsRepoInfoList* list)
 
 SsdsPkgInfo* ssds_read_pkginfo_init()
 {
-  SsdsPkgInfo* new = (SsdsPkgInfo*)malloc(sizeof(SsdsPkgInfo));
+  SsdsPkgInfo* new = (SsdsPkgInfo*)ssds_malloc(sizeof(SsdsPkgInfo));
   new->packages = NULL;
   new->length = 0;
   return new;
@@ -118,7 +118,7 @@ SsdsPkgInfo* ssds_read_pkginfo_init()
 
 SsdsRepoInfo* ssds_read_repoinfo_init()
 {
-  SsdsRepoInfo* new = (SsdsRepoInfo*)malloc(sizeof(SsdsRepoInfo));
+  SsdsRepoInfo* new = (SsdsRepoInfo*)ssds_malloc(sizeof(SsdsRepoInfo));
   new->count = 0;
   new->type = 0;
   new->name = NULL;
@@ -128,7 +128,7 @@ SsdsRepoInfo* ssds_read_repoinfo_init()
 
 SsdsRepoInfoList* ssds_read_list_init()
 {
-  SsdsRepoInfoList* new = (SsdsRepoInfoList*)malloc(sizeof(SsdsRepoInfoList));
+  SsdsRepoInfoList* new = (SsdsRepoInfoList*)ssds_malloc(sizeof(SsdsRepoInfoList));
   new->repoInfoList = NULL;
   return new;
 }
@@ -138,7 +138,7 @@ SsdsRepoInfoList* ssds_read_list_init()
 /**********************/
 SsdsJsonAnswer* ssds_json_answer_init()
 {
-  SsdsJsonAnswer* new = (SsdsJsonAnswer*)malloc(sizeof(SsdsJsonAnswer));
+  SsdsJsonAnswer* new = (SsdsJsonAnswer*)ssds_malloc(sizeof(SsdsJsonAnswer));
   new->name = NULL;
   new->pkgList = NULL;
   return new;
@@ -146,7 +146,7 @@ SsdsJsonAnswer* ssds_json_answer_init()
 
 SsdsJsonInstall* ssds_json_install_init()
 {
-  SsdsJsonInstall* new = (SsdsJsonInstall*)malloc(sizeof(SsdsJsonInstall));
+  SsdsJsonInstall* new = (SsdsJsonInstall*)ssds_malloc(sizeof(SsdsJsonInstall));
   new->pkg_name = NULL;
   new->pkg_loc = NULL;
   new->base_url = NULL;
@@ -162,7 +162,7 @@ void ssds_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json)
   
   JsonObject* main_obj = json_array_get_object_element(array, 0);
   char* name = (char*)json_object_get_string_member(main_obj, "name");
-  ans_list->name = (char*)malloc((strlen(name)+1)*sizeof(char));
+  ans_list->name = (char*)ssds_malloc((strlen(name)+1)*sizeof(char));
   strcpy(ans_list->name, name);
   
   JsonArray* inner_array = json_object_get_array_member(main_obj, "install");
@@ -175,25 +175,25 @@ void ssds_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json)
     
     //name of one package to install
     char* pkg_name = (char*)json_object_get_string_member(obj, "pkg_name");
-    install->pkg_name = (char*)malloc((strlen(pkg_name)+1)*sizeof(char));
+    install->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
     strcpy(install->pkg_name, pkg_name);
     
     //name of package location on repository
     char* pkg_loc = (char*)json_object_get_string_member(obj, "pkg_loc");
-    install->pkg_loc = (char*)malloc((strlen(pkg_loc)+1)*sizeof(char));
+    install->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
     strcpy(install->pkg_loc, pkg_loc);
     
     //baseurl or null
     if(json_object_get_null_member(obj, "base_url"))
     {
       char* meta = (char*)json_object_get_string_member(obj, "metalink");
-      install->metalink = (char*)malloc((strlen(meta)+1)*sizeof(char));
+      install->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
       strcpy(install->metalink, meta);
     }
     else
     {
       char* base = (char*)json_object_get_string_member(obj, "base_url");
-      install->base_url = (char*)malloc((strlen(base)+1)*sizeof(char));
+      install->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
       strcpy(install->base_url, base);
     }
     

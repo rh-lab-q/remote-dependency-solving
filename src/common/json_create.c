@@ -23,7 +23,7 @@
 
 SsdsJsonCreate* ssds_js_cr_init()
 {
-  SsdsJsonCreate* new = (SsdsJsonCreate*)malloc(sizeof(SsdsJsonCreate));
+  SsdsJsonCreate* new = (SsdsJsonCreate*)ssds_malloc(sizeof(SsdsJsonCreate));
   
   new->generator = json_generator_new();
   new->rootNode = json_node_new(JSON_NODE_OBJECT);

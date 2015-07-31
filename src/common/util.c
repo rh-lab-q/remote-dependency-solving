@@ -22,7 +22,7 @@
 
 void ssds_resolve_dependency_file_path(char * ret_val)
 {
-    struct utsname *machine = (struct utsname *)malloc(sizeof(struct utsname));
+    struct utsname *machine = (struct utsname *)ssds_malloc(sizeof(struct utsname));
 
     if(machine == NULL){
 	ssds_log(logERROR, "Not enough memory on heap.\n");
@@ -30,7 +30,7 @@ void ssds_resolve_dependency_file_path(char * ret_val)
     }
     if(uname(machine) < 0){
 	ssds_log(logERROR, "Unable to found system type and computer architecture.\n");
-	free(machine);
+	ssds_free(machine);
         return;
     }
 
@@ -38,7 +38,7 @@ void ssds_resolve_dependency_file_path(char * ret_val)
 
     if(end == NULL){
 	ssds_log(logERROR, "Internal error - unable to find dot in release string.\n");
-	free(machine);
+	ssds_free(machine);
 	return;
     }
 
@@ -48,11 +48,11 @@ void ssds_resolve_dependency_file_path(char * ret_val)
 	i--;
 
     int length = end - i;
-    char *fedora_version = (char *)malloc(length*sizeof(char));
+    char *fedora_version = (char *)ssds_malloc(length*sizeof(char));
 
     if(fedora_version == NULL){
 	ssds_log(logERROR, "Not enough memory on heap.\n");
-	free(machine);
+	ssds_free(machine);
 	return;
     }
 
@@ -63,8 +63,8 @@ void ssds_resolve_dependency_file_path(char * ret_val)
 
     //composing path to @System.solv file
     snprintf(ret_val, 100, "/var/cache/dnf/%s/%s/@System.solv",machine->machine,fedora_version);
-    free(machine);
-    free(fedora_version);
+    ssds_free(machine);
+    ssds_free(fedora_version);
 }
 
 int progress_callback(void *data, double total, double downloaded){
