@@ -28,7 +28,7 @@ extern "C"{
 #include "includes.h"
 #include "log_handler.h"
 #include <librepo/librepo.h>
-//#include "mem_management.h"
+#include "mem_management.h"
 
 /**
  * Resolves path for @System.solv file depending on system version
