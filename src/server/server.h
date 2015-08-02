@@ -24,3 +24,5 @@ extern "C"{
 #endif
 
 #endif
+
+int core();

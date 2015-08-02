@@ -58,6 +58,12 @@ int main(int argc, char* argv[]) {
   parse_params_srv(argc, argv);
     
   ssds_log(logDEBUG, "Params parsed.\n");
+
+  return core();
+}
+
+int core()
+{
   /*************************************************************************
   * 
   * 	Establishing port, socket etc for the communication

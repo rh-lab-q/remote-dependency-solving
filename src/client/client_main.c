@@ -31,6 +31,30 @@ int main(int argc, char* argv[]){
 
   ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
   ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
+  
+  SsdsJsonRead *json_read;
+  char *repo_output, *msg_output;
+  SsdsJsonAnswer* answer_from_srv;
+  GList *package_list;
+
+  int ret_code = create_json(params, &json_read, &repo_output, &msg_output);
+  if (ret_code != 0) return ret_code;
+
+  ret_code = network_part(json_read, repo_output, msg_output, &answer_from_srv);
+  if (ret_code != 0) return ret_code;
+
+  ret_code = download_packages(answer_from_srv, &package_list);
+  if (ret_code != 0) return ret_code;
+
+  ret_code = install_packages(answer_from_srv, package_list);
+  if (ret_code != 0) return ret_code;
+
+  return 0;
+}
+
+
+int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_output_ret, char **msg_output_ret)
+{
 
   /*******************************************************************/
   /* Creating json with all the info*/
@@ -87,8 +111,14 @@ int main(int argc, char* argv[]){
   ssds_log(logDEBUG, "Generating output message with info about sending @System.solv file to server.\n");
   msg_output = ssds_js_to_string(json_msg);
   ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
+  *json_read_ret = json_read;
+  *repo_output_ret = repo_output;
+  *msg_output_ret = msg_output;
+  return 0;
+}
 
-
+int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, SsdsJsonAnswer** answer_from_srv_ret)
+{
   /***************************************************************/
   /* Networking part - sending data to server and recieving      */
   /***************************************************************/
@@ -228,7 +258,13 @@ int main(int argc, char* argv[]){
   ssds_parse_answer(answer_from_srv, json_read);
 
   ssds_log(logDEBUG, "Answer parsed.\n");
-             
+  
+  *answer_from_srv_ret = answer_from_srv;
+  return 0;
+}
+
+int download_packages(SsdsJsonAnswer* answer_from_srv, GList **package_list_ret)
+{
   /***********************************************************/
   /* Downloading packages part                               */
   /***********************************************************/
@@ -276,21 +312,31 @@ int main(int argc, char* argv[]){
 
   ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
 
+  *package_list_ret = package_list;
+  return 0;
+}
+
+int install_packages(SsdsJsonAnswer* answer_from_srv, GList *package_list)
+{
   /*********************************************************/
   /* Installing packages                                   */
   /*********************************************************/
- 
+
   ssds_log(logMESSAGE, "Installing packages.\n"); 
-  for(GSList *elem = package_list; elem; elem = g_slist_next(elem)){
+  for(GSList *elem = package_list; elem; elem = g_slist_next(elem))
+  {
       char command[300];
       LrPackageTarget *target = (LrPackageTarget *)elem->data;
 
-      if(!target->err){
+      if(!target->err)
+      {
           sprintf(command, "rpm --install --nodeps %s", target->local_path);
           ssds_log(logMESSAGE,"Installing package: %s\n",(char *)target->cbdata);
           system(command);
-	  unlink(target->local_path);
-      }else{
+	        unlink(target->local_path);
+      }
+      else
+      {
           ssds_log(logERROR, "Package Error: %s\n", target->err);
       }
 
@@ -300,6 +346,6 @@ int main(int argc, char* argv[]){
   g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
     
   ssds_gc_cleanup();
+
   return 0;
-  
 }
