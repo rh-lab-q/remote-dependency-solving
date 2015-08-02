@@ -12,6 +12,7 @@ struct SsdsJsonCreate{
    JsonGenerator * generator; /**< Holds structure for generatig json from scraps */
    JsonNode* rootNode;        /**< Points to root of json */
    JsonNode* codeNode;        /**< Points to node holding control code */
+   JsonNode* dataNode;        /**< Points to node holding data part of json */
    JsonNode* currNode;        /**< Currently used node */
    JsonObject* rootObj;       /**< Root object - used for adding new objects */
    JsonObject* dataObj;       /**< Data object - used for adding objects under data */
@@ -27,10 +28,10 @@ typedef enum {
   JS_OBJ
 }SsdsJsInsType;
 
-SsdsJsonCreate* ssds_js_cr_init();
-gboolean ssds_js_cr_find(SsdsJsonCreate* json, char* x_path);
-void ssds_js_cr_insert(SsdsJsonCreate* json, int type, void* data);
-void ssds_js_dump(SsdsJsonCreate* json);
+// SsdsJsonCreate* ssds_js_cr_init();
+// gboolean ssds_js_cr_find(SsdsJsonCreate* json, char* x_path);
+// // void ssds_js_cr_insert(SsdsJsonCreate* json, int type, void* data, const char* name);
+// void ssds_js_dump(SsdsJsonCreate* json);
 
 
 
