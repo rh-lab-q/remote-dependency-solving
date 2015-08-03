@@ -109,7 +109,7 @@ ParamOptsCl* init_params_cl()
 void free_params_cl(ParamOptsCl* params)
 {
   g_slist_free_full(params->pkgs, (GDestroyNotify) free); //only *char in the list so free will suffice
-  free(params);
+  ssds_free(params);
 }
 
 

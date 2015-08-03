@@ -116,15 +116,15 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
         url_copy = strdup(url[j]);
         url_subst = lr_url_substitute(url_copy, list);
         url_subst_list[j] = strdup(url_subst);
-        free(url_copy);
-        free(url_subst);
+        free(url_copy); //created by strdup - not in GC, needs to be freed manually
+        free(url_subst); //created by strdup - not in GC, needs to be freed manually
       }
       url_subst_list[k] = NULL;
       
       ssds_js_add_repo(json,url_subst_list, name, type, k);
       ssds_free(url);      
       for(int j = 0; j <= k; j++)
-        free(url_subst_list[j]);
+        free(url_subst_list[j]); //created by strdup - not in GC, needs to be freed manually
       
       ssds_free(url_subst_list);
     }
