@@ -69,19 +69,19 @@ void ssds_gc_cleanup();
  * @param ptr       pointer that is searched
  * @return          1 if pointer is in garbage collector, 0 if its not
  */
-Ssds_gc_item * ssds_gc_search(Alloc_data data, int type);
+Ssds_gc_item * ssds_gc_search(Alloc_data * data, int type);
 
 /**
  * Removes pointer from garbage collector
  * @param ptr       pointer that is removed
  */
-void ssds_gc_remove(Alloc_data data, int type);
+void ssds_gc_remove(Alloc_data * data, int type);
 
 /**
  * Pushes pointer into garbage collector
  * @param ptr       pushed pointer
  */
-void ssds_gc_push(Alloc_data data, int type);
+void ssds_gc_push(Alloc_data * data, int type);
 
 /**
  * Realloc function that has the same interface as realloc but works

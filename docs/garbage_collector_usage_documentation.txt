@@ -1,0 +1,66 @@
+This is short documentation of the garbage collector(GC for short) used in Server Side Dependency Solving Project.
+
+USAGE:
+
+Before any using of this GC, you have to call ssds_gc_init() function. 
+This initializes structures needed for running it. 
+After that you can use other allocating functions of this GC.
+
+The main idea is that user of this GC calls functions with the same interface as 
+standard allocation functions, but with the "ssds_" prefix. 
+For instance ssds_malloc() has the same parameters, same return value, but inserts 
+allocated memory into GC.
+
+LIST OF FUNCTIONS USED BY YOUR PROGRAM:
+
+ssds_gc_init() 
+- initializes GC and needs to be called before any other functions.
+
+ssds_malloc(int size), 
+ssds_calloc(int n_items, int size), 
+ssds_realloc(void * old_ptr, int size) 
+- return value of these functions is the same as standard allocating functions, 
+but allocated memory is also inserted into GC for later cleanup.
+
+ssds_socket(int domain, int type, int protocol),
+ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len) 
+- very similiar to allocating functions in this GC, return value is the same as 
+standard functions for creating sockets, but sockets are also inserted into GC 
+for later cleanup.
+
+ssds_free(void * ptr),
+ssds_close
+- these functions free/close allocated memory or socket and also removes it from 
+GC because it does not need to be freed/closed twice. Use these functions if 
+you want to manually free or close memory or socket.
+
+ssds_gc_cleanup()
+- cleans (frees all memory and closes all sockets) in the GC and ALSO DESTROYS it. 
+This function should be called before the end of the program to prevent memory leaks. 
+If you would want to continue using GC functions, you have to call another 
+ssds_gc_init() after calling ssds_gc_cleanup().
+
+Other functions are auxiliary for the GC and I dont recommend using them. 
+Their interface is documented in src/common/mem_management.h .
+
+SAMPLE CODE:
+
+int main(int argc, char * argv[])
+{
+	ssds_gc_init();
+	void * alloc_memory = ssds_malloc(50);
+	int socket = ssds_socket(AF_INET, SOCK_STREAM, 0);
+	/*
+	 * USAGE OF MEMORY
+	 */
+	if(error) //an error occured.
+	{
+		ssds_gc_cleanup();
+	}
+	ssds_free(alloc_memory) //frees the allocated memory correctly
+	/*
+	 * SOME OTHER CODE
+	 */
+	ssds_gc_cleanup() //
+	return EXIT_SUCCESS;
+}
