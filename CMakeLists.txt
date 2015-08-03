@@ -80,6 +80,83 @@ endif()
 
 file(GLOB SRCS *.c *.h)
 
+set (ssds_common_srcs
+	src/common/json_read.c
+	src/common/json_create.c
+	src/common/repo_metadata.c
+	src/common/repo_handler.c
+	src/common/solving.c
+	src/common/log_handler.c
+	src/common/network_util.c
+	src/common/params.c
+	src/common/mem_management.c
+	src/common/cfg_parsing.c
+	)
+
+#set (ssds_common_headers
+#	src/common/includes.h
+#	src/common/json_handler.h
+#	src/common/repo_hanhler.h
+#	src/common/solving.h
+#	src/common/log_handher.h
+#	src/common/network_util.h
+#	src/common/params.h
+#	src/common/mem_management.h
+#	src/common/cfg_parsing.h
+#	)
+
+add_library(lib_ssds_common SHARED ${ssds_common_srcs})
+target_link_libraries(lib_ssds_common
+	${LIBS}
+	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS})
+
+set (ssds_server_srcs
+	src/server/server_main.c)
+
+add_library(lib_ssds_server SHARED ${ssds_server_srcs})
+target_link_libraries(lib_ssds_server
+	${LIBS}
+	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS})
+
+#set (ssds_server_headers
+#	src/server/server.h)
+#
+
+set (ssds_client_srcs
+	src/client/client_main.c)
+
+add_library(lib_ssds_client SHARED ${ssds_client_srcs})
+target_link_libraries(lib_ssds_client
+	${LIBS}
+	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS})
+
+#NOT WORKING ATM
+#add_library(lib_ssds SHARED ${ssds_common_srcs})
+#target_link_libraries(lib_ssds
+#	lib_ssds_client
+#	lib_ssds_server
+#	${LIBS}
+#	${GLIB2_LDFLAGS}
+#	${JSON_LDFLAGS}
+#	${HAWKEY_LDFLAGS}
+#	${LIBREPO_LDFLAGS}
+#	${CHECK_LDFLAGS})
+
+#set (ssds_client_headers
+#	src/client/client.c)
+
 PROJECT(ssds-server)
 set(SERVSRC "src/server/server_main.c")
 add_executable(ssds-server ${SERVSRC}
@@ -93,6 +170,8 @@ add_executable(ssds-server ${SERVSRC}
 		../src/common/params.c
 		../src/common/mem_management.c
 		../src/common/cfg_parsing.c)
+
+add_library(lib_serv SHARED ${SERVSRC})
 
 target_link_libraries(
 	ssds-server
