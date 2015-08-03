@@ -1,3 +1,9 @@
-Napsat mail klukum z hawkey - zeptat se, zda je mozny bez instalace updatovat .solv soubor na strane serveru na zaklade informace, ktery balik se nainstaloval na klientovi
+Version 0.3.0
+- define basic database structure (jridky)
+- client installs packages by librpm (jridky)
+- client and server use configuration file (SimonMatej)
+- first concept of caching algorithm (TBD)
+- testing suite for project (SimonMatej)
+- Proper return values in case of server failure (michalruprich)
+- Garbage collector test suite (wscherfel)
 
-Vyhnout se dobudoucna nacitani sack na klientovi, melo by to jit obejit tim, ze se pouzije librepo downloader a pak rpm na konkretni stazenej balik

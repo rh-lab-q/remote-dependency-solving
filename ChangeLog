@@ -1,3 +1,15 @@
+new version 0.3.0
+- client installs packages by librpm
+- client and server read configuration file
+- garbage collector implementation
+- several bugfixes
+
+new version 0.2.0
+- client installs packages by system command
+- server resolves dependencies
+- Code is written in C
+- protocol used for communication is JSON.
+
 new version 0.1.0
 - protocol definition
 - client class
