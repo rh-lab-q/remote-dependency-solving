@@ -2,11 +2,14 @@ This is short documentation of the garbage collector(GC for short) used in Serve
 
 USAGE:
 
-Before any using of this GC, you have to call ssds_gc_init() function. This initializes structures needed for running it. 
+Before any using of this GC, you have to call ssds_gc_init() function. 
+This initializes structures needed for running it. 
 After that you can use other allocating functions of this GC.
 
-The main idea is that user of this GC calls functions with the same interface as standard allocation functions, but with the "ssds_" prefix. 
-For instance ssds_malloc() has the same parameters, same return value, but inserts allocated memory into GC.
+The main idea is that user of this GC calls functions with the same interface as 
+standard allocation functions, but with the "ssds_" prefix. 
+For instance ssds_malloc() has the same parameters, same return value, but inserts 
+allocated memory into GC.
 
 LIST OF FUNCTIONS USED BY YOUR PROGRAM:
 
@@ -16,20 +19,26 @@ ssds_gc_init()
 ssds_malloc(int size), 
 ssds_calloc(int n_items, int size), 
 ssds_realloc(void * old_ptr, int size) 
-- return value of these functions is the same as standard allocating functions, but allocated memory is also inserted into GC for later cleanup.
+- return value of these functions is the same as standard allocating functions, 
+but allocated memory is also inserted into GC for later cleanup.
 
 ssds_socket(int domain, int type, int protocol),
 ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len) 
-- very similiar to allocating functions in this GC, return value is the same as standard functions for creating sockets, but sockets are also inserted into GC for later cleanup.
+- very similiar to allocating functions in this GC, return value is the same as 
+standard functions for creating sockets, but sockets are also inserted into GC 
+for later cleanup.
 
 ssds_free(void * ptr),
 ssds_close
-- these functions free/close allocated memory or socket and also removes it from GC because it does not need to be freed/closed twice. Use these functions if you want to manually free or close memory or socket.
+- these functions free/close allocated memory or socket and also removes it from 
+GC because it does not need to be freed/closed twice. Use these functions if 
+you want to manually free or close memory or socket.
 
 ssds_gc_cleanup()
 - cleans (frees all memory and closes all sockets) in the GC and ALSO DESTROYS it. 
 This function should be called before the end of the program to prevent memory leaks. 
-If you would want to continue using GC functions, you have to call another ssds_gc_init() after calling ssds_gc_cleanup().
+If you would want to continue using GC functions, you have to call another 
+ssds_gc_init() after calling ssds_gc_cleanup().
 
 Other functions are auxiliary for the GC and I dont recommend using them. 
 Their interface is documented in src/common/mem_management.h .
