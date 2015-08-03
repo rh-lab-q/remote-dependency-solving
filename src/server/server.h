@@ -17,6 +17,7 @@ extern "C"{
 #include "../common/params.h"
 #include "../common/mem_management.h"
 #include "../../cmake/Config/version_conf.h"
+#include "../common/cfg_parsing.h"
 
 
 #ifdef __cplusplus

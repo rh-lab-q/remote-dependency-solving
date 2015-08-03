@@ -96,13 +96,17 @@ int core()
   
   struct sockaddr_in server_comm, server_data, client_comm, client_data;
 
-  server_comm.sin_family = AF_INET;
-  server_comm.sin_addr.s_addr = INADDR_ANY;
-  server_comm.sin_port = htons(2345);
+  char *server_address, comm_port[5], data_port[5];
+  read_cfg(&server_address, &comm_port, &data_port);
+  free(server_address);
 
-  server_data.sin_family = AF_INET;
-  server_data.sin_addr.s_addr = INADDR_ANY;
-  server_data.sin_port = htons(2346);
+  server_comm.sin_family=AF_INET;
+  server_comm.sin_addr.s_addr=INADDR_ANY;
+  server_comm.sin_port=htons(strtol(comm_port, NULL, 10));
+
+  server_data.sin_family=AF_INET;
+  server_data.sin_addr.s_addr=INADDR_ANY;
+  server_data.sin_port=htons(strtol(data_port, NULL, 10));
 
   if(bind(comm_desc, (struct sockaddr*)&server_comm, sizeof(server_comm)) < 0)
   {

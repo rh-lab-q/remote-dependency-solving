@@ -16,6 +16,7 @@ extern "C"{
 #include "../common/util.h"
 #include "../common/mem_management.h"
 #include "../../cmake/Config/version_conf.h"
+#include "../common/cfg_parsing.h"
 
 /** path to package download directory */
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";

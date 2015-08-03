@@ -133,16 +133,20 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   ssds_log(logDEBUG, "Setting up connection to server.\n");
   struct sockaddr_in server_data;
   struct sockaddr_in server_comm;
-  server_comm.sin_addr.s_addr = inet_addr("127.0.0.1");
-  server_data.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+  char *server_address, comm_port[5], data_port[5];
+  read_cfg(&server_address, &comm_port, &data_port);
+
+  server_comm.sin_addr.s_addr = inet_addr(server_address);
+  server_data.sin_addr.s_addr = inet_addr(server_address);
   ssds_log(logDEBUG, "Set server address.\n");
 
   server_comm.sin_family = AF_INET;
   server_data.sin_family = AF_INET;
   ssds_log(logDEBUG, "Set comunication protocol.\n");
 
-  server_comm.sin_port = htons(2345);
-  server_data.sin_port = htons(2346);
+  server_comm.sin_port=htons(strtol(comm_port, NULL, 10));
+  server_data.sin_port=htons(strtol(data_port, NULL, 10));
   ssds_log(logDEBUG, "Set server port.\n");
   
   ssds_log(logDEBUG, "Socket controll.\n");
