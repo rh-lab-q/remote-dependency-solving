@@ -17,18 +17,18 @@ int main(int argc, char* argv[]){
   /*******************************************************************/
   /* Parsing parameters */
   /*******************************************************************/
-  ssds_log(logINFO, "Client startup.\n");
+  
+  ssds_log(logSSDS, "Client startup.\n");
 
   ParamOptsCl* params = init_params_cl();
   
-  ssds_log(logDEBUG, "Client params initialized.\n");
-
   if(parse_params_cl(argc, argv, params) == -1)
   {
     ssds_gc_cleanup();
     return 1;
   }
 
+  ssds_log(logDEBUG, "Client params initialized.\n");
   ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
   ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
   
@@ -346,7 +346,8 @@ int install_packages(SsdsJsonAnswer* answer_from_srv, GSList *package_list)
 
   }
   
-  ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\nEnd of ssds-client.\n\n",answer_from_srv->name); 
+  ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\n",answer_from_srv->name); 
+  ssds_log(logSSDS, "End of client.\n\n");
   g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
     
   ssds_gc_cleanup();

@@ -53,10 +53,9 @@ int main(int argc, char* argv[]) {
   signal(SIGSEGV, ssds_signal_handler);
   signal(SIGTERM, ssds_signal_handler);
   
-  ssds_log(logDEBUG, "Server started.\n");
-
   parse_params_srv(argc, argv);
-    
+
+  ssds_log(logSSDS, "Server started.\n");
   ssds_log(logDEBUG, "Params parsed.\n");
 
   return core();
@@ -134,7 +133,7 @@ int core()
     return 1;
   }
 
-  ssds_log(logINFO, "Server started. Waiting for incoming connections.\n");
+  ssds_log(logINFO, "Server setted up. Waiting for incoming connections.\n");
   
   if(listen(comm_desc, 5) != 0)
   {
