@@ -56,6 +56,7 @@ int main(int argc, char * argv[])
 	if(error) //an error occured.
 	{
 		ssds_gc_cleanup();
+		exit(EXIT_FAILIURE);
 	}
 	ssds_free(alloc_memory) //frees the allocated memory correctly
 	/*
