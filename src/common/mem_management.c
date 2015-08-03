@@ -22,6 +22,9 @@
 
 Ssds_gc * global_gc = NULL;
 
+int allocated = 0;
+int num_items = 0;
+
 void ssds_signal_handler(int signum)
 {
 	ssds_gc_cleanup();
@@ -54,6 +57,7 @@ void ssds_gc_cleanup()
 		item = next;
 	}
 	free(global_gc);
+	ssds_log(logMESSAGE,"Number of items: %d Memory allocated: %d \n",num_items, allocated);
 }
 
 Ssds_gc_item * ssds_gc_search(Alloc_data * data, int type)
@@ -163,12 +167,14 @@ void ssds_gc_push_socket(int socket)
 
 void ssds_free(void * ptr)
 {
+    num_items -= 1;
     ssds_gc_remove_ptr(ptr);
     free(ptr);
 }
 
 void ssds_close(int socket)
 {
+    num_items -= 1;
     ssds_gc_remove_socket(socket);
     close(socket);
 }
@@ -189,6 +195,7 @@ void ssds_gc_remove_socket(int socket)
 
 void * ssds_realloc(void * old_ptr, int size)
 {
+	allocated += size;
 	void * new_ptr = realloc(old_ptr, size);
 	if(new_ptr == NULL)
 	{
@@ -207,6 +214,8 @@ void * ssds_realloc(void * old_ptr, int size)
 
 void * ssds_malloc(int size)
 {
+	num_items += 1;
+	allocated += size;
 	void * new_ptr = malloc(size);
 	if(new_ptr == NULL)
 	{
@@ -221,6 +230,8 @@ void * ssds_malloc(int size)
 
 void * ssds_calloc(int n_items, int size)
 {
+	num_items += 1;
+	allocated += n_items * size;
 	void * new_ptr = calloc(n_items, size);
 	if(new_ptr == NULL)
 	{
@@ -248,6 +259,7 @@ void ssds_gc_init()
 
 int ssds_socket(int domain, int type, int protocol)
 {
+	num_items += 1;
 	int new_socket = socket(domain, type, protocol);
 	if(new_socket < 0)
 	{
@@ -262,6 +274,7 @@ int ssds_socket(int domain, int type, int protocol)
 
 int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len)
 {
+	num_items += 1;
 	int new_socket = accept(socket, address, address_len);
 	if(new_socket < 0)
 	{
