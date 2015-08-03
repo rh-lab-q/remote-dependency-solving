@@ -1,7 +1,25 @@
+/* Server side dependency solving - transfer of dependency solving from local machine to server when installing new packages
+ * Copyright (C) 2015  Michal Ruprich, Josef Řídký
+ *
+ * Licensed under the GNU Lesser General Public License Version 2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #include "json_improved.h"
-/*****************************************
- * This part is for json creation        *
- * ***************************************/
+
 SsdsJsonCreate* ssds_js_cr_init(int code)
 {
   SsdsJsonCreate* new = (SsdsJsonCreate*)malloc(sizeof(SsdsJsonCreate));
@@ -70,7 +88,7 @@ void ssds_js_cr_add_array_member(SsdsJsonCreate* json, int type, void* data)
     }
     case JS_INT:
     {
-      json_array_add_int_element(json->currArray, *((guint64*)data));
+      json_array_add_int_element(json->currArray, *((guint*)data));
       break;
     }
   }
@@ -98,7 +116,7 @@ void ssds_js_cr_add_obj_member(SsdsJsonCreate* json, int type, void* data, const
     }
       
     case JS_INT:
-      json_object_set_int_member(json->currObj, (const gchar*)name, *((guint64*)data));
+      json_object_set_int_member(json->currObj, (const gchar*)name, *((guint*)data));
     break;
       
     case JS_OBJ:
@@ -174,15 +192,39 @@ void ssds_js_cr_new_data(SsdsJsonCreate* json, int type, const char* name, void*
     }
     case JS_INT:
     {
-      json_object_set_int_member(json->currObj, (const gchar*)name, *((guint64*)data));
+      json_object_set_int_member(json->currObj, (const gchar*)name, *((guint*)data));
       break;
     }
   }
 }
 
-void ssds_js_switch_array(SsdsJsonCreate* json, const char* name)
+gboolean ssds_js_cr_switch_array(SsdsJsonCreate* json, const char* name)
 {
-  json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)name);
+  //create full path in jsonpath format from name of array provided
+  const char* default_path="$.data..";
+  int length=strlen(default_path)+strlen(name);
+  char* full_path=(char*)malloc((length+1)*sizeof(char));
+  strncpy(full_path, default_path, strlen(default_path)+1);
+  strncat(full_path, name, strlen(name));
+
+  //json path for finding 
+  JsonPath* new_path = json_path_new();
+  if(!json_path_compile(new_path, full_path, NULL))
+    return FALSE;
+  
+  //get the result
+  JsonNode* root = json_generator_get_root(json->generator);
+  JsonNode* result = json_path_match(new_path, root);
+  JsonArray* result_arr = json_node_get_array(result);
+  
+  JsonNode* selected_node = json_array_get_element(result_arr, 0);
+  json->currArray = json_node_get_array(selected_node);
+  
+  //clean up
+  free(full_path);
+  g_object_unref(new_path);
+  json_node_free(result);
+  return TRUE;
 }
 
 void ssds_js_cr_upper_array(SsdsJsonCreate* json)
@@ -205,7 +247,7 @@ void ssds_js_cr_upper_obj(SsdsJsonCreate* json)
   json->currObj = json_node_get_object(json->currNode);
 }
 
-char* ssds_js_to_string(SsdsJsonCreate* json)
+char* ssds_js_cr_to_string(SsdsJsonCreate* json)
 {
   gsize len;
   char* data;
@@ -213,7 +255,7 @@ char* ssds_js_to_string(SsdsJsonCreate* json)
   return data;
 }
 
-void ssds_js_dump(SsdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
+void ssds_js_cr_dump(SsdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
 {
   gchar *data;
   json_generator_set_pretty(json->generator, 1);
@@ -224,7 +266,7 @@ void ssds_js_dump(SsdsJsonCreate* json)//this will always dump error when some a
 /*****************************************
  * This part is for json parsing         *
  * ***************************************/
-SsdsJsonRead* ssds_json_read_init()
+SsdsJsonRead* ssds_json_rd_init()
 {
   SsdsJsonRead* new = (SsdsJsonRead*)malloc(sizeof(SsdsJsonRead));
   new->parser=json_parser_new();
@@ -232,7 +274,7 @@ SsdsJsonRead* ssds_json_read_init()
 }
 
 
-gboolean ssds_read_parse(char* buffer, SsdsJsonRead* json)
+gboolean ssds_rd_parse(char* buffer, SsdsJsonRead* json)
 {
   GError *error = NULL;
     
@@ -248,7 +290,7 @@ gboolean ssds_read_parse(char* buffer, SsdsJsonRead* json)
   return ret;
 }
 
-int ssds_read_get_code(SsdsJsonRead* json)
+int ssds_rd_get_code(SsdsJsonRead* json)
 {
   int ret=-1;
   JsonObject* obj=json_node_get_object(json->rootNode);
@@ -292,14 +334,17 @@ int main()
   ssds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "erase");
   
   ssds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "upgrade");
+  ssds_js_cr_add_array_member(json_cr, JS_STRING, "hokus_pokus");
+  ssds_js_cr_switch_array(json_cr, "erase");
+  ssds_js_cr_add_array_member(json_cr, JS_STRING, "hokus_pokus");
   
-  ssds_js_dump(json_cr);
+  ssds_js_cr_dump(json_cr);
   
   
   //x path example
-  char* result = ssds_js_to_string(json_cr);
-  SsdsJsonRead* json_rd = ssds_json_read_init();
-  ssds_read_parse(result, json_rd);
+  char* result = ssds_js_cr_to_string(json_cr);
+  SsdsJsonRead* json_rd = ssds_json_rd_init();
+  ssds_rd_parse(result, json_rd);
   
   GList* list = ssds_js_rd_find(json_rd, "$.data.install_pkgs..pkg_name");
   if(list==NULL)
@@ -313,6 +358,8 @@ int main()
       
     }
   }
+  
+  
   
   return 0;
 }
