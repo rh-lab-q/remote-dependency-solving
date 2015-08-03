@@ -20,10 +20,10 @@ extern "C"{
 /** path to package download directory */
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
 //static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
-int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_output_ret, char **msg_output_ret);
-int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, SsdsJsonAnswer** answer_from_srv_ret);
-int download_packages(SsdsJsonAnswer* answer_from_srv, GList **package_list_ret);
-int install_packages(SsdsJsonAnswer* answer_from_srv, GList *package_list);
+//int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_output_ret, char **msg_output_ret);
+//int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, SsdsJsonAnswer** answer_from_srv_ret);
+//int download_packages(SsdsJsonAnswer* answer_from_srv, GSList **package_list_ret);
+//int install_packages(SsdsJsonAnswer* answer_from_srv, GSList *package_list);
 
 #ifdef __cplusplus
 }
