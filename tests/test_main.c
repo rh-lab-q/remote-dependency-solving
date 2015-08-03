@@ -8,6 +8,7 @@
 */
 #include "test_dummy.h"
 #include "test_template.h"
+#include "test_cfg_parsing.h"
 
 int main()
 {
@@ -18,6 +19,7 @@ int main()
   /* ADD TEST SUITES TO RUN:
   */
   srunner_add_suite(sr, template_suite());
+  srunner_add_suite(sr, cfg_parsing_suite());
 
 
   //runs all added tests
