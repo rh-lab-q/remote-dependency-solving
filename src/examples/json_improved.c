@@ -205,6 +205,14 @@ void ssds_js_cr_upper_obj(SsdsJsonCreate* json)
   json->currObj = json_node_get_object(json->currNode);
 }
 
+char* ssds_js_to_string(SsdsJsonCreate* json)
+{
+  gsize len;
+  char* data;
+  data = (char*)json_generator_to_data (json->generator, &len);
+  return data;
+}
+
 void ssds_js_dump(SsdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
 {
   gchar *data;
@@ -216,6 +224,30 @@ void ssds_js_dump(SsdsJsonCreate* json)//this will always dump error when some a
 /*****************************************
  * This part is for json parsing         *
  * ***************************************/
+SsdsJsonRead* ssds_json_read_init()
+{
+  SsdsJsonRead* new = (SsdsJsonRead*)malloc(sizeof(SsdsJsonRead));
+  new->parser=json_parser_new();
+  return new;
+}
+
+
+gboolean ssds_read_parse(char* buffer, SsdsJsonRead* json)
+{
+  GError *error = NULL;
+    
+  gboolean ret = json_parser_load_from_data(json->parser, (const gchar*)buffer, -1, &error);
+  if(!ret)
+    return EXIT_FAILURE;
+  
+  json->rootNode = json_parser_get_root(json->parser);
+  
+  JsonObject* obj=json_node_get_object(json->rootNode);
+  json->dataNode=json_object_get_member(obj, (gchar*)"data");
+  json->dataObj=json_node_get_object(json->dataNode);
+  return ret;
+}
+
 int ssds_read_get_code(SsdsJsonRead* json)
 {
   int ret=-1;
@@ -226,12 +258,17 @@ int ssds_read_get_code(SsdsJsonRead* json)
   return ret;
 }
 
-gboolean ssds_js_rd_find(SsdsJsonCreate* json, char* x_path)
+GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path)
 {
-  gboolean ret = FALSE;
+  GList* ret = NULL;
   JsonPath* new_path = json_path_new();
   json_path_compile(new_path, x_path, NULL);
   
+  JsonNode* root = json_parser_get_root(json->parser);
+  JsonNode* result = json_path_match(new_path, root);
+  JsonArray* result_arr = json_node_get_array(result);
+  
+  ret = json_array_get_elements(result_arr);
   
   return ret;
 }
@@ -254,13 +291,28 @@ int main()
   ssds_js_cr_upper_obj(json_cr);
   ssds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "erase");
   
-//   ssds_js_cr_upper_obj(json_cr);
   ssds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "upgrade");
-//   
-  
-//   ssds_js_cr_new_data(json_cr, JS_ARRAY, "upgrade");
-  
   
   ssds_js_dump(json_cr);
+  
+  
+  //x path example
+  char* result = ssds_js_to_string(json_cr);
+  SsdsJsonRead* json_rd = ssds_json_read_init();
+  ssds_read_parse(result, json_rd);
+  
+  GList* list = ssds_js_rd_find(json_rd, "$.data.install_pkgs..pkg_name");
+  if(list==NULL)
+    printf("list is empty\n");
+  else{
+    int len = g_list_length(list);
+    for(int i=0; i<len; i++)
+    {
+      JsonNode* node = g_list_nth_data(list, i);
+      printf("%s\n", (char*)json_node_get_string(node));
+      
+    }
+  }
+  
   return 0;
 }
