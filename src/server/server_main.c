@@ -98,7 +98,7 @@ int core()
   char *server_address;
   long int comm_port, data_port;
   read_cfg(&server_address, &comm_port, &data_port);
-  free(server_address);
+  ssds_free(server_address);
 
   server_comm.sin_family = AF_INET;
   server_comm.sin_addr.s_addr = INADDR_ANY;
