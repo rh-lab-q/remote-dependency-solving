@@ -14,6 +14,8 @@ find_package(Check REQUIRED)
 include_directories(. ../src ${CHECK_INCLUDE_DIRS})
 
 target_link_libraries(test_main
+	lib_ssds_client
+	lib_ssds_server
 	lib_ssds_common
 	${CHECK_LDFLAGS})
 

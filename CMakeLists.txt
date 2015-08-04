@@ -80,7 +80,9 @@ endif()
 
 file(GLOB SRCS *.c *.h)
 
+#COMMON
 set (ssds_common_srcs
+	src/common/util.c
 	src/common/json_read.c
 	src/common/json_create.c
 	src/common/repo_metadata.c
@@ -90,22 +92,18 @@ set (ssds_common_srcs
 	src/common/network_util.c
 	src/common/params.c
 	src/common/mem_management.c
-	src/common/cfg_parsing.c
-	)
-
-#set (ssds_common_headers
-#	src/common/includes.h
-#	src/common/json_handler.h
-#	src/common/repo_hanhler.h
-#	src/common/solving.h
-#	src/common/log_handher.h
-#	src/common/network_util.h
-#	src/common/params.h
-#	src/common/mem_management.h
-#	src/common/cfg_parsing.h
-#	)
-
-add_library(lib_ssds_common SHARED ${ssds_common_srcs})
+	src/common/cfg_parsing.c)
+set (ssds_common_headers
+	src/common/includes.h
+	src/common/json_handler.h
+	src/common/repo_handler.h
+	src/common/solving.h
+	src/common/log_handler.h
+	src/common/network_util.h
+	src/common/params.h
+	src/common/mem_management.h
+	src/common/cfg_parsing.h)
+add_library(lib_ssds_common SHARED ${ssds_common_srcs} ${ssds_common_headers})
 target_link_libraries(lib_ssds_common
 	${LIBS}
 	${GLIB2_LDFLAGS}
@@ -114,11 +112,14 @@ target_link_libraries(lib_ssds_common
 	${LIBREPO_LDFLAGS}
 	${CHECK_LDFLAGS})
 
+#SERVER
 set (ssds_server_srcs
 	src/server/server_main.c)
-
-add_library(lib_ssds_server SHARED ${ssds_server_srcs})
+set (ssds_server_headers
+	src/server/server.h)
+add_library(lib_ssds_server STATIC ${ssds_server_srcs} ${ssds_server_headers})
 target_link_libraries(lib_ssds_server
+	lib_ssds_common
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
@@ -126,15 +127,14 @@ target_link_libraries(lib_ssds_server
 	${LIBREPO_LDFLAGS}
 	${CHECK_LDFLAGS})
 
-#set (ssds_server_headers
-#	src/server/server.h)
-#
-
+#CLIENT
 set (ssds_client_srcs
 	src/client/client_main.c)
-
-add_library(lib_ssds_client SHARED ${ssds_client_srcs})
+set (ssds_client_headers
+	src/client/client.h)
+add_library(lib_ssds_client STATIC ${ssds_client_srcs} ${ssds_client_headers})
 target_link_libraries(lib_ssds_client
+	lib_ssds_common
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
@@ -142,36 +142,14 @@ target_link_libraries(lib_ssds_client
 	${LIBREPO_LDFLAGS}
 	${CHECK_LDFLAGS})
 
-#NOT WORKING ATM
-#add_library(lib_ssds SHARED ${ssds_common_srcs})
-#target_link_libraries(lib_ssds
-#	lib_ssds_client
-#	lib_ssds_server
-#	${LIBS}
-#	${GLIB2_LDFLAGS}
-#	${JSON_LDFLAGS}
-#	${HAWKEY_LDFLAGS}
-#	${LIBREPO_LDFLAGS}
-#	${CHECK_LDFLAGS})
 
-#set (ssds_client_headers
-#	src/client/client.c)
 
 PROJECT(ssds-server)
-set(SERVSRC "src/server/server_main.c")
-add_executable(ssds-server ${SERVSRC}
-		../src/common/json_read.c
-		../src/common/json_create.c
-		../src/common/repo_metadata.c
-		../src/common/repo_handler.c
-		../src/common/solving.c
-		../src/common/log_handler.c
-		../src/common/network_util.c
-		../src/common/params.c
-		../src/common/mem_management.c
-		../src/common/cfg_parsing.c)
+add_executable(ssds-server
+	${ssds_server_srcs}
+	${ssds_common_srcs})
 
-add_library(lib_serv SHARED ${SERVSRC})
+#add_library(lib_serv SHARED ${SERVSRC})
 
 target_link_libraries(
 	ssds-server
@@ -180,30 +158,20 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	${CHECK_LDFLAGS}
-)
+	${CHECK_LDFLAGS})
 
 PROJECT(ssds-client)
-set(CLISRC "src/client/client_main.c")
-add_executable(ssds-client ${CLISRC}
-		../src/common/json_read.c
-		../src/common/json_create.c
-		../src/common/repo_handler.c
-		../src/common/log_handler.c
-		../src/common/network_util.c
-		../src/common/util.c
-		../src/common/params.c
-		../src/common/mem_management.c
-		../src/common/cfg_parsing.c)
-target_link_libraries(
-	ssds-client
+add_executable(ssds-client
+	${ssds_client_srcs}
+	${ssds_common_srcs})
+
+target_link_libraries(ssds-client
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	${CHECK_LDFLAGS}
-)
+	${CHECK_LDFLAGS})
 
 file(MAKE_DIRECTORY /tmp/ssds/)
 file(MAKE_DIRECTORY /var/cache/ssds/packages/install/)
