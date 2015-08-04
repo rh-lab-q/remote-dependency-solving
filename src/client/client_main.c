@@ -72,6 +72,13 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   
   ssds_js_insert_code(json_gen, 123); //insert code into json
   ssds_log(logDEBUG, "Inserted code 123 into json. Package count %d.\n", params->pkg_count);
+  
+  /*
+   *  Getting architecture, release and path to @System.solv
+   */
+  char path[100];
+  char *arch = NULL, *release = NULL;
+  ssds_resolve_dependency_file_path(path, &arch, &release);
 
   // parsing local repo
   if(!ssds_parse_default_repo(local_repo))
@@ -81,7 +88,7 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   }
   ssds_log(logDEBUG, "Local repo is parsed. Package count %d.\n", params->pkg_count);
 
-  ssds_get_repo_urls(local_repo, json_gen);
+  ssds_get_repo_urls(local_repo, json_gen, arch, release);
   ssds_log(logDEBUG, "Getting repo urls. Package count %d.\n", params->pkg_count);
   
   ssds_log(logDEBUG, "Loop thrue required packages. Package count %d.\n", params->pkg_count);
@@ -134,7 +141,8 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   struct sockaddr_in server_data;
   struct sockaddr_in server_comm;
 
-  char *server_address, comm_port[5], data_port[5];
+  char *server_address;
+  long int comm_port, data_port;
   read_cfg(&server_address, &comm_port, &data_port);
 
   server_comm.sin_addr.s_addr = inet_addr(server_address);
@@ -145,8 +153,8 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   server_data.sin_family = AF_INET;
   ssds_log(logDEBUG, "Set comunication protocol.\n");
 
-  server_comm.sin_port=htons(strtol(comm_port, NULL, 10));
-  server_data.sin_port=htons(strtol(data_port, NULL, 10));
+  server_comm.sin_port = htons(comm_port);
+  server_data.sin_port = htons(data_port);
   ssds_log(logDEBUG, "Set server port.\n");
   
   ssds_log(logDEBUG, "Socket controll.\n");
@@ -196,12 +204,11 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   write(comm_sock, msg_output, strlen(msg_output));
   ssds_log(logMESSAGE, "Message sent.\n");
 
-  char path[100];
-  ssds_resolve_dependency_file_path(path);
-
   ssds_log(logDEBUG, "Path to sys.solv file : %s\n",path);
   FILE * f;
   f = fopen(path,"rb");
+
+  ssds_log(logDEBUG, "Opening @System.solv file.\n");
   if(f == NULL)
   {
     ssds_log(logERROR,"Error while opening @System.solv file.\n");
@@ -209,17 +216,23 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
     return 1;
   }
 
+  ssds_log(logDEBUG, "Preparing .solv variables.\n");
+
   char buffer[131072];
   char msg_length[10];
   char* server_response;
   size_t bytes_read = 0;
 
+  ssds_log(logDEBUG, "Getting server response\n");
   server_response = sock_recv(comm_sock);
+  ssds_log(logDEBUG, "Sending @System.solv file.\n");
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
       snprintf(msg_length,10,"%d",(int)bytes_read);
       write(comm_sock, msg_length, strlen(msg_length));
+      ssds_log(logDEBUG, "Command send.\n");
       write(data_sock, buffer, bytes_read);
+      ssds_log(logDEBUG, "Data send.\n");
       server_response = sock_recv(comm_sock);
       // TODO: fix this nonsens vvvvvvvvvvvvv
       if(strcmp(server_response,"OK") != 0){}

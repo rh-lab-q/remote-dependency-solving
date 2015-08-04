@@ -34,8 +34,10 @@ extern "C"{
  * Resolves path for @System.solv file depending on system version
  * @brief ssds_resolve_dependency_file_path
  * @param ret_val return value of function
+ * @param arch    return value of function
+ * @param release return value of function
  */
-void ssds_resolve_dependency_file_path(char* ret_val);
+void ssds_resolve_dependency_file_path(char* ret_val, char** arch, char** release);
 
 /**
  * Callback function for downloading packages

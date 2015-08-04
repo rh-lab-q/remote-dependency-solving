@@ -77,8 +77,10 @@ int ssds_parse_default_repo(SsdsLocalRepoInfo* repo);
  * into SsdsJsonCreate structure so that they can be sent to server
  * @param repo      SsdsLocalRepoInfo*
  * @param json      SsdsJsonCreate*
+ * @param arch      char*
+ * @param release   char*
  */
-void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json);
+void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json, char* arch, char* release);
 
 /*****************************************************************/
 /* Repo metadata - information about metadata location on server */

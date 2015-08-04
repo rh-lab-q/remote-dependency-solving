@@ -40,7 +40,7 @@ int ssds_parse_default_repo(SsdsLocalRepoInfo* repo)
    return 1; 
 }
 
-void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
+void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json, char* arch, char* release)
 {
   GError* err = NULL;
  
@@ -99,9 +99,9 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       }
       
       ssds_log(logDEBUG,"Setting url var - releaseserver.\n"); 
-      LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", "21"); //"3.18.6-200.fc21"
+      LrUrlVars *list =  lr_urlvars_set(NULL, "releasever", release); //"3.18.6-200.fc21"
       ssds_log(logDEBUG,"Setting url var - basearch.\n"); 
-      list = lr_urlvars_set(list, "basearch", "x86_64");
+      list = lr_urlvars_set(list, "basearch", arch);
       
       ssds_log(logDEBUG,"Getting URL size.\n"); 
       ssds_log(logDEBUG,"Size: %d.\n",k); 
