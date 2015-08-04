@@ -12,4 +12,9 @@
 
 Suite* cfg_parsing_suite(void);
 
+int number_read();
+int invalid_file();
+int param_too_long();
+int complex_read();
+
 #endif

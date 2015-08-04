@@ -4,35 +4,10 @@
 
 START_TEST(test_cfg_parsing)
 {
-  fail_if(1 == 2);
-
-  FILE *tst_file_1;
-  tst_file_1 = fopen("../connection.cfg", "w+");
-  if (tst_file_1 == NULL)
-  {
-  	printf("unable to test, cannot create new file\n");
-  	return;
-  }
-  char *tst_str = "address=127.0.0.2\nport=951\ndata-port=789\n";
-  //char *tst_str1 = "951\0";
-  fwrite(tst_str, sizeof(char), 9, tst_file_1);
-  fseek(tst_file_1, 0, SEEK_SET);
-  printf("hello\n");
-  char *address;
-  long int p1, p2;
-  read_cfg(&address, &p1, &p2);
-
-  printf("hello\n");
-
-  printf("adress:%s p1:%ld\n",address, p1);
-
-  free(address);
-  //printf("read:[%s]\n", tst_str2);
-  //fail_if(951 != strtol(tst_str2, NULL, 10));
-
-
-  fclose(tst_file_1);
-  remove("../connection.cfg");
+  number_read();
+  invalid_file();
+  param_too_long();
+  complex_read();
 }
 END_TEST
 
@@ -44,3 +19,122 @@ Suite* cfg_parsing_suite(void)
   suite_add_tcase(s, tc);
   return s;
 }
+
+int complex_read()
+{
+  FILE *tempfile;
+  tempfile = fopen("../connection.cfg", "w+");
+  if (tempfile == NULL)
+  {
+    printf("unable to test, cannot create new file\n");
+    return 1;
+  }
+  char *tst_str = "address=127.0.0.2\nport=951\ndata-port=789\n";
+
+  fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
+  fseek(tempfile, 0, SEEK_SET);
+
+  char *address;
+  long int p1, p2;
+  read_cfg(&address, &p1, &p2);
+
+  fail_if(strcmp(address, "127.0.0.2") != 0);
+  fail_if(p1 != 951);
+  fail_if(p2 != 789);
+
+  free(address);
+  fclose(tempfile);
+  remove("../connection.cfg");
+
+  return 0;
+}
+
+int invalid_file()
+{
+  FILE *tempfile;
+  tempfile = fopen("../connection.cfg", "w+");
+  if (tempfile == NULL)
+  {
+    printf("unable to test, cannot create new file\n");
+    return 1;
+  }
+
+  char *tst_str = "so-much=127.0.0.2\ninvalid=951\nvalues=789\n#here\n#address=void";
+
+  fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
+  fseek(tempfile, 0, SEEK_SET);
+
+  char *address;
+  long int p1, p2;
+  read_cfg(&address, &p1, &p2);
+
+  fail_if(strcmp(address, "127.0.0.1") != 0);
+  fail_if(p1 != 2345);
+  fail_if(p2 != 2346);
+
+  free(address);
+  fclose(tempfile);
+  remove("../connection.cfg");
+
+  return 0;
+}
+
+int param_too_long()
+{
+  FILE *tempfile;
+  tempfile = fopen("../connection.cfg", "w+");
+  if (tempfile == NULL)
+  {
+    printf("unable to test, cannot create new file\n");
+    return 1;
+  }
+
+  char *tst_str = "port=4815162342";
+
+  fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
+  fseek(tempfile, 0, SEEK_SET);
+
+  char *address;
+  long int p1, p2;
+  read_cfg(&address, &p1, &p2);
+
+  fail_if(p1 != 4815);
+  
+  free(address);
+  fclose(tempfile);
+  remove("../connection.cfg");
+
+  return 0;
+}
+
+int number_read()
+{
+  FILE *tempfile;
+  tempfile = fopen("../connection.cfg", "w+");
+  if (tempfile == NULL)
+  {
+    printf("unable to test, cannot create new file\n");
+    return 1;
+  }
+
+  char *tst_str = "4815162342\nxxx";
+
+  fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
+
+  fseek(tempfile, 0, SEEK_SET);
+  char *res = file_read_value(tempfile, 0);
+  fail_if(strcmp(res, "4815162342") != 0);
+
+  free(res);
+
+  fseek(tempfile, 0, SEEK_SET);
+  file_read_value(tempfile, 4);
+  fail_if(strcmp(res, "481") != 0);
+  
+  free(res);
+  fclose(tempfile);
+  remove("../connection.cfg");
+
+  return 0;
+}
+

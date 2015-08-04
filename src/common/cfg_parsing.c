@@ -13,9 +13,8 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
   {
     ssds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
 
-    address = (char*)ssds_malloc(16*sizeof(char*));
-    strncpy(address, "127.0.0.1\0", strlen("127.0.0.1\0"));
-    *ret_address = address;
+    *ret_address = (char*)malloc(10*sizeof(char));
+    strncpy(*ret_address, "127.0.0.1\0", 10);
 
     *ret_comm_port = 2345;
     *ret_data_port = 2346;
@@ -72,7 +71,8 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
         }
         if (fmstate == 'a')
         {
-          address = file_read_value(cfg_file, 255);
+          address = file_read_value(cfg_file, 0);
+          *ret_address = address;
           address_parsed = 1;
           fmstate = 'e';
         }
@@ -92,7 +92,7 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
         {
           comm_port = file_read_value(cfg_file, 5);
           *ret_comm_port = strtol(comm_port, NULL, 10);
-          ssds_free(comm_port);
+          free(comm_port);
           comm_port_parsed = 1;
           fmstate = 'e';
         }
@@ -112,7 +112,7 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
         {
           data_port = file_read_value(cfg_file, 5);
           *ret_data_port = strtol(data_port, NULL, 10);
-          ssds_free(data_port);
+          free(data_port);
           data_port_parsed = 1;
           fmstate = 'e';
         }
@@ -128,8 +128,8 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
 
   if (address_parsed == 0)
   {
-    address = (char*)ssds_malloc(16*sizeof(char));
-    strncpy(address, "127.0.0.1\0", strlen("127.0.0.1\0"));
+    *ret_address = (char*)malloc(10*sizeof(char));
+    strncpy(*ret_address, "127.0.0.1\0", 10);
   }
   if (!comm_port_parsed)
   {
@@ -140,9 +140,8 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
     *ret_data_port = 2346;
   }
 
-  ssds_log(logDEBUG, "server: %s, comm port: %ld, data port: %ld\n", address, *ret_comm_port, *ret_data_port);
+  ssds_log(logDEBUG, "server: %s, comm port: %ld, data port: %ld\n", *ret_address, *ret_comm_port, *ret_data_port);
 
-  *ret_address = address;
   return 0;
 }
 
@@ -155,7 +154,7 @@ char* file_read_value(FILE* file, int max_length)
   char act_char;
   int value_lenght = 0;
   int allocated_lenght = 5;
-  value = (char*)ssds_malloc(6*sizeof(char)); //5 + 1
+  value = (char*)malloc(6*sizeof(char)); //5 + 1
 
   act_char = fgetc(file);
   while ((act_char != '\n') && (act_char != EOF))
@@ -163,13 +162,13 @@ char* file_read_value(FILE* file, int max_length)
     if (value_lenght == allocated_lenght)
     {
       allocated_lenght += 5;
-      value = (char*)ssds_realloc(value, (allocated_lenght + 1)*sizeof(char));
+      value = (char*)realloc(value, (allocated_lenght + 1)*sizeof(char));
     }
     value[value_lenght++] = act_char;
     act_char = fgetc(file);
   }
   value[value_lenght] = '\0';
-  if (value_lenght >= max_length)
+  if ((value_lenght >= max_length) & (max_length != 0))
   {
     ssds_log(logDEBUG, "[%s] shortened to:\n", value);
     value[max_length - 1] = '\0';
