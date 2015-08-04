@@ -18,12 +18,13 @@ START_TEST(test_cfg_parsing)
   fwrite(tst_str, sizeof(char), 9, tst_file_1);
   fseek(tst_file_1, 0, SEEK_SET);
   printf("hello\n");
-  char *address, p1[5], p2[5];
+  char *address;
+  long int p1, p2;
   read_cfg(&address, &p1, &p2);
 
   printf("hello\n");
 
-  printf("adress:%s p1:%c%c%c\n",address, p1[0], p1[1], p1[2]);
+  printf("adress:%s p1:%ld\n",address, p1);
 
   free(address);
   //printf("read:[%s]\n", tst_str2);

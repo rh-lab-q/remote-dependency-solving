@@ -21,11 +21,11 @@
 //#ifndef _CFG_PARSING_H
 //#define _CFG_PARSING_H
 
-#include "../common/includes.h"
-#include "../common/log_handler.h"
-//#include "mem_management.h"
+#include "includes.h"
+#include "log_handler.h"
+#include "mem_management.h"
 
 #define CFG_FILE "../connection.cfg"
 
-int read_cfg(char** address, char** comm_port, char** data_port);
+int read_cfg(char** address, long int* comm_port, long int* data_port);
 char* file_read_value(FILE* file, int max_length);
