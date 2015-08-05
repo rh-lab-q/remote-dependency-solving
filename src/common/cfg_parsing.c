@@ -13,7 +13,7 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
   {
     ssds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
 
-    *ret_address = (char*)malloc(10*sizeof(char));
+    *ret_address = (char*)ssds_malloc(10*sizeof(char));
     strncpy(*ret_address, "127.0.0.1\0", 10);
 
     *ret_comm_port = 2345;
@@ -92,7 +92,7 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
         {
           comm_port = file_read_value(cfg_file, 5);
           *ret_comm_port = strtol(comm_port, NULL, 10);
-          free(comm_port);
+          ssds_free(comm_port);
           comm_port_parsed = 1;
           fmstate = 'e';
         }
@@ -112,7 +112,7 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
         {
           data_port = file_read_value(cfg_file, 5);
           *ret_data_port = strtol(data_port, NULL, 10);
-          free(data_port);
+          ssds_free(data_port);
           data_port_parsed = 1;
           fmstate = 'e';
         }
@@ -128,7 +128,7 @@ int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_por
 
   if (address_parsed == 0)
   {
-    *ret_address = (char*)malloc(10*sizeof(char));
+    *ret_address = (char*)ssds_malloc(10*sizeof(char));
     strncpy(*ret_address, "127.0.0.1\0", 10);
   }
   if (!comm_port_parsed)
@@ -154,7 +154,7 @@ char* file_read_value(FILE* file, int max_length)
   char act_char;
   int value_lenght = 0;
   int allocated_lenght = 5;
-  value = (char*)malloc(6*sizeof(char)); //5 + 1
+  value = (char*)ssds_malloc(6*sizeof(char)); //5 + 1
 
   act_char = fgetc(file);
   while ((act_char != '\n') && (act_char != EOF))
@@ -162,7 +162,7 @@ char* file_read_value(FILE* file, int max_length)
     if (value_lenght == allocated_lenght)
     {
       allocated_lenght += 5;
-      value = (char*)realloc(value, (allocated_lenght + 1)*sizeof(char));
+      value = (char*)ssds_realloc(value, (allocated_lenght + 1)*sizeof(char));
     }
     value[value_lenght++] = act_char;
     act_char = fgetc(file);
@@ -172,7 +172,7 @@ char* file_read_value(FILE* file, int max_length)
   {
     ssds_log(logDEBUG, "[%s] shortened to:\n", value);
     value[max_length - 1] = '\0';
-    value = (char*)realloc(value, (max_length)*sizeof(char));
+    value = (char*)ssds_realloc(value, (max_length)*sizeof(char));
     ssds_log(logDEBUG, "\t[%s] (max-length = %d)\n", value, max_length);
   }
   //ssds_log(logDEBUG, "***read \"%s\" of lenght %d\n", value, value_lenght);

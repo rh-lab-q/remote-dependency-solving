@@ -4,10 +4,14 @@
 
 START_TEST(test_cfg_parsing)
 {
+  ssds_gc_init();
+
   number_read();
   invalid_file();
   param_too_long();
   complex_read();
+
+  ssds_gc_cleanup();
 }
 END_TEST
 
@@ -42,7 +46,7 @@ int complex_read()
   fail_if(p1 != 951);
   fail_if(p2 != 789);
 
-  free(address);
+  ssds_free(address);
   fclose(tempfile);
   remove("../connection.cfg");
 
@@ -72,7 +76,7 @@ int invalid_file()
   fail_if(p1 != 2345);
   fail_if(p2 != 2346);
 
-  free(address);
+  ssds_free(address);
   fclose(tempfile);
   remove("../connection.cfg");
 
@@ -100,7 +104,7 @@ int param_too_long()
 
   fail_if(p1 != 4815);
   
-  free(address);
+  ssds_free(address);
   fclose(tempfile);
   remove("../connection.cfg");
 
@@ -125,13 +129,13 @@ int number_read()
   char *res = file_read_value(tempfile, 0);
   fail_if(strcmp(res, "4815162342") != 0);
 
-  free(res);
+  ssds_free(res);
 
   fseek(tempfile, 0, SEEK_SET);
   file_read_value(tempfile, 4);
   fail_if(strcmp(res, "481") != 0);
   
-  free(res);
+  ssds_free(res);
   fclose(tempfile);
   remove("../connection.cfg");
 
