@@ -3,6 +3,7 @@ set (SSDS_TEST_FILES
 	test_dummy.c
 	test_template.c
 	test_cfg_parsing.c
+	test_params.c
 	)
 
 add_executable(test_main ${SSDS_TEST_FILES})
