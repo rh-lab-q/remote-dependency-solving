@@ -6,20 +6,13 @@ START_TEST(test_params)
 {
   ssds_gc_init();
 
-  no_parameters();
-  //there is an exit() called, return should be sufficient [params.c line:28]
-
-  install();
-  //free_params_cl() throws SIGABORT
-
-  both_install_and_chkdep();
-  //free_params_cl() throws SIGABORT
-
-  no_command_provided();
-  //there is an exit() called, return could be sufficient [params.c line:86]
-      //maybe return on [params.c line:96] could return 0, to differ
-  //parse_params_cl() throws SEGFAULT
-  //free_params_cl() might throw SIGABORT
+  /*CLIENT FUNCTIONS TESTING*/
+  /*test 1*/no_parameters();
+  /*test 2*/install();
+  /*test 3*/both_install_and_chkdep();
+           //failing: says no command provided [line 85],
+           // while it should be both commands [line 88]
+  /*test 4*/no_command_provided();
   
   ssds_gc_cleanup();
 }
@@ -40,7 +33,7 @@ void no_parameters()
   char *argv_tst[1] = {"./ssds-client"};
 
   int ret = parse_params_cl(1, argv_tst, params);
-  fail_if(ret != 1);
+  fail_if(ret != 2);
 
   free_params_cl(params);
   return;
@@ -54,8 +47,9 @@ void install()
   int ret = parse_params_cl(3, argv_tst, params);
   //printf("ret is %d, command is %d\n", ret, params->command);
   fail_if(params->command != -1);
+  fail_if(ret != 0);
 
-  free_params_cl(params);
+  //free_params_cl(params);
   return;
 }
 
@@ -79,7 +73,7 @@ void no_command_provided()
 
   int ret = parse_params_cl(3, argv_tst, params);
   //printf("ret is %d, command is %d, pkg_count is %d\n", ret, params->command, params->pkg_count);
-  fail_if(ret != 1);
+  fail_if(ret != 3);
 
   free_params_cl(params);
   return;

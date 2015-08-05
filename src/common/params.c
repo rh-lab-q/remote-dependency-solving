@@ -25,7 +25,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
   if(argc==1)
   {
     ssds_log(logERROR, "No command provided. The program will terminate now.\n");
-    exit(1);
+    return 2;
   }
   
   static int param_opt; //needs to be static or else make fails
@@ -83,7 +83,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
   if(seen == 0)
   {
     ssds_log(logERROR, "No command provided. The program will terminate now.\n");
-    exit(1);
+    return 3;
   }
   if(optind < argc)
   {
@@ -93,7 +93,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
       params->pkg_count++;
     }
   }
-  return 1;
+  return 0;
 }
 
 ParamOptsCl* init_params_cl()

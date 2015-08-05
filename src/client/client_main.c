@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
 
   ParamOptsCl* params = init_params_cl();
   
-  if(parse_params_cl(argc, argv, params) == -1)
+  if(parse_params_cl(argc, argv, params) != 0)
   {
     ssds_gc_cleanup();
     return 1;
