@@ -56,6 +56,7 @@ struct SsdsJsonCreate{
    JsonGenerator * generator; /**< Holds structure for generatig json from scraps */
    JsonNode* rootNode;        /**< Points to root of json */
    JsonNode* codeNode;        /**< Points to node holding control code */
+   JsonNode* dataNode;        /**< Points to node holding data part of json */
    JsonNode* currNode;        /**< Currently used node */
    JsonObject* rootObj;       /**< Root object - used for adding new objects */
    JsonObject* dataObj;       /**< Data object - used for adding objects under data */
@@ -63,75 +64,88 @@ struct SsdsJsonCreate{
    JsonArray* currArray;      /**< Currently used array */
 };
 
-/** 
- * Return new json_create structure
- * @return          new allocated json_create structure
+
+/**
+ * Type of data that is inserted into objects or arrays
  */
-SsdsJsonCreate* ssds_js_cr_init();
+typedef enum {
+  JS_STRING = 0,
+  JS_INT,
+  JS_BOOL,
+  JS_ARRAY,
+  JS_OBJ
+}SsdsJsInsType;
 
-/** 
- * Inserts control code sequence into json_create structure.
- * The code cannot be omitted at any circumstances
- * @param json      SsdsJsonCreate*
- * @param code      int
+
+/**
+ * Returns new SsdsJsonCreate structure - this structure is needed during the whole process of json creation
+ * @return          newly allocated SsdsJsonCreate structure
  */
-void ssds_js_insert_code(SsdsJsonCreate* json, int code);
+SsdsJsonCreate* ssds_js_cr_init(int code);
 
-/** 
- * Adds name of package requested by client into json_create structure.
- * Adds only one name at a time - needs to be called in a loop
- * @param json      SsdsJsonCreate*
- * @param package   char*
+/**
+ * Adds a new element into currArray from SsdsJsonCreate structure
+ * Array that is created last is set to be currArray. For inserting elements to defferent array use ssds_js_cr_switch_array
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param type      SsdsJsInsType - integer identifying type of data inserted as a new element
+ * @param data      data to be inserted - string, int, or bool - for object and array use NULL
  */
-void ssds_js_add_package(SsdsJsonCreate* json, char* package);
+void ssds_js_cr_add_array_member(SsdsJsonCreate* json, int type, void* data);
 
-/** 
- * Adds infotmation about one repo located on client machine.
- * Adds only one repo structutre at a time - needs to be called in a loop
- * @param json      SsdsJsonCreate*
- * @param url       char**
- * @param name      char*
- * @param type      int
- * @param url_count int
+/**
+ * Adds a new element into currObj from SsdsJsonCreate structure. 
+ * Works the same way as ssds_js_cr_add_array_member.
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param type      SsdsJsInsType - integer identifying type of data inserted as a new element
+ * @param data      data to be inserted - string, int, or bool - for object and array use NULL
+ * @param name      string to be used as a name for new element
  */
-void ssds_js_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int url_count);
+void ssds_js_cr_add_obj_member(SsdsJsonCreate* json, int type, void* data, const char* name);
 
-
-/** 
- * Adds object for packages requested by client into json_create structure.
- * Used by ssds_js_pkgs_insert on server side
- * @param json      SsdsJsonCreate*
+/**
+ * Adds new element into top level data object. It can be array, object, string, bool or int.
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param type      SsdsJsInsType - integer identifying type of data inserted as a new element
+ * @param data      data to be inserted - string, int, or bool - for object and array use NULL
+ * @param name      string to be used as a name for new element
  */
-void ssds_js_pkgs_init(SsdsJsonCreate* json);
+void ssds_js_cr_new_data(SsdsJsonCreate* json, int type, const char* name, void* data);
 
-/** 
- * Adds one package into install_pkgs in json_create on server side.
- * One package includes information about packages that need to be installed, erased or upgraded
- * @param json      SsdsJsonCreate*
- * @param goal      HyGoal*
- * @param name      const char*
+/**
+ * Finds an array anywhere in the json structure and sets json->currArray as the currently active array.
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param name      String used as the array identifier
+ * @return          TRUE if array with given name is found and set, otherwise FALSE
  */
-void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name);
+gboolean ssds_js_cr_switch_array(SsdsJsonCreate* json, const char* name);
 
-/** 
- * Converts json_create into string so that it can be sent over network
- * @param json      SsdsJsonCreate*
- * @return          char*
+/**
+ * Sets array one level above the current array as the current array.
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
  */
-char* ssds_js_to_string(SsdsJsonCreate* json);
+void ssds_js_cr_upper_array(SsdsJsonCreate* json);
 
-/** 
- * Used for debugging json_create.
- * Prints whole structure to stdout
- * @param json      SsdsJsonCreate*
+/**
+ * Sets object one level above current object as current object
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
  */
-void ssds_js_dump(SsdsJsonCreate* json);
+void ssds_js_cr_upper_obj(SsdsJsonCreate* json);
 
+/**
+ * Converts data in memory represented by SsdsJsonCreate to string.
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
+ */
+char* ssds_js_cr_to_string(SsdsJsonCreate* json);
 
-/******************************************************************/
-/* json_read part - implementation of functions in json_read.c    */
-/******************************************************************/
+/**
+ * Function used for debugging - use it to dump the created json to stdout.
+ * @param json      SsdsJsonCreate structure holding the json structure in memory
+ */
+void ssds_js_cr_dump(SsdsJsonCreate* json);
 
+/**********************************************************************************************
+ * Json read - this part describes functions used when parsing recieved json structure        *
+ **********************************************************************************************/
 /** 
  * Used by client to save names of packages requested by user.
  * Names are parsed from parameters 
@@ -200,6 +214,102 @@ struct SsdsJsonInstall{
   char* base_url;   /** < base_url for package download or null */
   char* metalink;   /** < metalink or null */
 };
+/**
+ * Returns new SsdsJsonRead structure - this structure is needed during the whole process of json parsing
+ * @return          newly allocated SsdsJsonCreate structure
+ */
+SsdsJsonRead* ssds_json_rd_init();
+
+/**
+ * Parses string representing json structure into SsdsJsonRead structure.
+ * @param buffer    Json structure in a string
+ * @param json      SsdsJsonRead structure holding parsed json in memory
+ * @return          Returns TRUE if the recieved json is valid, FALSE otherwise - TODO
+ */
+gboolean ssds_rd_parse(char* buffer, SsdsJsonRead* json);
+
+/**
+ * Extracts status code from json.
+ * @param json      SsdsJsonRead structure holding parsed json in memory
+ * @return          status code from recieved json
+ */
+int ssds_rd_get_code(SsdsJsonRead* json);
+
+/**
+ * Finds all elements from recieved json. x_path is a string describing path to the elements. 
+ * All elements found are placed in a GList.
+ * @param json      SsdsJsonRead structure holding parsed json in memory
+ * @param x_path    JsonPath format as a string - TODO
+ * @return          GList of all elements found - this needs to be freed afterwards
+ */
+GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path);
+
+// ================================================================================================
+
+/** 
+ * Inserts control code sequence into json_create structure.
+ * The code cannot be omitted at any circumstances
+ * @param json      SsdsJsonCreate*
+ * @param code      int
+ */
+void ssds_js_insert_code(SsdsJsonCreate* json, int code);
+
+/** 
+ * Adds name of package requested by client into json_create structure.
+ * Adds only one name at a time - needs to be called in a loop
+ * @param json      SsdsJsonCreate*
+ * @param package   char*
+ */
+void ssds_js_add_package(SsdsJsonCreate* json, char* package);
+
+/** 
+ * Adds infotmation about one repo located on client machine.
+ * Adds only one repo structutre at a time - needs to be called in a loop
+ * @param json      SsdsJsonCreate*
+ * @param url       char**
+ * @param name      char*
+ * @param type      int
+ * @param url_count int
+ */
+void ssds_js_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int url_count);
+
+
+/** 
+ * Adds object for packages requested by client into json_create structure.
+ * Used by ssds_js_pkgs_insert on server side
+ * @param json      SsdsJsonCreate*
+ */
+void ssds_js_pkgs_init(SsdsJsonCreate* json);
+
+/** 
+ * Adds one package into install_pkgs in json_create on server side.
+ * One package includes information about packages that need to be installed, erased or upgraded
+ * @param json      SsdsJsonCreate*
+ * @param goal      HyGoal*
+ * @param name      const char*
+ */
+void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name);
+
+/** 
+ * Converts json_create into string so that it can be sent over network
+ * @param json      SsdsJsonCreate*
+ * @return          char*
+ */
+char* ssds_js_to_string(SsdsJsonCreate* json);
+
+/** 
+ * Used for debugging json_create.
+ * Prints whole structure to stdout
+ * @param json      SsdsJsonCreate*
+ */
+void ssds_js_dump(SsdsJsonCreate* json);
+
+
+/******************************************************************/
+/* json_read part - implementation of functions in json_read.c    */
+/******************************************************************/
+
+
 
 /**
  * Returns new json_read structure
