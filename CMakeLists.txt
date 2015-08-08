@@ -102,7 +102,8 @@ set (ssds_common_headers
 	src/common/network_util.h
 	src/common/params.h
 	src/common/mem_management.h
-	src/common/cfg_parsing.h)
+	src/common/cfg_parsing.h
+	src/common/errors.h)
 add_library(lib_ssds_common SHARED ${ssds_common_srcs} ${ssds_common_headers})
 target_link_libraries(lib_ssds_common
 	${LIBS}

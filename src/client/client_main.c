@@ -178,7 +178,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect comm. socket on server. Please, check out your network connection and try it again later.\n");
     ssds_gc_cleanup();
-    return NEWTORKING_ERROR;
+    return NETWORKING_ERROR;
   }
 
   connection_try = 1;
@@ -193,7 +193,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect data socket on server. Please, check out your network connection and try it again later.\n");
     ssds_gc_cleanup();
-    return NEWTORKING_ERROR;
+    return NETWORKING_ERROR;
   }
   ssds_log(logMESSAGE, "Connection to server is established.\n");
   
@@ -241,7 +241,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
       {
         ssds_log(logERROR, "Networking error while sending @System.solv file.\n");
         ssds_gc_cleanup();
-        return NEWTORKING_ERROR;
+        return NETWORKING_ERROR;
       }
   }
   msg_output = "@System.solv file sent";
@@ -262,7 +262,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   {
     ssds_log(logERROR, "Error while recieving data\n");
     ssds_gc_cleanup();
-    return NEWTORKING_ERROR;
+    return NETWORKING_ERROR;
   }
   ssds_log(logDEBUG, "Answer is OK.\n\n%s\n\n", buf);
   
