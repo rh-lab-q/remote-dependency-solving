@@ -25,7 +25,7 @@ int main(int argc, char* argv[]){
   if(parse_params_cl(argc, argv, params) != 0)
   {
     ssds_gc_cleanup();
-    return 1;
+    return PARAMS_ERROR;
   }
 
   ssds_log(logDEBUG, "Client params initialized.\n");
@@ -84,7 +84,7 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   if(!ssds_parse_default_repo(local_repo))
   {
      ssds_gc_cleanup();
-     return 1;
+     return REPO_ERROR;
   }
   ssds_log(logDEBUG, "Local repo is parsed. Package count %d.\n", params->pkg_count);
 
@@ -162,7 +162,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   {
     ssds_log(logERROR, "Client encountered an error when creating sockets for communication and data.\n");
     ssds_gc_cleanup();
-    return 1;
+    return SOCKET_ERROR;
   }
 
   ssds_log(logDEBUG, "Socket controll - OK.\n"); 
@@ -178,7 +178,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect comm. socket on server. Please, check out your network connection and try it again later.\n");
     ssds_gc_cleanup();
-    return 1;
+    return NEWTORKING_ERROR;
   }
 
   connection_try = 1;
@@ -193,7 +193,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   if(connection_try == 3){
     ssds_log(logERROR, "Unable to connect data socket on server. Please, check out your network connection and try it again later.\n");
     ssds_gc_cleanup();
-    return 1;
+    return NEWTORKING_ERROR;
   }
   ssds_log(logMESSAGE, "Connection to server is established.\n");
   
@@ -213,7 +213,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   {
     ssds_log(logERROR,"Error while opening @System.solv file.\n");
     ssds_gc_cleanup();
-    return 1;
+    return FILE_ERROR;
   }
 
   ssds_log(logDEBUG, "Preparing .solv variables.\n");
@@ -230,12 +230,19 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   {
       snprintf(msg_length,10,"%d",(int)bytes_read);
       write(comm_sock, msg_length, strlen(msg_length));
-      ssds_log(logDEBUG, "Command send.\n");
+      ssds_log(logDEBUG, "Command sent.\n");
       write(data_sock, buffer, bytes_read);
-      ssds_log(logDEBUG, "Data send.\n");
+      ssds_log(logDEBUG, "Data sent.\n");
+
       server_response = sock_recv(comm_sock);
+
       // TODO: fix this nonsens vvvvvvvvvvvvv
-      if(strcmp(server_response,"OK") != 0){}
+      if(strcmp(server_response,"OK") != 0)
+      {
+        ssds_log(logERROR, "Networking error while sending @System.solv file.\n");
+        ssds_gc_cleanup();
+        return NEWTORKING_ERROR;
+      }
   }
   msg_output = "@System.solv file sent";
   write(comm_sock, msg_output, strlen(msg_output));
@@ -255,7 +262,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   {
     ssds_log(logERROR, "Error while recieving data\n");
     ssds_gc_cleanup();
-    return 1;
+    return NEWTORKING_ERROR;
   }
   ssds_log(logDEBUG, "Answer is OK.\n\n%s\n\n", buf);
   
@@ -266,7 +273,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   {
     ssds_log(logERROR, "Error while parsing answer from the server\n");
     ssds_gc_cleanup();
-    return 1;
+    return JSON_ERROR;
   }
   
   ssds_log(logDEBUG, "Parse init.\n");
@@ -324,7 +331,7 @@ int download_packages(SsdsJsonAnswer* answer_from_srv, GSList **package_list_ret
       ssds_log(logERROR, "%d: %s\n", error->code, error->message);
       g_error_free(error);
       ssds_gc_cleanup();
-      return 1;
+      return DOWNLOAD_ERROR;
   }
 
   ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
@@ -365,5 +372,5 @@ int install_packages(SsdsJsonAnswer* answer_from_srv, GSList *package_list)
     
   ssds_gc_cleanup();
 
-  return 0;
+  return EXIT_SUCCESS;
 }

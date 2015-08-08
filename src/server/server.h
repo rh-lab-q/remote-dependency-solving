@@ -18,6 +18,8 @@ extern "C"{
 #include "../common/mem_management.h"
 #include "../../cmake/Config/version_conf.h"
 #include "../common/cfg_parsing.h"
+#include "../common/errors.h"
+
 
 
 #ifdef __cplusplus
