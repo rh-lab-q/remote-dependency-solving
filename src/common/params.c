@@ -65,7 +65,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
         
       case '?':
         print_help_cl();
-        exit(EXIT_FAILURE);
+        exit(PARAMS_ERROR);
         break;
     }
     
@@ -130,7 +130,7 @@ void parse_params_srv(int argc, char* argv[])
         break;
       default: /* '?' */
         print_help_srv();
-        exit(EXIT_FAILURE);
+        exit(PARAMS_ERROR);
     }
   }
 }

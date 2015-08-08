@@ -24,6 +24,7 @@
 #include "includes.h"
 #include "log_handler.h"
 #include "mem_management.h"
+#include "errors.h"
 
 #ifdef __cplusplus
 extern "C"{

@@ -57,7 +57,10 @@ void ssds_gc_cleanup()
 		item = next;
 	}
 	free(global_gc);
-	ssds_log(logMESSAGE,"Number of items: %d Memory allocated: %d \n",num_items, allocated);
+	global_gc = NULL;
+	ssds_log(logDEBUG,"Number of items: %d Memory allocated: %d \n",num_items, allocated);
+	allocated = 0;
+	num_items = 0;
 }
 
 Ssds_gc_item * ssds_gc_search(Alloc_data * data, int type)
@@ -123,7 +126,7 @@ void ssds_gc_push(Alloc_data * data, int type)
 	{
 		fprintf(stderr, "Failed to allocate new item in ssds_gc_push.\n");
 		ssds_gc_cleanup();
-		exit(1);
+		exit(MEMORY_ERROR);
 	}
 	new_item->type = type;
 	new_item->next = NULL;
@@ -201,8 +204,6 @@ void * ssds_realloc(void * old_ptr, int size)
 	{
 		ssds_log(logERROR, "Failed to reallocate pointer in ssds_realloc.\n");
 		return NULL;
-		//ssds_gc_cleanup();
-		//exit(1);
 	}
 	if(new_ptr != old_ptr)
 	{
@@ -221,8 +222,6 @@ void * ssds_malloc(int size)
 	{
 		ssds_log(logERROR, "Failed to allocate pointer in ssds_malloc.\n");
 		return NULL;
-		//ssds_gc_cleanup();
-		//exit(1);
 	}
 	ssds_gc_push_ptr(new_ptr);
 	return new_ptr;
@@ -237,8 +236,6 @@ void * ssds_calloc(int n_items, int size)
 	{
 		ssds_log(logERROR, "Failed to allocate pointer in ssds_malloc.\n");
 		return NULL;
-		//ssds_gc_cleanup();
-		//exit(1);
 	}
 	ssds_gc_push_ptr(new_ptr);
 	return new_ptr;
@@ -251,8 +248,7 @@ void ssds_gc_init()
 	if(global_gc == NULL)
 	{
 		ssds_log(logERROR, "Failed to allocate garbace collector.\n");
-		//ssds_gc_cleanup();
-		exit(1);
+		exit(MEMORY_ERROR);
 	}
 	global_gc->top = NULL;
 }
@@ -265,8 +261,6 @@ int ssds_socket(int domain, int type, int protocol)
 	{
 		ssds_log(logERROR, "Failed to open socket.\n");
 		return -1;
-		//ssds_gc_cleanup();
-		//exit(1);
 	}
 	ssds_gc_push_socket(new_socket);
 	return new_socket;
@@ -280,9 +274,12 @@ int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restri
 	{
 		ssds_log(logERROR, "Failed to accept socket.\n");
 		return -1;
-		//ssds_gc_cleanup();
-		//exit(1);
 	}
 	ssds_gc_push_socket(new_socket);
 	return new_socket;
+}
+
+Ssds_gc * ssds_gc_get_header()
+{
+	return global_gc;
 }
