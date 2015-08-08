@@ -47,17 +47,23 @@ int main(int argc, char* argv[]) {
   /*******************************************************************/
   /* Setting up garbage collector and setting callback functions */
   /*******************************************************************/
-  /*ssds_gc_init();
+  ssds_gc_init();
   signal(SIGINT, ssds_signal_handler);
   signal(SIGBUS, ssds_signal_handler);
   signal(SIGSEGV, ssds_signal_handler);
   signal(SIGTERM, ssds_signal_handler);
-  */
+  
   ssds_log(logDEBUG, "Server started.\n");
 
   parse_params_srv(argc, argv);
     
   ssds_log(logDEBUG, "Params parsed.\n");
+
+  return core();
+}
+
+int core()
+{
   /*************************************************************************
   * 
   * 	Establishing port, socket etc for the communication
@@ -66,23 +72,23 @@ int main(int argc, char* argv[]) {
   int comm_desc, comm_sock, data_desc, data_sock, enable = 1;
   char* client_ip;
 
-  comm_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  data_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  int yes=1;
+  comm_desc = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  data_desc = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  int yes = 1;
 
   setsockopt(comm_desc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
   setsockopt(data_desc, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
   
-  if(comm_desc==-1)
+  if(comm_desc == -1)
   {
-    ssds_log(logERROR, "Server encountered an error when creating socket for communication");
-   // ssds_gc_cleanup();
+    ssds_log(logERROR, "Server encountered an error when creating socket for communication.\n");
+    ssds_gc_cleanup();
     return 1;
   }
-  if(data_desc==-1)
+  if(data_desc == -1)
   {
-    ssds_log(logERROR, "Server encountered an error when creating socket for sending data");
-   // ssds_gc_cleanup();
+    ssds_log(logERROR, "Server encountered an error when creating socket for sending data.\n");
+    ssds_gc_cleanup();
     return 1;
   }
   
@@ -90,53 +96,53 @@ int main(int argc, char* argv[]) {
   
   struct sockaddr_in server_comm, server_data, client_comm, client_data;
 
-  server_comm.sin_family=AF_INET;
-  server_comm.sin_addr.s_addr=INADDR_ANY;
-  server_comm.sin_port=htons(2345);
+  server_comm.sin_family = AF_INET;
+  server_comm.sin_addr.s_addr = INADDR_ANY;
+  server_comm.sin_port = htons(2345);
 
-  server_data.sin_family=AF_INET;
-  server_data.sin_addr.s_addr=INADDR_ANY;
-  server_data.sin_port=htons(2346);
+  server_data.sin_family = AF_INET;
+  server_data.sin_addr.s_addr = INADDR_ANY;
+  server_data.sin_port = htons(2346);
 
-  if(bind(comm_desc, (struct sockaddr*)&server_comm, sizeof(server_comm)) <0)
+  if(bind(comm_desc, (struct sockaddr*)&server_comm, sizeof(server_comm)) < 0)
   {
-    ssds_log(logERROR, "Server wasn't able to bind with communication socket\n");
-   // ssds_gc_cleanup();
+    ssds_log(logERROR, "Server wasn't able to bind with communication socket.\n");
+    ssds_gc_cleanup();
     return 1;
   }
  
   if(setsockopt(comm_desc, SOL_SOCKET, SO_REUSEADDR, (char *)&enable, sizeof(enable)) < 0){
     ssds_log(logERROR, "Server wasn't able to set communication socket option.\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
 
-  if(bind(data_desc, (struct sockaddr*)&server_data, sizeof(server_data)) <0)
+  if(bind(data_desc, (struct sockaddr*)&server_data, sizeof(server_data)) < 0)
   {
     ssds_log(logERROR, "Server wasn't able to bind with data socket\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
   
   if(setsockopt(data_desc, SOL_SOCKET, SO_REUSEADDR, (char *)&enable, sizeof(enable)) < 0){
     ssds_log(logERROR, "Server wasn't able to set data socket option.\n");
-   // ssds_gc_cleanup();
+    ssds_gc_cleanup();
     return 1;
   }
 
-  ssds_log(logINFO, "Server started. Waiting for incoming connections\n");
+  ssds_log(logINFO, "Server started. Waiting for incoming connections.\n");
   
-  if(listen(comm_desc, 5)!=0)
+  if(listen(comm_desc, 5) != 0)
   {
-    ssds_log(logERROR, "Listen failed on communication socket on server\n");
-   // ssds_gc_cleanup();
+    ssds_log(logERROR, "Listen failed on communication socket on server.\n");
+    ssds_gc_cleanup();
     return 1;
   }
 
-  if(listen(data_desc, 5)!=0)
+  if(listen(data_desc, 5) != 0)
   {
-    ssds_log(logERROR, "Listen failed on data socket on server\n");
-   // ssds_gc_cleanup();
+    ssds_log(logERROR, "Listen failed on data socket on server.\n");
+    ssds_gc_cleanup();
     return 1;
   }
   
@@ -148,37 +154,37 @@ int main(int argc, char* argv[]) {
   while(1)
   {
     client_finished = 0;
-    if((comm_sock=accept(comm_desc, (struct sockaddr *) &client_comm, (socklen_t*)&comm_addr_len))<0)
+    if((comm_sock = ssds_accept(comm_desc, (struct sockaddr *) &client_comm, (socklen_t*)&comm_addr_len)) < 0)
     {
-      ssds_log(logERROR, "Accept connection has failed");
-  //    ssds_gc_cleanup();
+      ssds_log(logERROR, "Accept connection has failed.\n");
+      ssds_gc_cleanup();
       return 1;
     }
-    if((data_sock=accept(data_desc, (struct sockaddr *) &client_data, (socklen_t*)&data_addr_len))<0)
+    if((data_sock = ssds_accept(data_desc, (struct sockaddr *) &client_data, (socklen_t*)&data_addr_len)) < 0)
     {
       ssds_log(logERROR, "Accept on data socket has failed");
-     // ssds_gc_cleanup();
+      ssds_gc_cleanup();
       return 1;
     }
-    client_ip=inet_ntoa(client_comm.sin_addr);
+    client_ip = inet_ntoa(client_comm.sin_addr);
     ssds_log(logMESSAGE, "Connection accepted from ip address %s\n", client_ip);
 
     //reading messages in loop and resolving them
     while(!client_finished)
     {
-        buf=sock_recv(comm_sock);
-
+        buf = sock_recv(comm_sock);
+ 
         if(buf == NULL)
         {
-          ssds_log(logERROR, "Recieving of message has failed\n");
-     //     ssds_gc_cleanup();
+          ssds_log(logERROR, "Recieving of message has failed.\n");
+          ssds_gc_cleanup();
           return 1;
         }        
 
         SsdsJsonRead* json = ssds_json_read_init();
         if(!ssds_read_parse(buf, json))//parse incoming message
         {
-          ssds_log(logERROR, "False data recieved from %s. Client rejected\n", client_ip);
+          ssds_log(logERROR, "False data recieved from %s. Client rejected.\n", client_ip);
           continue;
         }
 
@@ -191,14 +197,16 @@ int main(int argc, char* argv[]) {
             if(f == NULL)
             {
                 ssds_log(logERROR,"Error while creating @System.solv file.\n");
-       //         ssds_gc_cleanup();
+                ssds_gc_cleanup();
                 return 1;
             }
+
             char* data_buffer;
             char* comm_buffer;
             char* end_ptr;
             size_t bytes_written, bytes_to_write;
             int i = 0;
+       
             write(comm_sock, "OK", strlen("OK"));
             while(1)
             {
@@ -216,7 +224,7 @@ int main(int argc, char* argv[]) {
                 ssds_log(logDEBUG, "Writing %d bytes to @System.solv file for the %d. time.\n", bytes_written, ++i);
             }
             fclose(f);
-            ssds_log(logDEBUG, "Finished writing @System.Solv file.\n");
+            ssds_log(logDEBUG, "Finished writing @System.solv file.\n");
             break;
 
         case 123:
@@ -228,7 +236,7 @@ int main(int argc, char* argv[]) {
             ssds_read_get_packages(pkgs, json);
 
             ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
-            for(int i=0; i<pkgs->length; i++)
+            for(int i = 0; i < pkgs->length; i++)
             {
               ssds_log(logDEBUG, "\t%s\n", pkgs->packages[i]);
             }
@@ -238,10 +246,10 @@ int main(int argc, char* argv[]) {
             SsdsRepoInfoList* list = ssds_read_list_init();
             ssds_read_repo_info(json, list);
 
-            guint len=g_slist_length(list->repoInfoList);
+            guint len = g_slist_length(list->repoInfoList);
 
             ssds_log(logDEBUG, "Repositories, count: %d: \n", len);
-            for(unsigned int i=0; i<len; i++)
+            for(unsigned int i = 0; i < len; i++)
             {
               SsdsRepoInfo* info = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
               ssds_log(logDEBUG, "\t%d: %s\n", i, info->name);
@@ -275,9 +283,9 @@ int main(int argc, char* argv[]) {
         }
     }
   //ssds_gc_remove_socket(comm_sock);
-  close(comm_sock);
+  ssds_close(comm_sock);
   //ssds_gc_remove_socket(data_sock);
-  close(data_sock);
+  ssds_close(data_sock);
   }
   //ssds_solving::solve solveHandler;
 
@@ -326,5 +334,6 @@ int main(int argc, char* argv[]) {
   }
 
 #endif
+  ssds_gc_cleanup();
   return 0;
 }

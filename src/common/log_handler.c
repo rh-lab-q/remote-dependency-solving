@@ -30,14 +30,14 @@ void ssds_log(int log_level, const char *message, ...)
   time_t current_time = time(NULL);
   struct tm *ts = localtime(&current_time);
   
-  if(flog==NULL)
+  if(flog == NULL)
   {
     fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: ERROR: Unable to open log file \n",
             ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
     exit(EXIT_FAILURE);
   }
   
-  if(log_level!=logDEBUG)
+  if(log_level != logDEBUG)
     fprintf(flog, "(%d/%d/%d %02d:%02d:%02d) SSDS: %s: ", 
             ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec,
             log_lvl_msg[log_level]);//beginning of every message
@@ -47,7 +47,7 @@ void ssds_log(int log_level, const char *message, ...)
   
   switch(log_level){
     case logINFO:
-      if(__verbose==1)
+      if(__verbose == 1)
       {
         fprintf(stderr, "SSDS: INFO: ");
         vfprintf(stderr, message, args);
@@ -69,7 +69,7 @@ void ssds_log(int log_level, const char *message, ...)
       vfprintf(stderr, message, args);
       break;
     case logDEBUG:
-      if(__debug==1)
+      if(__debug == 1)
       {
         fprintf(stderr, "(%d/%d/%d %02d:%02d:%02d) SSDS: DEBUG: ",
                 ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, ts->tm_hour, ts->tm_min, ts->tm_sec);
@@ -78,7 +78,7 @@ void ssds_log(int log_level, const char *message, ...)
       break;
   }
   
-  if(log_level!=logDEBUG)
+  if(log_level != logDEBUG)
   {
     va_start(args, message);
     vfprintf(flog, message, args);
@@ -89,20 +89,20 @@ void ssds_log(int log_level, const char *message, ...)
 
 void set_verbose()
 {
-  __verbose=1;
+  __verbose = 1;
 }
 
 void unset_verbose()
 {
-  __verbose=0;
+  __verbose = 0;
 }
 
 void set_debug()
 {
-  __debug=1;
+  __debug = 1;
 }
 
 void unset_debug()
 {
-  __debug=0;
+  __debug = 0;
 }

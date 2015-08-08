@@ -36,14 +36,14 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
 {
  // for(ssds_repo::metadata_files_location* loc : metadata.files_locations)
   guint i;
-  for(i=0; i<g_slist_length(list->files_locations); i++)
+  for(i = 0; i < g_slist_length(list->files_locations); i++)
   {
     SsdsMetadataFilesLoc* file = (SsdsMetadataFilesLoc*)g_slist_nth_data(list->files_locations, i);
     HyRepo repo = hy_repo_create(file->repo_name);
 //     ssds_log(logDEBUG, "repomd: %s\n filelists: %s\nprimary: %s\n", file->repomd, file->filelists, file->primary);
     
     int path_len = strlen(file->repomd)+strlen("/repodata/repomd.xml");
-    char* repomd_path = (char*)malloc((path_len+1)*sizeof(char));
+    char* repomd_path = (char*)ssds_malloc((path_len+1)*sizeof(char));
     memset(repomd_path, '\0', path_len+1);
     strcpy(repomd_path, file->repomd);
     strcat(repomd_path, "/repodata/repomd.xml");
@@ -54,7 +54,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
     hy_repo_set_string(repo, HY_REPO_NAME, file->repo_name);
     
     hy_sack_load_yum_repo(*sack, repo, 0);
-    ssds_log(logDEBUG, "One repo loaded to sack\n");
+    ssds_log(logDEBUG, "One repo loaded to sack.\n");
   }
 }
 
@@ -70,13 +70,13 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
   plist = hy_query_run(query);
     
   HyPackage test;
-  ssds_log(logMESSAGE,"No. of packages found by query: %d\n", hy_packagelist_count(plist));
+  ssds_log(logMESSAGE,"No. of packages found by query: %d.\n", hy_packagelist_count(plist));
   
-  for(int i=0; i<hy_packagelist_count(plist);i++)
+  for(int i = 0; i < hy_packagelist_count(plist); i++)
   {
     test = hy_packagelist_get(plist, i);
-    if(hy_package_get_baseurl(test)==NULL)
-      printf("baliky jsou z: %s \n",hy_package_get_reponame(test));
+    if(hy_package_get_baseurl(test) == NULL)
+      printf("Pkgs're from: %s\n",hy_package_get_reponame(test));
   }
     
   HyPackage pkg;
@@ -85,7 +85,7 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
   /* GOAL */
   HyGoal goal = hy_goal_create(*sack);
   hy_goal_install(goal, pkg);
-  if(hy_goal_run(goal)==0)
+  if(hy_goal_run(goal) == 0)
     ssds_log(logMESSAGE, "Dependencies are ok.\n");
     
 //     answer.install_pkgs_init();
@@ -100,9 +100,9 @@ void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* 
   SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
   ssds_read_get_packages(pkgs, client_data);
   
-  ssds_log(logDEBUG,"Answer after get_packages\n");
+  ssds_log(logDEBUG,"Answer after get_packages.\n");
   int i;
-  for(i=0; i<pkgs->length; i++)
+  for(i = 0; i < pkgs->length; i++)
   {
     ssds_log(logDEBUG,"Answer in for loop.\n");
     ssds_dep_query(pkgs->packages[i], answer, sack);

@@ -15,7 +15,7 @@ extern "C"{
 #include "../common/json_handler.h"
 #include "../common/solving.h"
 #include "../common/params.h"
-//#include "../common/mem_management.h"
+#include "../common/mem_management.h"
 #include "../../cmake/Config/version_conf.h"
 
 
@@ -24,3 +24,5 @@ extern "C"{
 #endif
 
 #endif
+
+int core();

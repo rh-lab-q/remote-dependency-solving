@@ -23,7 +23,7 @@
 
 SsdsJsonCreate* ssds_js_cr_init()
 {
-  SsdsJsonCreate* new = (SsdsJsonCreate*)malloc(sizeof(SsdsJsonCreate));
+  SsdsJsonCreate* new = (SsdsJsonCreate*)ssds_malloc(sizeof(SsdsJsonCreate));
   
   new->generator = json_generator_new();
   new->rootNode = json_node_new(JSON_NODE_OBJECT);
@@ -191,7 +191,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     json_object_set_string_member(new_obj, (gchar*)"pkg_name", hy_package_get_name(pkg));
     json_object_set_string_member(new_obj, (gchar*)"pkg_loc", hy_package_get_location(pkg));
     
-    if(hy_package_get_baseurl(pkg)==NULL)
+    if(hy_package_get_baseurl(pkg) == NULL)
     {
       json_object_set_string_member(new_obj, (gchar*)"base_url", NULL);
       json_object_set_string_member(new_obj, (gchar*)"metalink", hy_package_get_reponame(pkg));
@@ -199,7 +199,7 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     else
     {
       json_object_set_string_member(new_obj, (gchar*)"base_url", hy_package_get_baseurl(pkg));
-      json_object_set_string_member(new_obj, (gchar*)"metalink", NULL);
+      json_object_set_string_member(new_obj, (gchar*)"metalink", hy_package_get_reponame(pkg));
     }
   }
   

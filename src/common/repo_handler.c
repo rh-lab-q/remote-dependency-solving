@@ -22,7 +22,7 @@
 
 SsdsLocalRepoInfo* ssds_repo_parse_init()
 { //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch
-  SsdsLocalRepoInfo* new = (SsdsLocalRepoInfo*)malloc(sizeof(SsdsLocalRepoInfo));
+  SsdsLocalRepoInfo* new = (SsdsLocalRepoInfo*)ssds_malloc(sizeof(SsdsLocalRepoInfo));
   new->repoHandler = lr_yum_repoconfs_init(); 
   
   return new;
@@ -48,8 +48,8 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
   GSList* list = lr_yum_repoconfs_get_list(repo->repoHandler, &err);
   
   ssds_log(logDEBUG, "Loop over repoconf list.\n");
-  for(unsigned int i=0; i<g_slist_length(list); i++){
-    char** url = (char **)malloc(1*sizeof(char*));
+  for(unsigned int i = 0; i < g_slist_length(list); i++){
+    char** url = (char **)ssds_malloc(1*sizeof(char*));
     char* name = NULL;
     short type = 0;
     void * val;
@@ -91,9 +91,9 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       //void ** val2;
       if(lr_yum_repoconf_getinfo(conf, &err, LR_YRC_BASEURL, &val) != 0){
 	ssds_log(logDEBUG,"Getting base urls.\n");  
-	free(url);
+	ssds_free(url);
         url = (char**)val; 
-	while(url[k]!=NULL)
+	while(url[k])
 	    k++;
         type = SSDS_BASEURL;
       }
@@ -106,27 +106,27 @@ void ssds_get_repo_urls(SsdsLocalRepoInfo* repo, SsdsJsonCreate* json)
       ssds_log(logDEBUG,"Getting URL size.\n"); 
       ssds_log(logDEBUG,"Size: %d.\n",k); 
       
-      char **url_subst_list=(char**)malloc((k+1)*sizeof(char*));
+      char **url_subst_list = (char**)ssds_malloc((k+1)*sizeof(char*));
       char* url_copy;
       char* url_subst;
  	
       ssds_log(logDEBUG,"Setting urls into json.\n");      
-      for(int j=0; j<k; j++)
+      for(int j = 0; j < k; j++)
       { 
         url_copy = strdup(url[j]);
         url_subst = lr_url_substitute(url_copy, list);
-        url_subst_list[j]=strdup(url_subst);
+        url_subst_list[j] = strdup(url_subst);
         free(url_copy);
         free(url_subst);
       }
-      url_subst_list[k]=NULL;
+      url_subst_list[k] = NULL;
       
       ssds_js_add_repo(json,url_subst_list, name, type, k);
-      free(url);      
-      for(int j=0; j<=k; j++)
+      ssds_free(url);      
+      for(int j = 0; j <= k; j++)
         free(url_subst_list[j]);
       
-      free(url_subst_list);
+      ssds_free(url_subst_list);
     }
   }
 }
