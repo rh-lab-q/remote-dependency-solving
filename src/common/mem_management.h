@@ -169,6 +169,12 @@ int ssds_socket(int domain, int type, int protocol);
  */
 int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
 
+/**
+ * Returns pointer to GC, used for testing
+ * @return          	pointer to GC
+ */
+Ssds_gc * ssds_gc_get_header();
+
 
 #ifdef __cplusplus
 }

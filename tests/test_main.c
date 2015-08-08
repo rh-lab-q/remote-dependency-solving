@@ -10,6 +10,7 @@
 #include "test_template.h"
 #include "test_cfg_parsing.h"
 #include "test_params.h"
+#include "test_gc.h"  
 
 int main()
 {
@@ -22,6 +23,7 @@ int main()
   srunner_add_suite(sr, template_suite());
   srunner_add_suite(sr, cfg_parsing_suite());
   srunner_add_suite(sr, params_suite());
+  srunner_add_suite(sr, gc_suite());
 
 
   //runs all added tests

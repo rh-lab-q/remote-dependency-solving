@@ -57,7 +57,10 @@ void ssds_gc_cleanup()
 		item = next;
 	}
 	free(global_gc);
-	ssds_log(logMESSAGE,"Number of items: %d Memory allocated: %d \n",num_items, allocated);
+	global_gc = NULL;
+	ssds_log(logDEBUG,"Number of items: %d Memory allocated: %d \n",num_items, allocated);
+	allocated = 0;
+	num_items = 0;
 }
 
 Ssds_gc_item * ssds_gc_search(Alloc_data * data, int type)
@@ -285,4 +288,9 @@ int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restri
 	}
 	ssds_gc_push_socket(new_socket);
 	return new_socket;
+}
+
+Ssds_gc * ssds_gc_get_header()
+{
+	return global_gc;
 }
