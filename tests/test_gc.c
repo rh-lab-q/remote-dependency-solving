@@ -43,7 +43,7 @@ void socket_test()
   fail_if(gc != NULL);
 
   ssds_gc_init();
-  int socket, sock_bind, sock_accept;
+  int socket;
 
   socket = ssds_socket(AF_INET, SOCK_STREAM, 0);
   fail_if(socket < 0);
