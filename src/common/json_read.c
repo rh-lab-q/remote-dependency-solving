@@ -27,6 +27,48 @@ SsdsJsonRead* ssds_json_read_init()
   return new;
 }
 
+gboolean ssds_rd_parse(char* buffer, SsdsJsonRead* json)
+{
+  GError *error = NULL;
+    
+  gboolean ret = json_parser_load_from_data(json->parser, (const gchar*)buffer, -1, &error);
+  if(!ret)
+    return EXIT_FAILURE;
+  
+  json->rootNode = json_parser_get_root(json->parser);
+  
+  JsonObject* obj=json_node_get_object(json->rootNode);
+  json->dataNode=json_object_get_member(obj, (gchar*)"data");
+  json->dataObj=json_node_get_object(json->dataNode);
+  return ret;
+}
+
+int ssds_rd_get_code(SsdsJsonRead* json)
+{
+  int ret=-1;
+  JsonObject* obj=json_node_get_object(json->rootNode);
+  if(json_object_has_member(obj, (gchar*)"code"))
+  ret=(int)json_object_get_int_member(obj, "code");
+  
+  return ret;
+}
+
+GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path)
+{
+  GList* ret = NULL;
+  JsonPath* new_path = json_path_new();
+  json_path_compile(new_path, x_path, NULL);
+  
+  JsonNode* root = json_parser_get_root(json->parser);
+  JsonNode* result = json_path_match(new_path, root);
+  JsonArray* result_arr = json_node_get_array(result);
+  
+  ret = json_array_get_elements(result_arr);
+  
+  return ret;
+}
+
+// =================================================================================
 
 gboolean ssds_read_parse(char* buffer, SsdsJsonRead* json)
 {

@@ -274,7 +274,7 @@ int core()
             HySack* sack_p = &sack;
             ssds_fill_sack(sack_p, meta_list);
 
-            SsdsJsonCreate* answer = ssds_js_cr_init();
+            SsdsJsonCreate* answer = ssds_js_cr_init(123);//TODO - correct code needs to be inserted
             ssds_dep_answer(json, answer, sack_p);
             
             ssds_js_dump(answer);
