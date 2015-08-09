@@ -31,7 +31,40 @@ int main(int argc, char* argv[]){
   ssds_log(logDEBUG, "Client params initialized.\n");
   ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
   ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
-  
+ 
+  // this switch is now just for info about selected command
+  switch(params->command)
+  {
+
+	case PAR_INSTALL: 
+		ssds_log(logMESSAGE, "Installation of packages was selected.\n");
+		/* TODO (even in update and dep. check)
+		 *  check id (if NULL - ask for it from server by message)
+		 *  connect to server
+		 *  if new id - send @System.solv
+		 *  parse repo	
+		 *  send repo info to server
+		 *  if some repo on client side missing - read warning from server
+		 *  send message with requested operation and package names to server
+		 *  read dep result
+		 *  print dep result to user
+		 *  
+		 *  ----- only in update and install -----
+		 *  ask if (update/install)/download/cancel 
+		 *  download packages
+		 *  install them
+		 */
+		break;
+	case PAR_UPDATE: 
+		ssds_log(logMESSAGE, "Update of packages was selected.\n");
+                break;
+	case PAR_ERASE: 
+		ssds_log(logMESSAGE, "Erase of packages was selected.\n");
+		break;
+	case PAR_CHK_DEP: 
+		ssds_log(logMESSAGE, "Dependency check of packages was selected.\n");
+		break;
+  } 
  /* SsdsJsonRead *json_read;
   char *repo_output, *msg_output;
   SsdsJsonAnswer* answer_from_srv;
