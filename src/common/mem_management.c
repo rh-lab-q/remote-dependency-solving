@@ -27,6 +27,7 @@ int num_items = 0;
 
 void ssds_signal_handler(int signum)
 {
+	ssds_log(logERROR, "End with signal number %d.\n", signum);
 	ssds_gc_cleanup();
 	exit(signum);
 }
