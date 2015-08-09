@@ -33,6 +33,8 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
   {
     {"install", no_argument, &param_opt, PAR_INSTALL},
     {"chkdep", no_argument, &param_opt, PAR_CHK_DEP},
+    {"update", no_argument, &param_opt, PAR_UPDATE},
+    {"erase", no_argument, &param_opt, PAR_ERASE},
     {"help", no_argument, 0, 'h'}
   };
   
@@ -47,6 +49,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
     switch(c)
     {
       case 0:
+	params->command = long_options[opt_index].val;
         seen++;
         break;
         
@@ -75,7 +78,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 
   if(seen > 1)
   {
-    ssds_log(logMESSAGE, "Choose either install or chkdep. The program will terminate now.\n");
+    ssds_log(logMESSAGE, "Choose either install, update, erase or chkdep. The program will terminate now.\n");
     ssds_log(logERROR, "Wrong parameter combination. Terminating.\n");
     return -1;
   }
@@ -85,6 +88,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
     ssds_log(logERROR, "No command provided. The program will terminate now.\n");
     return 3;
   }
+
   if(optind < argc)
   {
     while(optind < argc)
@@ -141,7 +145,9 @@ void print_help_cl()
   printf("Usage: ./ssds-client <commands> [<packages> ...]\n\n"
          "List of Commands\n\n"
          "--install\t\tResolve dependencies and install packages\n"
-         "--checkdep\t\tOnly show required packages - do not install yet\n"
+         "--update\t\tResolve dependencies and update packages\n"
+         "--erase\t\tErase packages\n"
+         "--chkdep\t\tOnly show required packages - do not install yet\n"
          "--help, -h\t\tDisplays help\n"
          "-v\t\t\tVerbose - turned off by default\n"
          "-d\t\t\tDebug - turned off by default\n"
