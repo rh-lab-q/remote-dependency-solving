@@ -103,7 +103,7 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   SsdsJsonRead* json_read = ssds_js_rd_init();
   ssds_log(logDEBUG, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
   
-  ssds_js_insert_code(json_gen, SEND_REPO); //insert code into json
+  ssds_js_cr_insert_code(json_gen, SEND_REPO); //insert code into json
   ssds_log(logDEBUG, "Inserted code %d into json. Package count %d.\n", SEND_REPO, params->pkg_count);
   
   /*
@@ -145,7 +145,7 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   /*******************************************************************/
 
   SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV);
-  ssds_js_insert_code(json_msg, SEND_SOLV);
+  ssds_js_cr_insert_code(json_msg, SEND_SOLV);
 
   char* msg_output;
   ssds_log(logDEBUG, "Generating output message with info about sending @System.solv file to server.\n");
