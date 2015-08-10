@@ -49,7 +49,7 @@ void ssds_log(int log_level, const char *message, ...)
   
   switch(log_level){
     case logSSDS:
-      fprintf(stdout, "[%d/%d/%d %02d:%02d:%02d SSDS]: ",
+      fprintf(stdout, "\033[92m[%d/%d/%d %02d:%02d:%02d SSDS]\033[0m: ",
                 ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
                 ts->tm_hour, ts->tm_min, ts->tm_sec);
       vfprintf(stdout, message, args);
@@ -58,7 +58,7 @@ void ssds_log(int log_level, const char *message, ...)
     case logINFO:
       if(__verbose == 1)
       {
-        fprintf(stdout, "[%d/%d/%d %02d:%02d:%02d INFO]: ",
+        fprintf(stdout, "\033[96m[%d/%d/%d %02d:%02d:%02d INFO]\033[0m: ",
                 ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
                 ts->tm_hour, ts->tm_min, ts->tm_sec);
         vfprintf(stdout, message, args);
@@ -66,25 +66,25 @@ void ssds_log(int log_level, const char *message, ...)
       break;
 
     case logMESSAGE:
-      fprintf(stdout, "[MESSAGE]: ");
+      fprintf(stdout, "\033[94m[MESSAGE]\033[0m: ");
       vfprintf(stdout, message, args);
       break;
 
     case logWARNING:
-      fprintf(stderr, "[%02d:%02d:%02d WARNING]: ",
+      fprintf(stderr, "\033[93m[%02d:%02d:%02d WARNING]\033[0m: ",
               ts->tm_hour, ts->tm_min, ts->tm_sec);
       vfprintf(stderr, message, args);
       break;
 
     case logERROR:
-      fprintf(stderr, "[%02d:%02d:%02d ERROR]: ",
+      fprintf(stderr, "\033[91m[%02d:%02d:%02d ERROR]\033[0m: ",
               ts->tm_hour, ts->tm_min, ts->tm_sec);
       vfprintf(stderr, message, args);
       break;
     case logDEBUG:
       if(__debug == 1)
       {
-        fprintf(stderr, "[%02d:%02d:%02d DEBUG]: ",
+        fprintf(stderr, "\033[95m[%02d:%02d:%02d DEBUG]\033[0m: ",
                 ts->tm_hour, ts->tm_min, ts->tm_sec);
         vfprintf(stderr, message, args);
       }
