@@ -100,7 +100,7 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   SsdsJsonCreate* json_gen = ssds_js_cr_init(SEND_REPO); 
   ssds_log(logDEBUG, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
 
-  SsdsJsonRead* json_read = ssds_json_read_init();
+  SsdsJsonRead* json_read = ssds_js_rd_init();
   ssds_log(logDEBUG, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
   
   ssds_js_insert_code(json_gen, SEND_REPO); //insert code into json
@@ -128,14 +128,14 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   for(int i = 0; i < params->pkg_count; i++)
   {
     char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
-    ssds_js_add_package(json_gen, pkg);
+    ssds_js_cr_add_package(json_gen, pkg);
     ssds_log(logDEBUG, "Added %s package as %d in order.\n", pkg, i);
   }
   ssds_log(logDEBUG, "Loop is done.\n");
 
   char* repo_output;
   ssds_log(logDEBUG, "Generating output message with repo info to server.\n");
-  repo_output = ssds_js_to_string(json_gen);
+  repo_output = ssds_js_cr_to_string(json_gen);
   ssds_log(logDEBUG, "Message generated.\n\n%s\n\n", repo_output);
   
   /*******************************************************************/
@@ -145,12 +145,13 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   /*******************************************************************/
 
   SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV);
-  ssds_js_insert_code(json_msg, SEND_SOLV); //code for sending system.solv file, this code can change in time
+  ssds_js_insert_code(json_msg, SEND_SOLV);
 
   char* msg_output;
   ssds_log(logDEBUG, "Generating output message with info about sending @System.solv file to server.\n");
-  msg_output = ssds_js_to_string(json_msg);
+  msg_output = ssds_js_cr_to_string(json_msg);
   ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
+  
 /*  *json_read_ret = json_read;
   *repo_output_ret = repo_output;
   *msg_output_ret = msg_output;
@@ -302,7 +303,7 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
 
-  if(!ssds_read_parse(buf, json_read))
+  if(!ssds_js_rd_parse(buf, json_read))
   {
     ssds_log(logERROR, "Error while parsing answer from the server\n");
     ssds_gc_cleanup();
@@ -310,9 +311,9 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   }
   
   ssds_log(logDEBUG, "Parse init.\n");
-  SsdsJsonAnswer* answer_from_srv = ssds_json_answer_init();
+  SsdsJsonAnswer* answer_from_srv = ssds_js_rd_answer_init();
   ssds_log(logDEBUG, "Parse answer.\n");
-  ssds_parse_answer(answer_from_srv, json_read);
+  ssds_js_rd_parse_answer(answer_from_srv, json_read);
 
   ssds_log(logDEBUG, "Answer parsed.\n");
   
