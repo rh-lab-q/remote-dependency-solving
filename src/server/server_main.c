@@ -195,8 +195,8 @@ int core()
         ssds_log(logDEBUG, "%s\n\n", buf);
         switch(ssds_read_get_code(json))
         {
-        case 10:
-            ssds_log(logDEBUG, "Got message with code 10 (client is going to send @System.solv file).\n");
+        case SEND_SOLV:
+            ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SEND_SOLV);
             FILE * f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
             if(f == NULL)
             {
@@ -237,7 +237,7 @@ int core()
             ssds_log(logDEBUG, "Finished writing @System.solv file.\n");
             break;
 
-        case 123:
+        case SEND_REPO:
 
             /* Dependency solving part */
             ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
@@ -280,7 +280,7 @@ int core()
             HySack* sack_p = &sack;
             ssds_fill_sack(sack_p, meta_list);
 
-            SsdsJsonCreate* answer = ssds_js_cr_init(123);//TODO - correct code needs to be inserted
+            SsdsJsonCreate* answer = ssds_js_cr_init(ANSWER_OK);
             ssds_dep_answer(json, answer, sack_p);
             
             ssds_js_dump(answer);

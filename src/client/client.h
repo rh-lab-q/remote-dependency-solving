@@ -19,9 +19,10 @@ extern "C"{
 #include "../common/cfg_parsing.h"
 #include "../common/errors.h"
 
-/** path to package download directory */
+// Paths to download folders
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
-//static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
+static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
+
 //int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_output_ret, char **msg_output_ret);
 //int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, SsdsJsonAnswer** answer_from_srv_ret);
 //int download_packages(SsdsJsonAnswer* answer_from_srv, GSList **package_list_ret);

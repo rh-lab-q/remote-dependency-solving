@@ -97,14 +97,14 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
   ssds_log(logDEBUG, "Local repo info initialized on %d. Package count %d.\n", local_repo, params->pkg_count);
   
-  SsdsJsonCreate* json_gen = ssds_js_cr_init(123); //TODO - correct code needs to be inserted
+  SsdsJsonCreate* json_gen = ssds_js_cr_init(SEND_REPO); 
   ssds_log(logDEBUG, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
 
   SsdsJsonRead* json_read = ssds_json_read_init();
   ssds_log(logDEBUG, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
   
-  ssds_js_insert_code(json_gen, 123); //insert code into json
-  ssds_log(logDEBUG, "Inserted code 123 into json. Package count %d.\n", params->pkg_count);
+  ssds_js_insert_code(json_gen, SEND_REPO); //insert code into json
+  ssds_log(logDEBUG, "Inserted code %d into json. Package count %d.\n", SEND_REPO, params->pkg_count);
   
   /*
    *  Getting architecture, release and path to @System.solv
@@ -144,8 +144,8 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   /* TODO - create some client identification.*/
   /*******************************************************************/
 
-  SsdsJsonCreate* json_msg = ssds_js_cr_init(10);
-  ssds_js_insert_code(json_msg, 10); //code for sending system.solv file, this code can change in time
+  SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV);
+  ssds_js_insert_code(json_msg, SEND_SOLV); //code for sending system.solv file, this code can change in time
 
   char* msg_output;
   ssds_log(logDEBUG, "Generating output message with info about sending @System.solv file to server.\n");
