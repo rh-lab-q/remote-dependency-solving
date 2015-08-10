@@ -265,14 +265,15 @@ void ssds_js_cr_dump(SsdsJsonCreate* json)//this will always dump error when som
 }
 
 // =============================================================================================
+// original json ˇˇˇ
 
 
-void ssds_js_insert_code(SsdsJsonCreate* json, int code)
+void ssds_js_cr_insert_code(SsdsJsonCreate* json, int code)
 {
   json_node_set_int(json->codeNode, (gint64)code);
 }
 
-void ssds_js_add_package(SsdsJsonCreate* json,char* package)
+void ssds_js_cr_add_package(SsdsJsonCreate* json,char* package)
 {
   //adding package for the first time
   if(!json_object_has_member(json->dataObj,(const gchar*)"req_pkgs"))
@@ -297,7 +298,7 @@ void ssds_js_add_package(SsdsJsonCreate* json,char* package)
 }
 
 
-void ssds_js_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int url_count)
+void ssds_js_cr_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int url_count)
 {
   if(!json_object_has_member(json->dataObj,(const gchar*)"repolist"))
   {
@@ -349,7 +350,7 @@ void ssds_js_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int
 }
 
 
-void ssds_js_pkgs_init(SsdsJsonCreate* json)
+void ssds_js_cr_pkgs_init(SsdsJsonCreate* json)
 {
   if(!json_object_has_member(json->dataObj,(const gchar*)"install_pkgs"))
   {
@@ -364,11 +365,11 @@ void ssds_js_pkgs_init(SsdsJsonCreate* json)
 }
 
 
-void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
+void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
 {
   if(!json_object_has_member(json->dataObj,(const gchar*)"install_pkgs"))
   {
-    ssds_js_pkgs_init(json);
+    ssds_js_cr_pkgs_init(json);
   }
   else
   {
@@ -467,23 +468,6 @@ void ssds_js_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     pkg = hy_packagelist_get(goal_pkgs, i);
     json_array_add_string_element(new_arr, hy_package_get_location(pkg));
   }
-}
-
-char* ssds_js_to_string(SsdsJsonCreate* json)
-{
-  gsize len;
-  char* data;
-  data = (char*)json_generator_to_data (json->generator, &len);
-  return data;
-}
-
-
-void ssds_js_dump(SsdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
-{
-  gchar *data;
-  json_generator_set_pretty(json->generator, 1);
-  data = json_generator_to_data (json->generator, NULL);
-  printf("%s\n", (char*)data);
 }
 
 int ssds_strcmp(gconstpointer a, gconstpointer b){

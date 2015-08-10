@@ -185,15 +185,15 @@ int core()
           return NETWORKING_ERROR;
         }        
 
-        SsdsJsonRead* json = ssds_json_read_init();
-        if(!ssds_read_parse(buf, json))//parse incoming message
+        SsdsJsonRead* json = ssds_js_rd_init();
+        if(!ssds_js_rd_parse(buf, json))//parse incoming message
         {
           ssds_log(logERROR, "False data recieved from %s. Client rejected.\n", client_ip);
           continue;
         }
 
         ssds_log(logDEBUG, "%s\n\n", buf);
-        switch(ssds_read_get_code(json))
+        switch(ssds_js_rd_get_code(json))
         {
         case 10:
             ssds_log(logDEBUG, "Got message with code 10 (client is going to send @System.solv file).\n");
@@ -242,8 +242,8 @@ int core()
             /* Dependency solving part */
             ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
 
-            SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
-            ssds_read_get_packages(pkgs, json);
+            SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
+            ssds_js_rd_get_packages(pkgs, json);
 
             ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
             for(int i = 0; i < pkgs->length; i++)
@@ -253,8 +253,8 @@ int core()
 
             ssds_log(logDEBUG, "Getting repo info from client.\n");
 
-            SsdsRepoInfoList* list = ssds_read_list_init();
-            ssds_read_repo_info(json, list);
+            SsdsRepoInfoList* list = ssds_js_rd_list_init();
+            ssds_js_rd_repo_info(json, list);
 
             guint len = g_slist_length(list->repoInfoList);
 
@@ -283,8 +283,8 @@ int core()
             SsdsJsonCreate* answer = ssds_js_cr_init(123);//TODO - correct code needs to be inserted
             ssds_dep_answer(json, answer, sack_p);
             
-            ssds_js_dump(answer);
-            char* message = ssds_js_to_string(answer);
+            ssds_js_cr_dump(answer);
+            char* message = ssds_js_cr_to_string(answer);
 //             printf("%s\n\n", message);
             write(comm_sock, message, strlen(message));
             client_finished = 1;

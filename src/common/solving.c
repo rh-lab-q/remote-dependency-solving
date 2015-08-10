@@ -89,7 +89,7 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
     ssds_log(logMESSAGE, "Dependencies are ok.\n");
     
 //     answer.install_pkgs_init();
-  ssds_js_pkgs_insert(answer, &goal, request);
+  ssds_js_cr_pkgs_insert(answer, &goal, request);
 //     answer.install_pkgs_insert(&goal, request);
 }
 
@@ -97,8 +97,8 @@ void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
 void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack)
 {
   ssds_log(logDEBUG,"Dependencies answer.\n");
-  SsdsPkgInfo* pkgs = ssds_read_pkginfo_init();
-  ssds_read_get_packages(pkgs, client_data);
+  SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
+  ssds_js_rd_get_packages(pkgs, client_data);
   
   ssds_log(logDEBUG,"Answer after get_packages.\n");
   int i;
