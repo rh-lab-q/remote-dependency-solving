@@ -359,11 +359,35 @@ SsdsRepoInfo* ssds_js_rd_repoinfo_init();
 SsdsRepoInfoList* ssds_js_rd_list_init();
 
 
-
+/**
+ * Returns newly allocated structure to store list of packages to be installed on client side
+ * @return          SsdsJsonAnswer*
+ */
 SsdsJsonAnswer* ssds_js_rd_answer_init();
+
+/**
+ * Returns newly allocated structure that holds info about one particular rpm to be installed.
+ * This structure is used in SsdsJsonAnswer in a GSList of SsdsJsonInstall
+ * @return          SsdsJsonInstall
+ */
 SsdsJsonInstall* ssds_js_rd_install_init();
 
+/**
+ * Parses incoming json and creates a list of packages to be installed for one app
+ */
 void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json);
+
+/**
+ * Returns number of objects or elements in an array specified by name
+ * @param json      SsdsJsonRead* that holds json structure
+ * @param name      string holding name of array in the json structure
+ * @return          int - count of objects or elements in the array
+ */
+int ssds_js_rd_get_count(SsdsJsonRead* json, char* name);
+
+/**
+ * Redeclaration of strcmp due to various warning in compilation
+ */
 int ssds_strcmp(gconstpointer a, gconstpointer b);  
 
 #ifdef __cplusplus

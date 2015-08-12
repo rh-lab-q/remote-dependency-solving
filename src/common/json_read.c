@@ -180,6 +180,26 @@ SsdsJsonInstall* ssds_js_rd_install_init()
   return new;
 }
 
+int ssds_js_rd_get_count(SsdsJsonRead* json, char* name)
+{
+  const char* default_path="$.data..";
+  int length=strlen(default_path)+strlen(name);
+  char* full_path=(char*)malloc((length+1)*sizeof(char));
+  strncpy(full_path, default_path, strlen(default_path)+1);
+  strncat(full_path, name, strlen(name));
+  
+  JsonPath* new_path = json_path_new();
+  json_path_compile(new_path, full_path, NULL);
+  
+  JsonNode* result = json_path_match(new_path, json->rootNode);
+  JsonArray* result_array = json_node_get_array(result);
+  JsonArray* final = json_array_get_array_element(result_array, 0);
+  int ret = json_array_get_length(final);
+  
+  free(full_path);
+  return ret;
+}
+
 void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json)
 {
   //TODO - multiple apps in answer

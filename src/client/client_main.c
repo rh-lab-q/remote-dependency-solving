@@ -316,9 +316,8 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   SsdsJsonAnswer* answer_from_srv = ssds_js_rd_answer_init();
   ssds_log(logDEBUG, "Parse answer.\n");
   ssds_js_rd_parse_answer(answer_from_srv, json_read);
-
   ssds_log(logDEBUG, "Answer parsed.\n");
-  
+  return 1;
  /* *answer_from_srv_ret = answer_from_srv;
   return 0;
 }
