@@ -42,6 +42,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
   int opt_index = 0;
   int seen = 0;
   extern int optind;
+  opterr = 0;
   
   while(1)
   {
@@ -49,7 +50,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
     switch(c)
     {
       case 0:
-	params->command = long_options[opt_index].val;
+        params->command = long_options[opt_index].val;
         seen++;
         break;
         
@@ -68,7 +69,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
         
       case '?':
         print_help_cl();
-        exit(PARAMS_ERROR);
+        return -1;
         break;
     }
     
@@ -146,7 +147,7 @@ void print_help_cl()
          "List of Commands\n\n"
          "--install\t\tResolve dependencies and install packages\n"
          "--update\t\tResolve dependencies and update packages\n"
-         "--erase\t\tErase packages\n"
+         "--erase\t\t\tErase packages\n"
          "--chkdep\t\tOnly show required packages - do not install yet\n"
          "--help, -h\t\tDisplays help\n"
          "-v\t\t\tVerbose - turned off by default\n"
