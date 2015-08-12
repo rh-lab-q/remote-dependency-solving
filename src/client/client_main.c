@@ -8,6 +8,13 @@ int main(int argc, char* argv[]){
   /*******************************************************************/
   /* Setting up garbage collector and setting callback functions */
   /*******************************************************************/
+  uid_t uid = geteuid();
+  if(uid != 0)
+  {
+    ssds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
+    return 1;
+  }
+  
   ssds_gc_init();
   signal(SIGINT, ssds_signal_handler);
   signal(SIGBUS, ssds_signal_handler);
@@ -316,8 +323,9 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
   SsdsJsonAnswer* answer_from_srv = ssds_js_rd_answer_init();
   ssds_log(logDEBUG, "Parse answer.\n");
   ssds_js_rd_parse_answer(answer_from_srv, json_read);
+
   ssds_log(logDEBUG, "Answer parsed.\n");
-  return 1;
+  
  /* *answer_from_srv_ret = answer_from_srv;
   return 0;
 }
