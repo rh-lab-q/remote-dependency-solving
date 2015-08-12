@@ -88,6 +88,8 @@ int main(int argc, char* argv[]){
 
 int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_output_ret, char **msg_output_ret)
 {*/
+  
+  check_for_missing_repos(); //check if client misses some repositories
 
   /*******************************************************************/
   /* Creating json with all the info*/

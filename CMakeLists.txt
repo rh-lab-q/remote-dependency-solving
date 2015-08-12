@@ -92,7 +92,8 @@ set (ssds_common_srcs
 	src/common/network_util.c
 	src/common/params.c
 	src/common/mem_management.c
-	src/common/cfg_parsing.c)
+	src/common/cfg_parsing.c
+	src/common/detect_missing_repos.c)
 set (ssds_common_headers
 	src/common/includes.h
 	src/common/json_handler.h
@@ -103,7 +104,8 @@ set (ssds_common_headers
 	src/common/params.h
 	src/common/mem_management.h
 	src/common/cfg_parsing.h
-	src/common/errors.h)
+	src/common/errors.h
+	src/common/detect_missing_repos.h)
 add_library(lib_ssds_common SHARED ${ssds_common_srcs} ${ssds_common_headers})
 target_link_libraries(lib_ssds_common
 	${LIBS}

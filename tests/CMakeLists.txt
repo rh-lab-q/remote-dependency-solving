@@ -5,6 +5,7 @@ set (SSDS_TEST_FILES
 	test_cfg_parsing.c
 	test_params.c
 	test_gc.c
+	test_missing_repos.c
 	)
 
 add_executable(test_main ${SSDS_TEST_FILES})
