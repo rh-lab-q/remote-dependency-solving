@@ -200,13 +200,13 @@ int ssds_js_rd_get_count(SsdsJsonRead* json, char* name)
   return ret;
 }
 
-void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json)
+void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json, int nmr)
 {
   //TODO - multiple apps in answer
   //right now only one app can be parsed at a time
   JsonArray*array = json_object_get_array_member(json->dataObj, "install_pkgs");
   
-  JsonObject* main_obj = json_array_get_object_element(array, 0);
+  JsonObject* main_obj = json_array_get_object_element(array, nmr);
   char* name = (char*)json_object_get_string_member(main_obj, "name");
   ans_list->name = (char*)ssds_malloc((strlen(name)+1)*sizeof(char));
   strcpy(ans_list->name, name);

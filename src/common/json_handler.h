@@ -374,8 +374,13 @@ SsdsJsonInstall* ssds_js_rd_install_init();
 
 /**
  * Parses incoming json and creates a list of packages to be installed for one app
+ * @param ans_list  SsdsJsonAnswer structure that holds names and adresses of all packages to be installed with one app
+ * @param json      SsdsJsonRead* holds the incoming json structure that will be parsed
+ * @param nmr       There can be more than one app in one request from client. For this reason, there is function
+ *                  ssds_js_rd_get_count to get number of objects holding particular apps. With this number simply go through all
+ *                  objects in a loop and use nmr as an order indicator.
  */
-void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json);
+void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json, int nmr);
 
 /**
  * Returns number of objects or elements in an array specified by name
