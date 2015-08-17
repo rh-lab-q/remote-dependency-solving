@@ -5,14 +5,15 @@
 //#define DEBUG
 
 int main(int argc, char* argv[]){
+
   /*******************************************************************/
-  /* Setting up garbage collector and setting callback functions */
+  /* Setting up garbage collector and setting callback functions     */
   /*******************************************************************/
   uid_t uid = geteuid();
   if(uid != 0)
   {
     ssds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
-    return 1;
+    return ROOT_ERROR;
   }
   
   ssds_gc_init();
@@ -22,7 +23,7 @@ int main(int argc, char* argv[]){
   signal(SIGTERM, ssds_signal_handler);
 
   /*******************************************************************/
-  /* Parsing parameters */
+  /* Parsing parameters 					     */
   /*******************************************************************/
   
   ssds_log(logSSDS, "Client startup.\n");
@@ -72,31 +73,8 @@ int main(int argc, char* argv[]){
 		ssds_log(logMESSAGE, "Dependency check of packages was selected.\n");
 		break;
   } 
- /* SsdsJsonRead *json_read;
-  char *repo_output, *msg_output;
-  SsdsJsonAnswer* answer_from_srv;
-  GList *package_list;
-
-  int ret_code = create_json(params, &json_read, &repo_output, &msg_output);
-  if (ret_code != 0) return ret_code;
-
-  ret_code = network_part(json_read, repo_output, msg_output, &answer_from_srv);
-  if (ret_code != 0) return ret_code;
-
-  ret_code = download_packages(answer_from_srv, &package_list);
-  if (ret_code != 0) return ret_code;
-
-  ret_code = install_packages(answer_from_srv, package_list);
-  if (ret_code != 0) return ret_code;
-
-  return 0;
-}
-
-
-int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_output_ret, char **msg_output_ret)
-{*/
   
-  check_for_missing_repos(); //check if client misses some repositories
+ // check_for_missing_repos(); //check if client misses some repositories
 
   /*******************************************************************/
   /* Creating json with all the info*/
@@ -161,85 +139,23 @@ int create_json(ParamOptsCl *params, SsdsJsonRead **json_read_ret, char **repo_o
   msg_output = ssds_js_cr_to_string(json_msg);
   ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
   
-/*  *json_read_ret = json_read;
-  *repo_output_ret = repo_output;
-  *msg_output_ret = msg_output;
-  return 0;
-}
-
-int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, SsdsJsonAnswer** answer_from_srv_ret)
-{*/
   /***************************************************************/
   /* Networking part - sending data to server and recieving      */
   /***************************************************************/
   ssds_log(logDEBUG, "Begin of network part.\n");
 
-  int data_sock, comm_sock, connection_try = 1;
+  int data_sock, comm_sock, status;
 
-  comm_sock = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  data_sock = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  ssds_log(logDEBUG, "Setted up socket descriptor.\n");
+  status = client_connect(&data_sock, &comm_sock);
 
-  ssds_log(logDEBUG, "Setting up connection to server.\n");
-  struct sockaddr_in server_data;
-  struct sockaddr_in server_comm;
-
-  char *server_address;
-  long int comm_port, data_port;
-  read_cfg(&server_address, &comm_port, &data_port);
-
-  server_comm.sin_addr.s_addr = inet_addr(server_address);
-  server_data.sin_addr.s_addr = inet_addr(server_address);
-  ssds_log(logDEBUG, "Set server address.\n");
-
-  server_comm.sin_family = AF_INET;
-  server_data.sin_family = AF_INET;
-  ssds_log(logDEBUG, "Set comunication protocol.\n");
-
-  server_comm.sin_port = htons(comm_port);
-  server_data.sin_port = htons(data_port);
-  ssds_log(logDEBUG, "Set server port.\n");
-  
-  ssds_log(logDEBUG, "Socket controll.\n");
-  if(comm_sock == -1 || data_sock == -1)
+  if(status != OK)
   {
-    ssds_log(logERROR, "Client encountered an error when creating sockets for communication and data.\n");
-    ssds_gc_cleanup();
-    return SOCKET_ERROR;
+	ssds_gc_cleanup();
+	return status;
   }
 
-  ssds_log(logDEBUG, "Socket controll - OK.\n"); 
-  
-  ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
-  while((connect(comm_sock, (struct sockaddr *)&server_comm, sizeof(server_comm)) < 0) && (connection_try < 3))
-  {  
-     ssds_log(logMESSAGE, "Unable to connect to comm. socket on server. Trying that again above 5 sec.\n");
-     sleep(5);
-     ssds_log(logMESSAGE, "Trying to connect to server...(%d of 3)\n", ++connection_try);
-  }
+  ssds_log(logDEBUG, "Data socket: %d   Communication socket: %d.\n", data_sock, comm_sock);
 
-  if(connection_try == 3){
-    ssds_log(logERROR, "Unable to connect comm. socket on server. Please, check out your network connection and try it again later.\n");
-    ssds_gc_cleanup();
-    return NETWORKING_ERROR;
-  }
-
-  connection_try = 1;
-  
-  ssds_log(logMESSAGE, "Trying to connect to data socket...(1 of 3)\n");
-  while((connect(data_sock,(struct sockaddr *)&server_data, sizeof(server_data)) < 0) && (connection_try < 3))
-  {
-      ssds_log(logMESSAGE, "Unable to connect to data socket. Trying again in 5 sec.\n");
-      sleep(5);
-      ssds_log(logMESSAGE, "Trying to connect to data socket...(%d of 3)\n", ++connection_try);
-  }
-  if(connection_try == 3){
-    ssds_log(logERROR, "Unable to connect data socket on server. Please, check out your network connection and try it again later.\n");
-    ssds_gc_cleanup();
-    return NETWORKING_ERROR;
-  }
-  ssds_log(logMESSAGE, "Connection to server is established.\n");
-  
   /***********************************************************/
   /* Sending @System.solv file                               */
   /***********************************************************/

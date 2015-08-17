@@ -24,7 +24,9 @@
 #include "log_handler.h"
 #include "mem_management.h"
 #include "includes.h"
-
+#include "cfg_parsing.h"
+#include "errors.h"
+#
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -46,6 +48,13 @@ extern "C"{
  */
 char* sock_recv(int sock_fd);
 
+/** 
+ * Function to connect client to server. 
+ * @param  *data_sock  data socket
+ * @param  *comm_sock  communication socket
+ * @return int         OK or error code
+ */
+int client_connect(int *data_sock, int *comm_sock);
 
 #ifdef __cplusplus
 }
