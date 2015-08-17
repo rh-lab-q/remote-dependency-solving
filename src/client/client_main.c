@@ -319,99 +319,94 @@ int network_part(SsdsJsonRead *json_read, char *repo_output, char *msg_output, S
     return JSON_ERROR;
   }
   
-  ssds_log(logDEBUG, "Parse init.\n");
-  SsdsJsonAnswer* answer_from_srv = ssds_js_rd_answer_init();
-  ssds_log(logDEBUG, "Parse answer.\n");
-  ssds_js_rd_parse_answer(answer_from_srv, json_read);
+  int num_install = ssds_js_rd_get_count(json_read, "install_pkgs");
 
-  ssds_log(logDEBUG, "Answer parsed.\n");
+  for(int id_app = 0; id_app < num_install; id_app++){
+
+	ssds_log(logDEBUG, "Parse init.\n");
+	SsdsJsonAnswer* answer_from_srv = ssds_js_rd_answer_init();
+	ssds_log(logDEBUG, "Parse answer.\n");
+	
+	ssds_js_rd_parse_answer(answer_from_srv, json_read, id_app);
+
+	ssds_log(logDEBUG, "Answer parsed.\n");
   
- /* *answer_from_srv_ret = answer_from_srv;
-  return 0;
-}
+  	/***********************************************************/
+	/* Downloading packages part                               */
+	/***********************************************************/
 
-int download_packages(SsdsJsonAnswer* answer_from_srv, GSList **package_list_ret)
-{*/
-  /***********************************************************/
-  /* Downloading packages part                               */
-  /***********************************************************/
+	ssds_log(logDEBUG, "Begin downloading part.\n");
+        ssds_log(logMESSAGE, "Working on package: %s.\n", answer_from_srv->name);
 
-  ssds_log(logDEBUG, "Begin downloading part.\n");
-  
-  // required variables
-  gboolean return_status;
-  LrHandle *handler;
-  GSList *package_list = NULL;
-  LrPackageTarget *target;
-  GError *error = NULL;
+  	// required variables
+	gboolean return_status;
+	LrHandle *handler;
+	GSList *package_list = NULL;
+	LrPackageTarget *target;
+	GError *error = NULL;
 
-  for(guint i = 0; i < g_slist_length(answer_from_srv->pkgList); i++){
-     SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
-     ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
+	for(guint i = 0; i < g_slist_length(answer_from_srv->pkgList); i++){
+	     SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
+	     ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
    
-     ssds_log(logDEBUG, "Downloading preparation.\n");
-     handler = lr_handle_init();
-     ssds_log(logDEBUG, "Download handler initied.\n");
-     lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
-     ssds_log(logDEBUG, "Array of URLs is setted.\n");
-     lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
-     ssds_log(logDEBUG, "Repo type is setted.\n");
-     lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
-     ssds_log(logDEBUG, "Progress callback is setted.\n");
+	     ssds_log(logDEBUG, "Downloading preparation.\n");
+	     handler = lr_handle_init();
+	     ssds_log(logDEBUG, "Download handler initied.\n");
+	     lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
+	     ssds_log(logDEBUG, "Array of URLs is setted.\n");
+	     lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
+	     ssds_log(logDEBUG, "Repo type is setted.\n");
+	     lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
+	     ssds_log(logDEBUG, "Progress callback is setted.\n");
 
-     // Prepare list of target
-     target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET_INSTALL, LR_CHECKSUM_UNKNOWN,
-                                      NULL, 0, inst->base_url, TRUE, progress_callback, inst->pkg_name, 
-        			      end_callback, NULL, &error);
-     package_list = g_slist_append(package_list, target);
-  }
+	     // Prepare list of target
+	     target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET_INSTALL, 
+					      LR_CHECKSUM_UNKNOWN, NULL, 0, inst->base_url, TRUE, 
+					      progress_callback, inst->pkg_name, end_callback, NULL, &error);
+	     package_list = g_slist_append(package_list, target);
+  	}
   
-  // Download all packages        
-  ssds_log(logMESSAGE, "Downloading packages.\n");
-  return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
+	  // Download all packages        
+	  ssds_log(logMESSAGE, "Downloading packages.\n");
+	  return_status = lr_download_packages(package_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
   
-  if(!return_status || error != NULL){
-      ssds_log(logERROR, "%d: %s\n", error->code, error->message);
-      g_error_free(error);
-      ssds_gc_cleanup();
-      return DOWNLOAD_ERROR;
+ 	 if(!return_status || error != NULL){
+	      ssds_log(logERROR, "%d: %s\n", error->code, error->message);
+	      g_error_free(error);
+	      ssds_gc_cleanup();
+	      return DOWNLOAD_ERROR;
+	 }
+
+	 ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
+
+  	/*********************************************************/
+  	/* Installing packages                                   */
+  	/*********************************************************/
+
+	  ssds_log(logMESSAGE, "Installing packages.\n"); 
+	  for(GSList *elem = package_list; elem; elem = g_slist_next(elem))
+	  {
+	      char command[300];
+	      LrPackageTarget *target = (LrPackageTarget *)elem->data;
+
+	      if(!target->err)
+	      {
+        	  sprintf(command, "rpm --install --nodeps %s", target->local_path);
+	          ssds_log(logMESSAGE,"Installing package: %s\n",(char *)target->cbdata);
+//      	    system(command);
+//		    unlink(target->local_path);
+      	      }else{
+	          ssds_log(logERROR, "Package Error: %s\n", target->err);
+      	      }
+
+  	  }
+  
+	  ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\n",answer_from_srv->name); 
+  	  g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
+	  ssds_free(answer_from_srv);
   }
 
-  ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
-
-/*  *package_list_ret = package_list;
-  return 0;
-}
-
-int install_packages(SsdsJsonAnswer* answer_from_srv, GSList *package_list)
-{*/
-  /*********************************************************/
-  /* Installing packages                                   */
-  /*********************************************************/
-
-  ssds_log(logMESSAGE, "Installing packages.\n"); 
-  for(GSList *elem = package_list; elem; elem = g_slist_next(elem))
-  {
-      char command[300];
-      LrPackageTarget *target = (LrPackageTarget *)elem->data;
-
-      if(!target->err)
-      {
-          sprintf(command, "rpm --install --nodeps %s", target->local_path);
-          ssds_log(logMESSAGE,"Installing package: %s\n",(char *)target->cbdata);
-//          system(command);
-	        unlink(target->local_path);
-      }
-      else
-      {
-          ssds_log(logERROR, "Package Error: %s\n", target->err);
-      }
-
-  }
-  
-  ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\n",answer_from_srv->name); 
   ssds_log(logSSDS, "End of client.\n\n");
-  g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
     
   ssds_gc_cleanup();
 
