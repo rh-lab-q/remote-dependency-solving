@@ -75,7 +75,7 @@ target = lr_packagetarget_new(h, "a/atlas-3.10.1-18.fc21.x86_64.rpm", "./rpm/", 
 	// RPM init  
 	// TODO: need to init rpmdb connection
 	Header hdr;
-        char namen[] = "/var/cache/ssds/packages/install/gimp-2.8.14-3.fc21.x86_64.rpm";
+        char *namen = "/var/cache/ssds/packages/install/php-5.6.11-1.fc21.x86_64.rpm";
 	rpmReadConfigFiles(NULL,NULL);
         rpmts ts = rpmtsCreate();
 	rpmprobFilterFlags ignoreSet = 0;
@@ -88,13 +88,42 @@ target = lr_packagetarget_new(h, "a/atlas-3.10.1-18.fc21.x86_64.rpm", "./rpm/", 
                         FD_t fd = (FD_t) fopen(namen,"r.ufdio");
                         printf("%d\n", fd);
 			char *msg = NULL;
-//                        int rr = rpmReadPackageFile(ts,fd,namen,&hdr);
-                        int rr = rpmReadHeader(ts,fd,&hdr,&msg);
-			printf("Package is %s. %d %s\n",rr!=RPMRC_OK? "corrupted":"ok",rr,msg);
+                        int rr = rpmReadPackageFile(ts,fd,namen,&hdr);
+//                        int rr = rpmReadHeader(ts,fd,&hdr,&msg);
+			switch (rr){
+			case RPMRC_OK: printf("OK\n");
+				       break;
+			case RPMRC_NOKEY: printf("NO KEY\n");
+					  break;
+			case RPMRC_NOTFOUND: printf("NOT FOUND\n");
+					     break;
+			case RPMRC_NOTTRUSTED: printf("NOT TRUSTED\n");
+					       break;
+			case RPMRC_FAIL: printf("FAIL\n");
+					 break;
+			default: printf("unknown error %d \n", rr);
+				 break;
+			}
+
 			int upgrade = 0;
 			//rpmRelocation rel = NULL;
-			int r = rpmtsAddInstallElement(ts, hdr,namen ,upgrade,0);
-                printf("add install element %s %d.\n", r==RPMRC_OK?"ok":"error", r);
+			int r = rpmtsAddInstallElement(ts, hdr, (fnpyKey) namen ,upgrade, NULL);
+                printf("add install element \n");
+		switch (r){
+                        case RPMRC_OK: printf("OK\n");
+                                       break;
+                        case RPMRC_NOKEY: printf("NO KEY\n");
+                                          break;
+                        case RPMRC_NOTFOUND: printf("NOT FOUND\n");
+                                             break;
+                        case RPMRC_NOTTRUSTED: printf("NOT TRUSTED\n");
+                                               break;
+                        case RPMRC_FAIL: printf("FAIL\n");
+                                         break;
+                        default: printf("unknown error %d \n", rr);
+                                 break;
+                        }
+
 		//}
         //}
 	rpmtsi tsi = rpmtsiInit(ts);
