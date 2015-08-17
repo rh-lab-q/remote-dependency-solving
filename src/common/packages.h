@@ -21,12 +21,6 @@ enum{
 
 int ssds_add_to_transaction (rpmts ts, char *pkg, int action);
 int ssds_add_to_erase (rpmts ts, char *pkg);
-void *rpmCallback(const void * arg,
-                  const rpmCallbackType what,
-                  const rpm_loff_t amount,
-                  const rpm_loff_t total,
-                  fnpyKey key,
-                  void * data);
 
 #ifdef __cplusplus
 }
