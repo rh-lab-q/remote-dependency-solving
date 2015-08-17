@@ -7,6 +7,11 @@ extern "C"{
 
 #include "../common/includes.h"
 #include <librepo/librepo.h>
+#include <rpm/rpmlib.h>
+#include <rpm/rpmts.h>
+#include <rpm/rpmcli.h>
+#include <rpm/rpmps.h>
+
 //SSDS
 #include "../common/log_handler.h"
 #include "../common/network_util.h"
@@ -18,6 +23,8 @@ extern "C"{
 #include "../../cmake/Config/version_conf.h"
 #include "../common/errors.h"
 #include "../common/detect_missing_repos.h"
+#include "../common/packages.h"
+
 // Paths to download folders
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
 static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";

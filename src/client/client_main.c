@@ -68,7 +68,42 @@ int main(int argc, char* argv[]){
                 break;
 	case PAR_ERASE: 
 		ssds_log(logMESSAGE, "Erase of packages was selected.\n");
-		break;
+		rpmts ts;
+		int rc, nf = 0;
+
+	        rpmReadConfigFiles(NULL, NULL);
+        	ts = rpmtsCreate();
+	        rpmtsSetRootDir(ts, NULL);
+		
+		for(int i = 0; i < params->pkg_count; i++){
+ 		    char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
+                    int res = ssds_add_to_erase(ts, pkg);
+		    if(res != OK){
+			ssds_log(logERROR, "Unable to erase requested package.\n");
+			ssds_gc_cleanup();
+			return ERASE_ERROR;
+		    }   
+		}
+
+		rpmprobFilterFlags flag = 0;
+
+        	nf |= INSTALL_LABEL | INSTALL_HASH;
+	        rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) nf);
+
+        	rc = rpmtsRun(ts, NULL, flag);
+	        if(rc == 0){
+        	       ssds_log(logMESSAGE, "All packages was correctly erased.\n");
+		       rc = OK;
+	        }else{
+                       ssds_log(logWARNING, "Erasing ends with code %d\n", rc);
+		       rc = ERASE_ERROR;
+	        }
+
+        	rpmtsClean(ts);
+	        rpmtsFree(ts);
+		ssds_gc_cleanup();
+		return rc;
+
 	case PAR_CHK_DEP: 
 		ssds_log(logMESSAGE, "Dependency check of packages was selected.\n");
 		break;
@@ -254,7 +289,7 @@ int main(int argc, char* argv[]){
 	ssds_log(logDEBUG, "Begin downloading part.\n");
         ssds_log(logMESSAGE, "Working on package: %s.\n", answer_from_srv->name);
 
-  	// required variables
+  	// required variables for downloading
 	gboolean return_status;
 	LrHandle *handler;
 	GSList *package_list = NULL;
@@ -295,31 +330,49 @@ int main(int argc, char* argv[]){
 
 	 ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
 
-  	/*********************************************************/
-  	/* Installing packages                                   */
-  	/*********************************************************/
+  	 /*********************************************************/
+  	 /* Installing packages                                   */
+  	 /*********************************************************/
+	  
+	 // required variables for rpmlib
+         rpmts ts;
 
-	  ssds_log(logMESSAGE, "Installing packages.\n"); 
-	  for(GSList *elem = package_list; elem; elem = g_slist_next(elem))
-	  {
-	      char command[300];
+         rpmReadConfigFiles(NULL, NULL);
+         ts = rpmtsCreate();
+         rpmtsSetRootDir(ts, NULL);
+                                          
+	 ssds_log(logMESSAGE, "Installing packages.\n"); 
+	 for(GSList *elem = package_list; elem; elem = g_slist_next(elem))
+	 {
 	      LrPackageTarget *target = (LrPackageTarget *)elem->data;
 
 	      if(!target->err)
 	      {
-        	  sprintf(command, "rpm --install --nodeps %s", target->local_path);
-	          ssds_log(logMESSAGE,"Installing package: %s\n",(char *)target->cbdata);
-//      	    system(command);
-//		    unlink(target->local_path);
+        	ssds_add_to_transaction(ts, target->local_path, SSDS_INSTALL);
       	      }else{
 	          ssds_log(logERROR, "Package Error: %s\n", target->err);
       	      }
 
-  	  }
-  
-	  ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\n",answer_from_srv->name); 
-  	  g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
-	  ssds_free(answer_from_srv);
+  	 }
+
+	 rpmprobFilterFlags flag = 0;
+	 
+	 int nf = 0, rc;
+	 
+	 nf |= INSTALL_LABEL | INSTALL_HASH;
+         rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) nf);
+	 
+	 rc = rpmtsRun(ts, NULL, flag);
+         if(rc == 0){
+                ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\n",answer_from_srv->name);
+         }else{
+		ssds_log(logWARNING, "Install ends with code %d\n", rc);
+	 }
+         
+	 rpmtsClean(ts);
+         rpmtsFree(ts);
+	 g_slist_free_full(package_list, (GDestroyNotify) lr_packagetarget_free);
+	 ssds_free(answer_from_srv);
   }
 
   ssds_log(logSSDS, "End of client.\n\n");
