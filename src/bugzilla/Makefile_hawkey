@@ -1,0 +1,12 @@
+#soubor: Makefile
+# Michal Ruprich, xrupri00, RedHat, SSDS - hawkey example
+
+PP=g++
+CPPFLAGS= -std=c++11
+INCLUDE=-I/usr/include/hawkey
+all: hawkey_bug
+
+hawkey_bug:
+	$(PP) $(CPPFLAGS) $(INCLUDE) -l hawkey hawkey_bug.cpp -o hawkey_bug
+clean:
+	rm -rf *o hawkey_bug
