@@ -2,16 +2,16 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include<unistd.h>
+#include <unistd.h>
 
 int main()
 {
-  int socket_desc, new_sock;
+  int listen_sock, connect_sock;
   char* client_ip;
   char client_msg[1000];
-  socket_desc=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  listen_sock=socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   
-  if(socket_desc==-1)
+  if(listen_sock==-1)
   {
     printf("Server encountered an error when creating socket for communication\n");
     return 1;
@@ -22,7 +22,7 @@ int main()
   server.sin_addr.s_addr=INADDR_ANY;
   server.sin_port=htons(2345);
   
-  if(bind(socket_desc, (struct sockaddr*)&server, sizeof(server)) <0)
+  if(bind(listen_sock, (struct sockaddr*)&server, sizeof(server)) <0)
   {
     printf("Server wasn't able to bind with socket\n");
     return 1;
@@ -30,7 +30,7 @@ int main()
   
   printf("Server ready. Waiting for incoming connections.\n");
   
-  if(listen(socket_desc, 5)!=0)
+  if(listen(listen_sock, 5)!=0)
   {
     printf("Listen failed on server\n");
     return 1;
@@ -41,13 +41,15 @@ int main()
   int addr_len = sizeof(server);
   while(1)
   {
-    if((new_sock=accept(socket_desc, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
+    if((connect_sock=accept(listen_sock, (struct sockaddr *) &client, (socklen_t*)&addr_len))<0)
     {
       printf("Accept connection has failed\n");
       return 1;
     }
     
-    if( recv(new_sock, client_msg , 1000 , 0) < 0)
+    int recv_nmr = 0;
+    
+    if( recv(connect_sock, &recv_nmr , sizeof(recv_nmr) , 0) < 0)
     {
       printf("Recieving of data has failed\n");
       return 1;
@@ -55,9 +57,10 @@ int main()
     
     client_ip=inet_ntoa(client.sin_addr);
     printf("Connection accepted from ip address %s\n", client_ip);
-    printf("%s\n", client_msg);
     
-    write(new_sock, message, strlen(message));
+    printf("%d\n", ntohl(recv_nmr));
+    
+//     write(connect_sock, message, strlen(message));
   }
   
   return 0;

@@ -304,11 +304,11 @@ int main(int argc, char* argv[]){
 	     handler = lr_handle_init();
 	     ssds_log(logDEBUG, "Download handler initied.\n");
 	     lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
-	     ssds_log(logDEBUG, "Array of URLs is setted.\n");
+	     ssds_log(logDEBUG, "Array of URLs is set.\n");
 	     lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
-	     ssds_log(logDEBUG, "Repo type is setted.\n");
+	     ssds_log(logDEBUG, "Repo type is set.\n");
 	     lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
-	     ssds_log(logDEBUG, "Progress callback is setted.\n");
+	     ssds_log(logDEBUG, "Progress callback is set.\n");
 
 	     // Prepare list of target
 	     target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET_INSTALL, 

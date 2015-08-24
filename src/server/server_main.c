@@ -134,7 +134,7 @@ int core()
     return SOCKET_ERROR;
   }
 
-  ssds_log(logINFO, "Server setted up. Waiting for incoming connections.\n");
+  ssds_log(logINFO, "Server set up. Waiting for incoming connections.\n");
   
   if(listen(comm_desc, 5) != 0)
   {
