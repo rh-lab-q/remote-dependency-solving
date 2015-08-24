@@ -1,11 +1,17 @@
 
 #include "cfg_parsing.h"
 
-int read_cfg(char** ret_address, long int* ret_comm_port, long int* ret_data_port)
+int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* ret_data_port)
 {
   /*
   ** reads connection configuration from CFG file
   */
+ 
+  /********************************************************************/
+  /* TODO: loading ID string from cfg file                            */
+  /********************************************************************/
+  *id = NULL;
+
   char *address, *comm_port, *data_port;
   FILE* cfg_file;
   cfg_file = fopen(CFG_FILE, "r");

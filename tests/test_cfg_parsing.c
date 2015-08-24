@@ -38,13 +38,14 @@ int complex_read()
   fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
   fseek(tempfile, 0, SEEK_SET);
 
-  char *address;
+  char *address, *id;
   long int p1, p2;
-  read_cfg(&address, &p1, &p2);
+  read_cfg(&id, &address, &p1, &p2);
 
   fail_if(strcmp(address, "127.0.0.2") != 0);
   fail_if(p1 != 951);
   fail_if(p2 != 789);
+  fail_if(id != NULL);
 
   ssds_free(address);
   fclose(tempfile);
@@ -68,13 +69,14 @@ int invalid_file()
   fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
   fseek(tempfile, 0, SEEK_SET);
 
-  char *address;
+  char *address, *id;
   long int p1, p2;
-  read_cfg(&address, &p1, &p2);
+  read_cfg(&id, &address, &p1, &p2);
 
   fail_if(strcmp(address, "127.0.0.1") != 0);
   fail_if(p1 != 2345);
   fail_if(p2 != 2346);
+  fail_if(id != NULL);
 
   ssds_free(address);
   fclose(tempfile);
@@ -98,9 +100,9 @@ int param_too_long()
   fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
   fseek(tempfile, 0, SEEK_SET);
 
-  char *address;
+  char *address, *id;
   long int p1, p2;
-  read_cfg(&address, &p1, &p2);
+  read_cfg(&id, &address, &p1, &p2);
 
   fail_if(p1 != 4815);
   

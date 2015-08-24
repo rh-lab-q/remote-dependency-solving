@@ -27,5 +27,5 @@
 
 #define CFG_FILE "../connection.cfg"
 
-int read_cfg(char** address, long int* comm_port, long int* data_port);
+int read_cfg(char **id, char** address, long int* comm_port, long int* data_port);
 char* file_read_value(FILE* file, int max_length);
