@@ -63,7 +63,7 @@ char* sock_recv(int sock_fd)
   return reply;
 }
 
-int client_connect(int *data_sock, int *comm_sock)
+int client_connect(int *data_sock, int *comm_sock, char *server_address, long int data_port, long int comm_port)
 {
 
   int connection_try = 1;
@@ -75,10 +75,6 @@ int client_connect(int *data_sock, int *comm_sock)
   ssds_log(logDEBUG, "Setting up connection to server.\n");
   struct sockaddr_in server_data;
   struct sockaddr_in server_comm;
-
-  char *server_address;
-  long int comm_port, data_port;
-  read_cfg(&server_address, &comm_port, &data_port);
 
   server_comm.sin_addr.s_addr = inet_addr(server_address);
   server_data.sin_addr.s_addr = inet_addr(server_address);

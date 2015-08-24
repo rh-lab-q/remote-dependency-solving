@@ -50,11 +50,14 @@ char* sock_recv(int sock_fd);
 
 /** 
  * Function to connect client to server. 
- * @param  *data_sock  data socket
- * @param  *comm_sock  communication socket
+ * @param  *data_sock  		data socket
+ * @param  *comm_sock  		communication socket
+ * @param  *server_address	IP of server
+ * @param  data_port		data port
+ * @param  comm_port  		communication port
  * @return int         OK or error code
  */
-int client_connect(int *data_sock, int *comm_sock);
+int client_connect(int *data_sock, int *comm_sock, char *server_address, long int data_port, long int comm_port);
 
 #ifdef __cplusplus
 }
