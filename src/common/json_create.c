@@ -273,6 +273,17 @@ void ssds_js_cr_insert_code(SsdsJsonCreate* json, int code)
   json_node_set_int(json->codeNode, (gint64)code);
 }
 
+void ssds_js_cr_gen_id(SsdsJsonCreate* json, char* arch, char* release)
+{
+  JsonNode* json_arch = json_node_new(JSON_NODE_VALUE);
+  json_node_set_string(json_arch, (gchar*)arch);
+  json_object_set_member(json->dataObj, (gchar*)"arch", json_arch);
+
+  JsonNode* json_rel = json_node_new(JSON_NODE_VALUE);
+  json_node_set_string(json_rel,(gchar*) release);
+  json_object_set_member(json->dataObj, (gchar*)"release", json_rel);
+}
+                                                  
 void ssds_js_cr_add_package(SsdsJsonCreate* json,char* package)
 {
   //adding package for the first time

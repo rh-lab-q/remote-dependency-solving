@@ -95,9 +95,9 @@ int core()
   
   struct sockaddr_in server_comm, server_data, client_comm, client_data;
 
-  char *server_address;
+  char *server_address, *id;
   long int comm_port, data_port;
-  read_cfg(&server_address, &comm_port, &data_port);
+  read_cfg(&id, &server_address, &comm_port, &data_port);
   ssds_free(server_address);
 
   server_comm.sin_family = AF_INET;

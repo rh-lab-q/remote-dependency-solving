@@ -104,6 +104,14 @@ void ssds_js_cr_dump(SsdsJsonCreate* json);
  */
 void ssds_js_cr_insert_code(SsdsJsonCreate* json, int code);
 
+/**
+ * Adds architecture type and release version into json_create structure.
+ * @param json		SsdsJsonCreate*
+ * @param arch		char*
+ * @param release	char*
+ */
+void ssds_js_cr_gen_id(SsdsJsonCreate* json, char* arch, char* release);
+
 /** 
  * Adds name of package requested by client into json_create structure.
  * Adds only one name at a time - needs to be called in a loop

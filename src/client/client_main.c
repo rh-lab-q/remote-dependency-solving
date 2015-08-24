@@ -40,6 +40,81 @@ int main(int argc, char* argv[]){
   ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
   ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
  
+  /********************************************************************/
+  /* Load configuration                                               */
+  /********************************************************************/
+
+  char *server_address, *id;
+  long int comm_port, data_port;
+  read_cfg(&id, &server_address, &comm_port, &data_port);
+
+  /********************************************************************/
+  /*  Getting architecture, release and path to @System.solv          */ 
+  /********************************************************************/
+  char path[100];
+  char *arch = NULL, *release = NULL;
+  ssds_resolve_dependency_file_path(path, &arch, &release);
+
+  /********************************************************************/
+  /* Networking part - connecting to server                           */
+  /********************************************************************/
+  ssds_log(logDEBUG, "Network part.\n");
+
+  int data_sock, comm_sock, status;
+
+  status = client_connect(&data_sock, &comm_sock, server_address, data_port, comm_port);
+
+  if(status != OK)
+  {
+        ssds_gc_cleanup();
+        return status;
+  }
+
+  ssds_log(logDEBUG, "Data socket: %d   Communication socket: %d.\n", data_sock, comm_sock);
+
+
+  /********************************************************************/
+  /* JSON send and read initialization                                */
+  /********************************************************************/
+  
+  ssds_log(logDEBUG, "Client JSON creating. Package count %d.\n", params->pkg_count);
+  
+  SsdsJsonCreate* json_gen = ssds_js_cr_init(SEND_REPO);
+  ssds_log(logDEBUG, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
+
+  SsdsJsonRead* json_read = ssds_js_rd_init();
+  ssds_log(logDEBUG, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
+                            
+  /********************************************************************/
+  /* Checking client ID                                               */
+  /********************************************************************/
+
+  if(id == NULL)
+  {     
+        //char *id;
+        //int status = ssds_get_new_id(comm_sock, &id);
+        char *message;
+	ssds_js_cr_insert_code(json_gen, GENERATE_ID); //insert code into json
+	ssds_log(logDEBUG, "Inserted code %d into json.\n", GENERATE_ID);
+
+	ssds_js_cr_gen_id(json_gen, arch, release);    // generate message for server
+        ssds_log(logDEBUG, "Generated JSON for server with params: arch=%s, release=%s.\n", arch, release);
+
+        ssds_log(logDEBUG, "Generating message string.\n");
+        message = ssds_js_cr_to_string(json_gen);
+        ssds_log(logDEBUG, "Message string generated: \t%s\n", message);
+
+  	ssds_log(logMESSAGE, "Sending message to server.\n");
+	write(comm_sock, message, strlen(message));
+	ssds_log(logMESSAGE, "Message sent.\n");
+
+        // TODO: reading answer with generated ID from server
+        ssds_free(json_gen);
+        json_gen = ssds_js_cr_init(SEND_REPO);
+	// ssds_send_System_solv(comm_sock, data_sock, path);
+  }
+
+
   // this switch is now just for info about selected command
   switch(params->command)
   {
@@ -69,7 +144,7 @@ int main(int argc, char* argv[]){
 	case PAR_ERASE: 
 		ssds_log(logMESSAGE, "Erase of packages was selected.\n");
 		rpmts ts;
-		int rc, nf = 0;
+		int rc, noticeFlags = 0;
 
 	        rpmReadConfigFiles(NULL, NULL);
         	ts = rpmtsCreate();
@@ -87,15 +162,15 @@ int main(int argc, char* argv[]){
 
 		rpmprobFilterFlags flag = 0;
 
-        	nf |= INSTALL_LABEL | INSTALL_HASH;
-	        rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) nf);
+        	noticeFlags |= INSTALL_LABEL | INSTALL_HASH;
+	        rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) noticeFlags);
 
         	rc = rpmtsRun(ts, NULL, flag);
 	        if(rc == 0){
         	       ssds_log(logMESSAGE, "All packages was correctly erased.\n");
 		       rc = OK;
 	        }else{
-                       ssds_log(logWARNING, "Erasing ends with code %d\n", rc);
+                       ssds_log(logERROR, "Erasing ends with code %d\n", rc);
 		       rc = ERASE_ERROR;
 	        }
 
@@ -112,29 +187,16 @@ int main(int argc, char* argv[]){
  // check_for_missing_repos(); //check if client misses some repositories
 
   /*******************************************************************/
-  /* Creating json with all the info*/
+  /* Creating repo info JSON                                         */
   /*******************************************************************/
-  ssds_log(logDEBUG, "Client JSON creating. Package count %d.\n", params->pkg_count);
+  ssds_log(logDEBUG, "Client repo info JSON creating. Package count %d.\n", params->pkg_count);
 
   SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
   ssds_log(logDEBUG, "Local repo info initialized on %d. Package count %d.\n", local_repo, params->pkg_count);
   
-  SsdsJsonCreate* json_gen = ssds_js_cr_init(SEND_REPO); 
-  ssds_log(logDEBUG, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
-
-  SsdsJsonRead* json_read = ssds_js_rd_init();
-  ssds_log(logDEBUG, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
-  
   ssds_js_cr_insert_code(json_gen, SEND_REPO); //insert code into json
   ssds_log(logDEBUG, "Inserted code %d into json. Package count %d.\n", SEND_REPO, params->pkg_count);
   
-  /*
-   *  Getting architecture, release and path to @System.solv
-   */
-  char path[100];
-  char *arch = NULL, *release = NULL;
-  ssds_resolve_dependency_file_path(path, &arch, &release);
-
   // parsing local repo
   if(!ssds_parse_default_repo(local_repo))
   {
@@ -174,23 +236,6 @@ int main(int argc, char* argv[]){
   msg_output = ssds_js_cr_to_string(json_msg);
   ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
   
-  /***************************************************************/
-  /* Networking part - sending data to server and recieving      */
-  /***************************************************************/
-  ssds_log(logDEBUG, "Begin of network part.\n");
-
-  int data_sock, comm_sock, status;
-
-  status = client_connect(&data_sock, &comm_sock);
-
-  if(status != OK)
-  {
-	ssds_gc_cleanup();
-	return status;
-  }
-
-  ssds_log(logDEBUG, "Data socket: %d   Communication socket: %d.\n", data_sock, comm_sock);
-
   /***********************************************************/
   /* Sending @System.solv file                               */
   /***********************************************************/
