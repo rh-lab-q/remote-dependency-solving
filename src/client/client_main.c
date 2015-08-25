@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
   /*  Getting architecture, release and path to @System.solv          */ 
   /********************************************************************/
   char path[100];
-  char *arch = NULL, *release = NULL;
+  char *arch = NULL, *release = NULL, *message = NULL;
   ssds_resolve_dependency_file_path(path, &arch, &release);
 
   /********************************************************************/
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]){
   
   ssds_log(logDEBUG, "Client JSON creating. Package count %d.\n", params->pkg_count);
   
-  SsdsJsonCreate* json_gen = ssds_js_cr_init(SEND_REPO);
+  SsdsJsonCreate* json_gen = ssds_js_cr_init(GET_INSTALL);
   ssds_log(logDEBUG, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
 
   SsdsJsonRead* json_read = ssds_js_rd_init();
@@ -130,10 +130,28 @@ int main(int argc, char* argv[]){
 		 *  download packages
 		 *  install them
 		 */
+                status = ssds_send_repo(params, arch, release, comm_sock, GET_INSTALL);
+		if(status != OK)
+		{
+                	ssds_gc_cleanup();
+	                return status;
+	        }
+		
+		
+                if(ssds_check_repo(comm_sock, &message) != ANSWER_OK)
+		{
+			ssds_log(logWARNING,"%s\n", message);
+		}
+
 		break;
+
 	case PAR_UPDATE: 
 		ssds_log(logMESSAGE, "Update of packages was selected.\n");
+	        ssds_log(logERROR, "Update option has not been implemented yet.\n");
+		ssds_gc_cleanup();
+		return EXIT_SUCCESS;
                 break;
+
 	case PAR_ERASE: 
 		ssds_log(logMESSAGE, "Erase of packages was selected.\n");
 		rpmts ts;
@@ -174,53 +192,14 @@ int main(int argc, char* argv[]){
 
 	case PAR_CHK_DEP: 
 		ssds_log(logMESSAGE, "Dependency check of packages was selected.\n");
+		ssds_log(logERROR, "Dependency check option has not been implemented yet.\n");
+                ssds_gc_cleanup();
+                return EXIT_SUCCESS;
 		break;
   } 
   
  // check_for_missing_repos(); //check if client misses some repositories
 
-  /*******************************************************************/
-  /* Creating repo info JSON                                         */
-  /*******************************************************************/
-  ssds_log(logDEBUG, "Client repo info JSON creating. Package count %d.\n", params->pkg_count);
-
-  SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
-  ssds_log(logDEBUG, "Local repo info initialized on %d. Package count %d.\n", local_repo, params->pkg_count);
-  
-  ssds_js_cr_insert_code(json_gen, SEND_REPO); //insert code into json
-  ssds_log(logDEBUG, "Inserted code %d into json. Package count %d.\n", SEND_REPO, params->pkg_count);
-  
-  // parsing local repo
-  if(!ssds_parse_default_repo(local_repo))
-  {
-     ssds_gc_cleanup();
-     return REPO_ERROR;
-  }
-  ssds_log(logDEBUG, "Local repo is parsed. Package count %d.\n", params->pkg_count);
-
-  ssds_get_repo_urls(local_repo, json_gen, arch, release);
-  ssds_log(logDEBUG, "Getting repo urls. Package count %d.\n", params->pkg_count);
-  
-  ssds_log(logDEBUG, "Loop thrue required packages. Package count %d.\n", params->pkg_count);
-  for(int i = 0; i < params->pkg_count; i++)
-  {
-    char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
-    ssds_js_cr_add_package(json_gen, pkg);
-    ssds_log(logDEBUG, "Added %s package as %d in order.\n", pkg, i);
-  }
-  ssds_log(logDEBUG, "Loop is done.\n");
-
-  char* repo_output;
-  ssds_log(logDEBUG, "Generating output message with repo info to server.\n");
-  repo_output = ssds_js_cr_to_string(json_gen);
-  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n", repo_output);
-  
-  /***********************************************************/
-  /* Sending repo info to server                             */
-  /***********************************************************/
-  ssds_log(logMESSAGE, "Sending message with repo info to server.\n");
-  write(comm_sock, repo_output, strlen(repo_output));
-  ssds_log(logDEBUG, "Message sent.\n");
 
   ssds_log(logMESSAGE, "Reading answer from server.\n");
   char* buf = sock_recv(comm_sock);

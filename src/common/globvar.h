@@ -14,10 +14,10 @@ extern "C"{
        SEND_SOLV,
        SOLV_MORE_FRAGMENT,
        SOLV_NO_MORE_FRAGMENT,
-       SEND_REPO,
        GET_DEPENDENCY,
        GET_INSTALL,
        GET_UPDATE,
+       GET_ERASE,
        ANSWER_OK,
        ANSWER_WARNING,
        ANSWER_ERROR

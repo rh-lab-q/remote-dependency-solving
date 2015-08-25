@@ -30,6 +30,9 @@ static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/"
 static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
 
 int ssds_get_new_id(int socket, char **id, char *arch, char *release);
+int ssds_send_System_solv(int comm_sock, int data_sock, char *path);
+int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int comm_sock, int action);
+int ssds_check_repo(int socket, char **message);
 #ifdef __cplusplus
 }
 #endif

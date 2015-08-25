@@ -197,6 +197,8 @@ int core()
         {
         case SEND_SOLV:
             ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SEND_SOLV);
+	case SOLV_MORE_FRAGMENT:
+	    ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SOLV_MORE_FRAGMENT);
 	    SsdsJsonCreate *json_send = ssds_js_cr_init(ANSWER_OK);
 
 	    char *msg = ssds_js_cr_to_string(json_send);
@@ -255,7 +257,15 @@ int core()
             ssds_log(logDEBUG, "Finished writing @System.solv file.\n");
             break;
 
-        case SEND_REPO:
+        case GET_INSTALL:
+	    
+	    /* Checking repo files */
+	    /* TODO here should be checking of cached repo files !!! */
+	    ssds_log(logDEBUG, "Repo files checking.\n");
+ 
+	    ssds_js_cr_insert_code(json_send, ANSWER_OK);
+	    msg = ssds_js_cr_to_string(json_send);
+	    write(comm_sock, msg, strlen(msg));
 
             /* Dependency solving part */
             ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
@@ -308,6 +318,20 @@ int core()
             client_finished = 1;
 
             break;
+
+        case GET_UPDATE:
+        case GET_DEPENDENCY:
+	case GET_ERASE: 
+	    /* Checking repo files */
+            /* TODO here should be checking of cached repo files !!! */
+            ssds_log(logDEBUG, "Repo files checking.\n");
+
+	    SsdsJsonCreate *repo_answer = ssds_js_cr_init(ANSWER_OK);
+            char *repo_msg = ssds_js_cr_to_string(repo_answer);
+            write(comm_sock, repo_msg, strlen(repo_msg));
+	    ssds_free(repo_answer);
+	    client_finished = 1;
+	    break;
 	default: //client_finished = 1;
 		 break;
         }

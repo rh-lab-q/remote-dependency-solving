@@ -94,3 +94,65 @@ int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
 
   return OK; 
 }
+
+int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int comm_sock, int action)
+{
+  
+  ssds_log(logDEBUG, "Client repo info JSON creating.\n");
+
+  SsdsJsonCreate *json_gen = ssds_js_cr_init(action);
+  SsdsLocalRepoInfo* local_repo = ssds_repo_parse_init();
+
+  ssds_log(logDEBUG, "Local repo info initialized.\n");
+
+  // parsing local repo
+  if(!ssds_parse_default_repo(local_repo))
+  {
+     return REPO_ERROR;
+  }
+  ssds_log(logDEBUG, "Local repo is parsed.\n");
+  
+  ssds_get_repo_urls(local_repo, json_gen, arch, release);
+  ssds_log(logDEBUG, "Getting repo urls.\n");
+  
+  ssds_log(logDEBUG, "Loop thrue required packages.\n");
+  for(int i = 0; i < params->pkg_count; i++)
+  {
+     char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
+     ssds_js_cr_add_package(json_gen, pkg);
+     ssds_log(logDEBUG, "Added %s package as %d in order.\n", pkg, i+1);
+  }
+  ssds_log(logDEBUG, "Loop is done.\n");
+  
+  char* repo_output;
+  ssds_log(logDEBUG, "Generating output message with repo info to server.\n");
+  repo_output = ssds_js_cr_to_string(json_gen);
+  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n", repo_output);
+
+  /***********************************************************/
+  /* Sending repo info to server                             */
+  /***********************************************************/
+  ssds_log(logMESSAGE, "Sending message with repo info to server.\n");
+  write(comm_sock, repo_output, strlen(repo_output));
+  ssds_log(logDEBUG, "Message sent.\n");
+
+  return OK;
+}
+
+int ssds_check_repo(int socket, char **message)
+{
+	char *buffer = sock_recv(socket);
+	SsdsJsonRead *json = ssds_js_rd_init();
+        int rc = -1;
+
+        ssds_js_rd_parse(buffer, json);
+
+        rc = ssds_js_rd_get_code(json);
+      
+        if(rc != ANSWER_OK)
+        {
+           *message = ssds_js_rd_get_message(json);
+        }
+
+        return rc;
+}
