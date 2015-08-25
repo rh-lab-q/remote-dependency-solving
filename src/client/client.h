@@ -29,6 +29,7 @@ extern "C"{
 static const char *DOWNLOAD_TARGET_INSTALL = "/var/cache/ssds/packages/install/";
 static const char *DOWNLOAD_TARGET_UPDATE = "/var/cache/ssds/packages/update/";
 
+int ssds_get_new_id(int socket, char **id, char *arch, char *release);
 #ifdef __cplusplus
 }
 #endif

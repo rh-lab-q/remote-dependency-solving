@@ -91,27 +91,20 @@ int main(int argc, char* argv[]){
 
   if(id == NULL)
   {     
-        //char *id;
-        //int status = ssds_get_new_id(comm_sock, &id);
-        char *message;
-	ssds_js_cr_insert_code(json_gen, GENERATE_ID); //insert code into json
-	ssds_log(logDEBUG, "Inserted code %d into json.\n", GENERATE_ID);
+        status = ssds_get_new_id(comm_sock, &id, arch, release);
+	if(status != OK)
+	{
+		ssds_gc_cleanup();
+		return status;
+	}
 
-	ssds_js_cr_gen_id(json_gen, arch, release);    // generate message for server
-        ssds_log(logDEBUG, "Generated JSON for server with params: arch=%s, release=%s.\n", arch, release);
+	status = ssds_send_System_solv(comm_sock, data_sock, path);
+        if(status != OK)
+        {
+                ssds_gc_cleanup();
+                return status;
+        }
 
-        ssds_log(logDEBUG, "Generating message string.\n");
-        message = ssds_js_cr_to_string(json_gen);
-        ssds_log(logDEBUG, "Message string generated: \t%s\n", message);
-
-  	ssds_log(logMESSAGE, "Sending message to server.\n");
-	write(comm_sock, message, strlen(message));
-	ssds_log(logMESSAGE, "Message sent.\n");
-
-        // TODO: reading answer with generated ID from server
-        ssds_free(json_gen);
-        json_gen = ssds_js_cr_init(SEND_REPO);
-	// ssds_send_System_solv(comm_sock, data_sock, path);
   }
 
 
@@ -222,70 +215,6 @@ int main(int argc, char* argv[]){
   repo_output = ssds_js_cr_to_string(json_gen);
   ssds_log(logDEBUG, "Message generated.\n\n%s\n\n", repo_output);
   
-  /*******************************************************************/
-  /* Creating json for communication with server*/
-  /* For now client only sends to server @System.solv file*/
-  /* TODO - create some client identification.*/
-  /*******************************************************************/
-
-  SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV);
-  ssds_js_cr_insert_code(json_msg, SEND_SOLV);
-
-  char* msg_output;
-  ssds_log(logDEBUG, "Generating output message with info about sending @System.solv file to server.\n");
-  msg_output = ssds_js_cr_to_string(json_msg);
-  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
-  
-  /***********************************************************/
-  /* Sending @System.solv file                               */
-  /***********************************************************/
-  ssds_log(logMESSAGE, "Sending info about sending @System.solv file to server.\n");
-  write(comm_sock, msg_output, strlen(msg_output));
-  ssds_log(logMESSAGE, "Message sent.\n");
-
-  ssds_log(logDEBUG, "Path to sys.solv file : %s\n",path);
-  FILE * f;
-  f = fopen(path,"rb");
-
-  ssds_log(logDEBUG, "Opening @System.solv file.\n");
-  if(f == NULL)
-  {
-    ssds_log(logERROR,"Error while opening @System.solv file.\n");
-    ssds_gc_cleanup();
-    return FILE_ERROR;
-  }
-
-  ssds_log(logDEBUG, "Preparing .solv variables.\n");
-
-  char buffer[131072];
-  char msg_length[10];
-  char* server_response;
-  size_t bytes_read = 0;
-
-  ssds_log(logDEBUG, "Getting server response\n");
-  server_response = sock_recv(comm_sock);
-  ssds_log(logDEBUG, "Sending @System.solv file.\n");
-  while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
-  {
-      snprintf(msg_length,10,"%d",(int)bytes_read);
-      write(comm_sock, msg_length, strlen(msg_length));
-      ssds_log(logDEBUG, "Command sent.\n");
-      write(data_sock, buffer, bytes_read);
-      ssds_log(logDEBUG, "Data sent.\n");
-
-      server_response = sock_recv(comm_sock);
-
-      // TODO: fix this nonsens vvvvvvvvvvvvv
-      if(strcmp(server_response,"OK") != 0)
-      {
-        ssds_log(logERROR, "Networking error while sending @System.solv file.\n");
-        ssds_gc_cleanup();
-        return NETWORKING_ERROR;
-      }
-  }
-  msg_output = "@System.solv file sent";
-  write(comm_sock, msg_output, strlen(msg_output));
-
   /***********************************************************/
   /* Sending repo info to server                             */
   /***********************************************************/

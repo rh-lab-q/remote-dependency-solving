@@ -48,7 +48,17 @@ int ssds_rd_get_code(SsdsJsonRead* json)
   int ret=-1;
   JsonObject* obj=json_node_get_object(json->rootNode);
   if(json_object_has_member(obj, (gchar*)"code"))
-  ret=(int)json_object_get_int_member(obj, "code");
+        ret=(int)json_object_get_int_member(obj, "code");
+
+  return ret;
+}
+
+int ssds_js_rd_get_read_bytes(SsdsJsonRead* json)
+{
+  int ret=-1;
+  JsonObject* obj = json->dataObj;
+  if(json_object_has_member(obj, (gchar*)"read"))
+  	ret=(int)json_object_get_int_member(obj, "read");
   
   return ret;
 }

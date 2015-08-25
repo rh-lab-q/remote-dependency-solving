@@ -197,40 +197,57 @@ int core()
         {
         case SEND_SOLV:
             ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SEND_SOLV);
+	    SsdsJsonCreate *json_send = ssds_js_cr_init(ANSWER_OK);
+
+	    char *msg = ssds_js_cr_to_string(json_send);
             FILE * f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
             if(f == NULL)
             {
                 ssds_log(logERROR,"Error while creating @System.solv file.\n");
+		ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+                msg = ssds_js_cr_to_string(json_send);
+		write(comm_sock, msg, strlen(msg));	
                 ssds_gc_cleanup();
                 return FILE_ERROR;
             }
 
-            char* data_buffer;
+	    SsdsJsonRead *json_solv = ssds_js_rd_init();
+	    char* data_buffer;
             char* comm_buffer;
-            char* end_ptr;
             size_t bytes_written, bytes_to_write;
-            int i = 0;
+            int i = 0, code = 0;
        
-            write(comm_sock, "OK", strlen("OK"));
             while(1)
             {
                 comm_buffer = sock_recv(comm_sock);
-                if(strcmp(comm_buffer,"@System.solv file sent") == 0)
+               
+		ssds_js_rd_parse(comm_buffer, json_solv);		
+		code = ssds_js_rd_get_code(json_solv);
+		
+		if(code == SOLV_NO_MORE_FRAGMENT)
                 {
                     break;
                 }
                 data_buffer = sock_recv(data_sock);
 
-                bytes_to_write = strtol(comm_buffer, &end_ptr, 10);
+                bytes_to_write = (size_t)ssds_js_rd_get_read_bytes(json_solv);
                 bytes_written = fwrite(data_buffer ,1 ,bytes_to_write ,f);
                 
+                ssds_free(json_solv);   
+
                 if(bytes_written != bytes_to_write)
                 {
-                  write(comm_sock, "BYTES_ERROR", strlen("BYTES_ERROR"));
+		  ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+		  msg = ssds_js_cr_to_string(json_send);	
+                  write(comm_sock, msg, strlen(msg));
+		  ssds_free(json_send);
+		  ssds_log(logWARNING, "Bytes written diff from bytes to write.\n");
                   client_finished = 1;
                   break;
                 }
-                write(comm_sock, "OK", strlen("OK"));
+
+                json_solv = ssds_js_rd_init();
+                write(comm_sock, msg, strlen(msg));
                 ssds_log(logDEBUG, "Writing %d bytes to @System.solv file for the %d. time.\n", bytes_written, ++i);
             }
             fclose(f);
@@ -290,8 +307,11 @@ int core()
             client_finished = 1;
 
             break;
+	default: //client_finished = 1;
+		 break;
         }
     }
+    ssds_log(logDEBUG, "End of communication with client.\n");
     ssds_close(comm_sock);
     ssds_close(data_sock);
   }
