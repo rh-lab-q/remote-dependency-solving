@@ -134,7 +134,8 @@ target_link_libraries(lib_ssds_server
 
 #CLIENT
 set (ssds_client_srcs
-	src/client/client_main.c)
+	src/client/client_main.c
+	src/client/client.c)
 set (ssds_client_headers
 	src/client/client.h)
 add_library(lib_ssds_client STATIC ${ssds_client_srcs} ${ssds_client_headers})
