@@ -117,7 +117,14 @@ void ssds_js_cr_gen_id(SsdsJsonCreate* json, char* arch, char* release);
  * @param json		SsdsJsonCreate*
  * @param bytes_read	int
  */
-void ssds_set_read_bytes(SsdsJsonCreate* json, int bytes_read);
+void ssds_js_cr_set_read_bytes(SsdsJsonCreate* json, int bytes_read);
+
+/**
+ * Adds string message into json structure (just for error and warning messages).
+ * @param json  SsdsJsonCreate*
+ * @param msg	char*
+ */
+void ssds_js_cr_set_message(SsdsJsonCreate* json, char *msg);
 
 /** 
  * Adds name of package requested by client into json_create structure.
@@ -320,6 +327,13 @@ int ssds_js_rd_get_code(SsdsJsonRead* json);
  * @return          bytes count from json
  */
 int ssds_js_rd_get_read_bytes(SsdsJsonRead* json);
+
+/**
+ * Extracts string message from json.
+ * @param json      SsdsJsonRead structure holding parsed json in memory
+ * @return          message
+ */
+char* ssds_js_rd_get_message(SsdsJsonRead* json);
 
 /**
  * Finds all elements from recieved json. x_path is a string describing path to the elements. 

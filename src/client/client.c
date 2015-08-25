@@ -63,7 +63,7 @@ int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
   ssds_log(logDEBUG, "Sending @System.solv file.\n");
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
-      ssds_set_read_bytes(json_solv, (int) bytes_read);
+      ssds_js_cr_set_read_bytes(json_solv, (int) bytes_read);
       msg_length = ssds_js_cr_to_string(json_solv);  
 
       write(comm_sock, msg_length, strlen(msg_length));
@@ -77,10 +77,9 @@ int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
       server_response = sock_recv(comm_sock);
       ssds_js_rd_parse(server_response, json_read);
   
-      // TODO: fix this nonsens vvvvvvvvvvvvv
       if(ssds_js_rd_get_code(json_read) != ANSWER_OK)
       {
-         ssds_log(logERROR, "Networking error while sending @System.solv file. Code %d.\n", ssds_js_rd_get_code(json_read));
+         ssds_log(logERROR, "%s\n", ssds_js_rd_get_message(json_read));
          return NETWORKING_ERROR;
       }
      

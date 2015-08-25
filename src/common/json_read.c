@@ -63,6 +63,16 @@ int ssds_js_rd_get_read_bytes(SsdsJsonRead* json)
   return ret;
 }
 
+char* ssds_js_rd_get_message(SsdsJsonRead* json)
+{
+  char *msg = NULL;
+  JsonObject* obj = json->dataObj;
+  if(json_object_has_member(obj, (gchar*)"message"))
+        msg = (char *)json_object_get_string_member(obj, "message");
+
+  return msg;
+}
+
 GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path)
 {
   GList* ret = NULL;

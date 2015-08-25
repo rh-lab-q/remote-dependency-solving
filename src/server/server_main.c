@@ -238,6 +238,7 @@ int core()
                 if(bytes_written != bytes_to_write)
                 {
 		  ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+		  ssds_js_cr_set_message(json_send, "Bytes count corruption.");
 		  msg = ssds_js_cr_to_string(json_send);	
                   write(comm_sock, msg, strlen(msg));
 		  ssds_free(json_send);
