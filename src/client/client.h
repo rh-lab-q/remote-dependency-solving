@@ -33,6 +33,7 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release);
 int ssds_send_System_solv(int comm_sock, int data_sock, char *path);
 int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int comm_sock, int action);
 int ssds_check_repo(int socket, char **message);
+int ssds_answer_process(int socket, int action);
 #ifdef __cplusplus
 }
 #endif
