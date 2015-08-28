@@ -4,6 +4,23 @@
 //for debugging
 //#define DEBUG
 
+/* Client plan:
+ *  check id (if NULL - ask for it from server by message) TODO: gen. ID on server and store it into cfg gile
+ *  connect to server - done
+ *  if new id - send @System.solv - done
+ *  parse repo - done 
+ *  send repo info to server - done
+ *  if some repo on client side missing - read warning from server TODO: checking repo missing on server side
+ *  send message with requested operation and package names to server TODO: add update and erase option in json
+ *  read dep result - done
+ *  print dep result to user TODO: print that
+ *  
+ *  ----- only in update and install -----
+ *  ask if (update/install)/download/cancel 
+ *  download packages - done
+ *  install/update/erase them - done
+ */
+
 int main(int argc, char* argv[]){
 
   /*******************************************************************/
@@ -76,19 +93,6 @@ int main(int argc, char* argv[]){
  
   ssds_log(logDEBUG, "Data socket: %d   Communication socket: %d.\n", data_sock, comm_sock);
 
-
-  /********************************************************************/
-  /* JSON send and read initialization                                */
-  /********************************************************************/
-  
-  ssds_log(logDEBUG, "Client JSON creating. Package count %d.\n", params->pkg_count);
-  
-  SsdsJsonCreate* json_gen = ssds_js_cr_init(GET_INSTALL);
-  ssds_log(logDEBUG, "Json create initialized on %d. Package count %d.\n", json_gen, params->pkg_count);
-
-  SsdsJsonRead* json_read = ssds_js_rd_init();
-  ssds_log(logDEBUG, "Json read initialized on %d. Package count %d.\n", json_read, params->pkg_count);
-                            
   /********************************************************************/
   /* Checking client ID                                               */
   /********************************************************************/
@@ -110,22 +114,7 @@ int main(int argc, char* argv[]){
 
 	case PAR_INSTALL: 
 		ssds_log(logMESSAGE, "Installation of packages was selected.\n");
-		/* TODO (even in update and dep. check)
-		 *  check id (if NULL - ask for it from server by message)
-		 *  connect to server
-		 *  if new id - send @System.solv
-		 *  parse repo	
-		 *  send repo info to server
-		 *  if some repo on client side missing - read warning from server
-		 *  send message with requested operation and package names to server
-		 *  read dep result
-		 *  print dep result to user
-		 *  
-		 *  ----- only in update and install -----
-		 *  ask if (update/install)/download/cancel 
-		 *  download packages
-		 *  install them
-		 */
+
                 status = ssds_send_repo(params, arch, release, comm_sock, GET_INSTALL);
 		if(status != OK) break; 
 				
@@ -140,6 +129,17 @@ int main(int argc, char* argv[]){
 	case PAR_UPDATE: 
 		ssds_log(logMESSAGE, "Update of packages was selected.\n");
 	        ssds_log(logERROR, "Update option has not been implemented yet.\n");
+
+		/*status = ssds_send_repo(params, arch, release, comm_sock, GET_UPDATE);
+                if(status != OK) break;
+
+                if(ssds_check_repo(comm_sock, &message) != ANSWER_OK)
+                {
+                        ssds_log(logWARNING,"%s\n", message);
+                }
+
+                status = ssds_answer_process(comm_sock, GET_UPDATE);*/
+
                 break;
 
 	case PAR_ERASE: 
@@ -177,6 +177,17 @@ int main(int argc, char* argv[]){
 
         	rpmtsClean(ts);
 	        rpmtsFree(ts);
+
+		/*status = ssds_send_repo(params, arch, release, comm_sock, GET_ERASE);
+                if(status != OK) break;
+
+                if(ssds_check_repo(comm_sock, &message) != ANSWER_OK)
+                {
+                        ssds_log(logWARNING,"%s\n", message);
+                }
+
+                status = ssds_answer_process(comm_sock, GET_ERASE);*/
+
 		break;
 
 	case PAR_CHK_DEP: 
@@ -185,7 +196,6 @@ int main(int argc, char* argv[]){
 		break;
   } 
   
- // check_for_missing_repos(); //check if client misses some repositories
 end:
   ssds_log(logSSDS, "End of client.\n\n");
     
