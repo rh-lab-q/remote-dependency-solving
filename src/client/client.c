@@ -1,3 +1,26 @@
+/**
+ * Server side dependency solving 
+ * transfer of dependency solving from local machine to server when installing new packages
+ * 
+ * Copyright (C) 2015 Michal Ruprich, Josef Řídký, Walter Scherfel, Šimon Matěj
+ *
+ * Licensed under the GNU Lesser General Public License Version 2.1
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
 #include "client.h"
 
 int ssds_get_new_id(int socket, char **id, char *arch, char *release)
@@ -27,13 +50,15 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release)
 
 int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
 {
-  SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV), *json_solv = ssds_js_cr_init(SOLV_MORE_FRAGMENT);
-  SsdsJsonRead* json_read = ssds_js_rd_init();
+  SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV);
+  SsdsJsonRead* json_read = NULL;
 
   char* msg_output;
   ssds_log(logDEBUG, "Generating output message with info about sending @System.solv file to server.\n");
   msg_output = ssds_js_cr_to_string(json_msg);
   ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
+
+  ssds_free(json_msg);
 
   /***********************************************************/
   /* Sending @System.solv file                               */
@@ -60,20 +85,23 @@ int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
   char* server_response;
   size_t bytes_read = 0;
 
+  json_msg = ssds_js_cr_init(SOLV_MORE_FRAGMENT);
+
   ssds_log(logDEBUG, "Sending @System.solv file.\n");
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
-      ssds_js_cr_set_read_bytes(json_solv, (int) bytes_read);
-      msg_length = ssds_js_cr_to_string(json_solv);  
+      ssds_js_cr_set_read_bytes(json_msg, (int) bytes_read);
+      msg_length = ssds_js_cr_to_string(json_msg);  
 
       write(comm_sock, msg_length, strlen(msg_length));
       ssds_log(logDEBUG, "Command sent.\n");
       write(data_sock, buffer, bytes_read);
       ssds_log(logDEBUG, "Data sent.\n");
 
-      ssds_free(json_solv);
-      json_solv = ssds_js_cr_init(SOLV_MORE_FRAGMENT);
+      ssds_free(json_msg);
+      json_msg = ssds_js_cr_init(SOLV_MORE_FRAGMENT);
       
+      json_read = ssds_js_rd_init();
       server_response = sock_recv(comm_sock);
       ssds_js_rd_parse(server_response, json_read);
   
@@ -84,18 +112,18 @@ int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
       }
      
       ssds_free(json_read);
-      json_read = ssds_js_rd_init();
   }
 
   ssds_js_cr_insert_code(json_msg, SOLV_NO_MORE_FRAGMENT);
   msg_output = ssds_js_cr_to_string(json_msg);
   write(comm_sock, msg_output, strlen(msg_output));
   ssds_log(logDEBUG, "Message sent.\n");
+  ssds_free(json_msg);
 
   return OK; 
 }
 
-int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int comm_sock, int action)
+int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int socket, int action)
 {
   
   ssds_log(logDEBUG, "Client repo info JSON creating.\n");
@@ -133,7 +161,7 @@ int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int comm_sock
   /* Sending repo info to server                             */
   /***********************************************************/
   ssds_log(logMESSAGE, "Sending message with repo info to server.\n");
-  write(comm_sock, repo_output, strlen(repo_output));
+  write(socket, repo_output, strlen(repo_output));
   ssds_log(logDEBUG, "Message sent.\n");
 
   return OK;
@@ -172,7 +200,7 @@ int ssds_answer_process(int socket, int action)
     ssds_log(logERROR, "Error while recieving data\n");
     return NETWORKING_ERROR;
   }
-  ssds_log(logDEBUG, "Answer is OK.\n\n%s\n\n", buf);
+  ssds_log(logDEBUG, "Some answer has been delivered.\n\n%s\n\n", buf);
 
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
@@ -208,6 +236,7 @@ int ssds_answer_process(int socket, int action)
      case GET_ERASE:   num_pkg = ssds_js_rd_get_count(json, "erase_pkgs");
                        break;
      default: ssds_log(logWARNING, "Unsupported type of action.\n");
+	      ssds_free(json);
 	      return ACTION_ERROR;
   }
 
@@ -271,8 +300,13 @@ int ssds_answer_process(int socket, int action)
             g_error_free(error);
             return DOWNLOAD_ERROR;
           }
-        
-          ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
+          
+          if(return_status && (package_install_list != NULL || package_update_list != NULL))
+          {
+             ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
+          }else{
+  	     ssds_log(logMESSAGE, "No package to download.\n");
+          }
         }
 	/*********************************************************/
         /* Installing / Updating / Erasing packages              */
@@ -343,7 +377,9 @@ int ssds_answer_process(int socket, int action)
         rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) nf);
 
         rc = rpmtsRun(ts, NULL, flag);
-        if(rc == OK){
+        if(rc == OK && 
+	   (package_install_list != NULL || package_update_list != NULL || package_erase_list != NULL))
+	{
 	  switch(action){
 
 		case GET_INSTALL:
@@ -360,19 +396,26 @@ int ssds_answer_process(int socket, int action)
           }
 
         }else{
-	  switch(action){
+	  if(rc != OK){
+  	  	switch(action){
 
-                case GET_INSTALL:        
-                     ssds_log(logWARNING, "Installation of package %s end with code %d.\n",answer_from_srv->name, rc);
-                     break;
+                	case GET_INSTALL:        
+	                     ssds_log(logWARNING, "Installation of package %s end with code %d.\n",
+                                      answer_from_srv->name, rc);
+        	             break;
 
-                case GET_UPDATE:
-                     ssds_log(logWARNING, "Updating of package %s end with code %d.\n",answer_from_srv->name, rc);
-                     break;
-                case GET_ERASE:
-                     ssds_log(logWARNING, "Erasing of package %s end with code %d.\n",answer_from_srv->name, rc);
-                     break;
+                	case GET_UPDATE:
+	                     ssds_log(logWARNING, "Updating of package %s end with code %d.\n",
+				      answer_from_srv->name, rc);
+        	             break;
+                	case GET_ERASE:
+	                     ssds_log(logWARNING, "Erasing of package %s end with code %d.\n",
+				      answer_from_srv->name, rc);
+        	             break;
 
+          	}
+          }else{
+		ssds_log(logMESSAGE, "Nothing to do.\n");
           }
         }
 
@@ -383,6 +426,7 @@ int ssds_answer_process(int socket, int action)
         g_slist_free_full(package_update_list, (GDestroyNotify) lr_packagetarget_free);
 	//g_slist_free_full(package_erase_list, (GDestroyNotify) ssds_free);
         ssds_free(answer_from_srv);
+	ssds_free(json);
   }
 
   return rc;
