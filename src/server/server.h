@@ -20,12 +20,13 @@ extern "C"{
 #include "../common/cfg_parsing.h"
 #include "../common/errors.h"
 
+int ssds_server_init(int *comm_desc, int *data_desc, int *comm_addr_len, int *data_addr_len);
 
+int ssds_server_accept_connection(int comm_desc, int data_desc, int comm_addr_len, int data_addr_len);
+
+int ssds_server_process(int comm_port, int data_port, char *clietn_ip, int *client_end);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif
-
-int core();

@@ -119,7 +119,8 @@ target_link_libraries(lib_ssds_common
 
 #SERVER
 set (ssds_server_srcs
-	src/server/server_main.c)
+	src/server/server_main.c
+	src/server/server.c)
 set (ssds_server_headers
 	src/server/server.h)
 add_library(lib_ssds_server STATIC ${ssds_server_srcs} ${ssds_server_headers})
