@@ -70,8 +70,8 @@ int main(int argc, char* argv[]){
   /********************************************************************/
 
   char *server_address, *id;
-  long int comm_port, data_port;
-  read_cfg(&id, &server_address, &comm_port, &data_port);
+  long int port;
+  read_cfg(&id, &server_address, &port);
 
   /********************************************************************/
   /*  Getting architecture, release and path to @System.solv          */ 
@@ -85,13 +85,13 @@ int main(int argc, char* argv[]){
   /********************************************************************/
   ssds_log(logDEBUG, "Network part.\n");
 
-  int data_sock, comm_sock;
+  int socket;
 
-  status = client_connect(&data_sock, &comm_sock, server_address, data_port, comm_port);
+  status = client_connect(&socket, server_address, port);
 
   if(status != OK) goto end;
  
-  ssds_log(logDEBUG, "Data socket: %d   Communication socket: %d.\n", data_sock, comm_sock);
+  ssds_log(logDEBUG, "Communication socket: %d.\n", socket);
 
   /********************************************************************/
   /* Checking client ID                                               */
@@ -99,10 +99,10 @@ int main(int argc, char* argv[]){
 
   if(id == NULL)
   {     
-        status = ssds_get_new_id(comm_sock, &id, arch, release);
+        status = ssds_get_new_id(socket, &id, arch, release);
 	if(status != OK) goto end;
 
-	status = ssds_send_System_solv(comm_sock, data_sock, path);
+	status = ssds_send_System_solv(socket, path);
         if(status != OK) goto end;
 
   }
@@ -115,30 +115,30 @@ int main(int argc, char* argv[]){
 	case PAR_INSTALL: 
 		ssds_log(logMESSAGE, "Installation of packages was selected.\n");
 
-                status = ssds_send_repo(params, arch, release, comm_sock, GET_INSTALL);
+                status = ssds_send_repo(params, arch, release, socket, GET_INSTALL);
 		if(status != OK) break; 
 				
-                if(ssds_check_repo(comm_sock, &message) != ANSWER_OK)
+                if(ssds_check_repo(socket, &message) != ANSWER_OK)
 		{
 			ssds_log(logWARNING,"%s\n", message);
 		}
 
-		status = ssds_answer_process(comm_sock, GET_INSTALL);
+		status = ssds_answer_process(socket, GET_INSTALL);
 		break;
 
 	case PAR_UPDATE: 
 		ssds_log(logMESSAGE, "Update of packages was selected.\n");
 	        ssds_log(logERROR, "Update option has not been implemented yet.\n");
 
-		/*status = ssds_send_repo(params, arch, release, comm_sock, GET_UPDATE);
+		/*status = ssds_send_repo(params, arch, release, socket, GET_UPDATE);
                 if(status != OK) break;
 
-                if(ssds_check_repo(comm_sock, &message) != ANSWER_OK)
+                if(ssds_check_repo(socket, &message) != ANSWER_OK)
                 {
                         ssds_log(logWARNING,"%s\n", message);
                 }
 
-                status = ssds_answer_process(comm_sock, GET_UPDATE);*/
+                status = ssds_answer_process(socket, GET_UPDATE);*/
 
                 break;
 
@@ -178,15 +178,15 @@ int main(int argc, char* argv[]){
         	rpmtsClean(ts);
 	        rpmtsFree(ts);
 
-		/*status = ssds_send_repo(params, arch, release, comm_sock, GET_ERASE);
+		/*status = ssds_send_repo(params, arch, release, socket, GET_ERASE);
                 if(status != OK) break;
 
-                if(ssds_check_repo(comm_sock, &message) != ANSWER_OK)
+                if(ssds_check_repo(socket, &message) != ANSWER_OK)
                 {
                         ssds_log(logWARNING,"%s\n", message);
                 }
 
-                status = ssds_answer_process(comm_sock, GET_ERASE);*/
+                status = ssds_answer_process(socket, GET_ERASE);*/
 
 		break;
 

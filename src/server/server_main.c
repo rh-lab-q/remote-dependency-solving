@@ -31,18 +31,18 @@ int main(int argc, char* argv[]) {
   signal(SIGSEGV, ssds_signal_handler);
   signal(SIGTERM, ssds_signal_handler);
 
-  int status = OK, comm_desc, data_desc, comm_addr_len, data_addr_len;
+  int status = OK, comm_desc, comm_addr_len;
   
   parse_params_srv(argc, argv);
 
   ssds_log(logSSDS, "Server started.\n");
   ssds_log(logDEBUG, "Params parsed.\n");
 
-  status = ssds_server_init(&comm_desc, &data_desc, &comm_addr_len, &data_addr_len);
+  status = ssds_server_init(&comm_desc, &comm_addr_len);
   if(status != OK) goto end;
  
   while(1){
-	status = ssds_server_accept_connection(comm_desc, data_desc, comm_addr_len, data_addr_len);
+	status = ssds_server_accept_connection(comm_desc, comm_addr_len);
 	if(status != OK) goto end;
   }
 end:

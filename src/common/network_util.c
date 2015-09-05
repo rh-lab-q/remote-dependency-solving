@@ -63,42 +63,83 @@ char* sock_recv(int sock_fd)
   return reply;
 }
 
-int client_connect(int *data_sock, int *comm_sock, char *server_address, long int data_port, long int comm_port)
+ssize_t sock_solv_recv(int sock_fd, char **buffer)
+{
+  *buffer = (char*)ssds_malloc(MAX_INPUT_LEN*sizeof(char));
+  memset(*buffer, 0, MAX_INPUT_LEN);
+  ssize_t retVal = read(sock_fd, *buffer , MAX_INPUT_LEN);
+
+  if(retVal == -1)
+  {
+    ssds_log(logERROR, "Unable to read data from socket\n");
+    ssds_free(*buffer);
+    return retVal;
+  }
+
+  if(retVal == MAX_INPUT_LEN)
+  {
+    char* buff = (char*)ssds_malloc(BUFF_SIZE*sizeof(char));
+    memset(buff, 0, BUFF_SIZE);
+
+    int read_count = 0;
+    int buff_size = 1;
+    ssize_t ret;
+    memcpy(buff, *buffer, MAX_INPUT_LEN);
+
+    do
+    {
+      read_count++;
+      memset(*buffer, 0, MAX_INPUT_LEN);
+
+      if(read_count*MAX_INPUT_LEN >= buff_size*BUFF_SIZE)
+        buff = ssds_realloc(buff, ++buff_size*BUFF_SIZE);
+
+      ret = read(sock_fd, *buffer , MAX_INPUT_LEN);
+      retVal += ret;
+      memcpy(buff+read_count*MAX_INPUT_LEN, *buffer, MAX_INPUT_LEN);
+
+    }while(!(ret < MAX_INPUT_LEN));
+
+    ssds_free(*buffer);
+    *buffer = buff;
+  }
+  //no buffer is needed for very short messages
+  return retVal;
+}
+ 
+ 
+
+int client_connect(int *socket, char *server_address, long int port)
 {
 
   int connection_try = 1;
 
-  *comm_sock = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  *data_sock = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  *socket = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
   ssds_log(logDEBUG, "Setted up socket descriptor.\n");
 
   ssds_log(logDEBUG, "Setting up connection to server.\n");
-  struct sockaddr_in server_data;
   struct sockaddr_in server_comm;
 
   server_comm.sin_addr.s_addr = inet_addr(server_address);
-  server_data.sin_addr.s_addr = inet_addr(server_address);
   ssds_log(logDEBUG, "Set server address.\n");
 
   server_comm.sin_family = AF_INET;
-  server_data.sin_family = AF_INET;
   ssds_log(logDEBUG, "Set comunication protocol.\n");
 
-  server_comm.sin_port = htons(comm_port);
-  server_data.sin_port = htons(data_port);
+  server_comm.sin_port = htons(port);
   ssds_log(logDEBUG, "Set server port.\n");
 
   ssds_log(logDEBUG, "Socket controll.\n");
-  if(*comm_sock == -1 || *data_sock == -1)
+  if(*socket == -1)
   {
-    ssds_log(logERROR, "Client encountered an error when creating sockets for communication and data.\n");
+    ssds_log(logERROR, "Client encountered an error when creating socket for communication.\n");
     return SOCKET_ERROR;
   }
 
   ssds_log(logDEBUG, "Socket controll - OK.\n");
 
   ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
-  while((connect(*comm_sock, (struct sockaddr *)&server_comm, sizeof(server_comm)) < 0) && (connection_try < 3))
+  while((connect(*socket, (struct sockaddr *)&server_comm, sizeof(server_comm)) < 0) && (connection_try < 3))
   {
      ssds_log(logMESSAGE, "Unable to connect to comm. socket on server. Trying that again above 5 sec.\n");
      sleep(5);
@@ -110,19 +151,6 @@ int client_connect(int *data_sock, int *comm_sock, char *server_address, long in
     return NETWORKING_ERROR;
   }
 
-  connection_try = 1;
-
-  ssds_log(logMESSAGE, "Trying to connect to data socket...(1 of 3)\n");
-  while((connect(*data_sock,(struct sockaddr *)&server_data, sizeof(server_data)) < 0) && (connection_try < 3))
-  {
-      ssds_log(logMESSAGE, "Unable to connect to data socket. Trying again in 5 sec.\n");
-      sleep(5);
-      ssds_log(logMESSAGE, "Trying to connect to data socket...(%d of 3)\n", ++connection_try);
-  }
-  if(connection_try == 3){
-    ssds_log(logERROR, "Unable to connect data socket on server. Please, check out your network connection and try it again later.\n");
-    return NETWORKING_ERROR;
-  }
   ssds_log(logMESSAGE, "Connection to server is established.\n");
 
   return OK;

@@ -48,25 +48,15 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release)
   return OK;
 }
 
-int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
+int ssds_send_System_solv(int socket, char *path)
 {
   SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV);
-  SsdsJsonRead* json_read = NULL;
 
   char* msg_output;
-  ssds_log(logDEBUG, "Generating output message with info about sending @System.solv file to server.\n");
-  msg_output = ssds_js_cr_to_string(json_msg);
-  ssds_log(logDEBUG, "Message generated.\n\n%s\n\n---- END OF PARSING PART ----\n\n", msg_output);
-
-  ssds_free(json_msg);
 
   /***********************************************************/
   /* Sending @System.solv file                               */
   /***********************************************************/
-  ssds_log(logMESSAGE, "Sending info about sending @System.solv file to server.\n");
-  write(comm_sock, msg_output, strlen(msg_output));
-  ssds_log(logMESSAGE, "Message sent.\n");
-
   ssds_log(logDEBUG, "Path to sys.solv file : %s\n",path);
   FILE * f;
   f = fopen(path,"rb");
@@ -78,49 +68,47 @@ int ssds_send_System_solv(int comm_sock, int data_sock, char *path)
     return FILE_ERROR;
   }
 
+  ssds_log(logDEBUG, "Getting size of @System.solv file.\n");
+
+  fseek(f, 0, SEEK_END);
+  ssize_t size = ftell(f);
+  fseek(f, 0, SEEK_SET);
+
+  ssds_log(logDEBUG, "Size of @System.solv file is %d.\n", size);
+  ssds_js_cr_set_read_bytes(json_msg, (int) size);
+  msg_output = ssds_js_cr_to_string(json_msg);
+  write(socket, msg_output, strlen(msg_output));
   ssds_log(logDEBUG, "Preparing .solv variables.\n");
 
   char buffer[131072];
-  char* msg_length;
-  char* server_response;
   size_t bytes_read = 0;
-
-  json_msg = ssds_js_cr_init(SOLV_MORE_FRAGMENT);
 
   ssds_log(logDEBUG, "Sending @System.solv file.\n");
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
-      ssds_js_cr_set_read_bytes(json_msg, (int) bytes_read);
-      msg_length = ssds_js_cr_to_string(json_msg);  
-
-      write(comm_sock, msg_length, strlen(msg_length));
-      ssds_log(logDEBUG, "Command sent.\n");
-      write(data_sock, buffer, bytes_read);
+      write(socket, buffer, bytes_read);
       ssds_log(logDEBUG, "Data sent.\n");
-
-      ssds_free(json_msg);
-      json_msg = ssds_js_cr_init(SOLV_MORE_FRAGMENT);
-      
-      json_read = ssds_js_rd_init();
-      server_response = sock_recv(comm_sock);
-      ssds_js_rd_parse(server_response, json_read);
-  
-      if(ssds_js_rd_get_code(json_read) != ANSWER_OK)
-      {
-         ssds_log(logERROR, "%s\n", ssds_js_rd_get_message(json_read));
-         return NETWORKING_ERROR;
-      }
-     
-      ssds_free(json_read);
   }
-
-  ssds_js_cr_insert_code(json_msg, SOLV_NO_MORE_FRAGMENT);
-  msg_output = ssds_js_cr_to_string(json_msg);
-  write(comm_sock, msg_output, strlen(msg_output));
-  ssds_log(logDEBUG, "Message sent.\n");
   ssds_free(json_msg);
 
-  return OK; 
+  char *buff = sock_recv(socket);
+  
+  SsdsJsonRead *json = ssds_js_rd_init();
+  
+  ssds_js_rd_parse(buff, json);
+
+  int rc = ssds_js_rd_get_code(json);
+
+  if(rc != ANSWER_OK)
+  {
+     ssds_log(logERROR, "Message from server: %s\n", ssds_js_rd_get_message(json));
+     rc = NETWORKING_ERROR;
+  }else{
+     rc = OK;
+  }
+  ssds_free(buff);
+
+  return rc; 
 }
 
 int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int socket, int action)
@@ -170,6 +158,7 @@ int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int socket, i
 int ssds_check_repo(int socket, char **message)
 {
   char *buffer = sock_recv(socket);
+
   SsdsJsonRead *json = ssds_js_rd_init();
   int rc = -1;
 

@@ -49,15 +49,22 @@ extern "C"{
 char* sock_recv(int sock_fd);
 
 /** 
+ * Function to recieve data of previously unknown length from socket. 
+ * There is a buffer that resizes according to the size of recieved data.
+ * @param sock_fd  File descriptor for socket that is recieving data
+ * @param buffer   buffer with recieved data - needs to be freed in the end
+ * @return         count of readed bytes
+ */
+ssize_t sock_solv_recv(int sock_fd, char **buffer);
+
+/** 
  * Function to connect client to server. 
- * @param  *data_sock  		data socket
- * @param  *comm_sock  		communication socket
+ * @param  *socket  		communication socket
  * @param  *server_address	IP of server
- * @param  data_port		data port
  * @param  comm_port  		communication port
  * @return int         OK or error code
  */
-int client_connect(int *data_sock, int *comm_sock, char *server_address, long int data_port, long int comm_port);
+int client_connect(int *socket, char *server_address, long int comm_port);
 
 #ifdef __cplusplus
 }
