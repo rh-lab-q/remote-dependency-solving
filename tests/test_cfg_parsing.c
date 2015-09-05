@@ -33,18 +33,17 @@ int complex_read()
     printf("unable to test, cannot create new file\n");
     return 1;
   }
-  char *tst_str = "address=127.0.0.2\nport=951\ndata-port=789\n";
+  char *tst_str = "address=127.0.0.2\nport=951\n";
 
   fwrite(tst_str, sizeof(char), strlen(tst_str), tempfile);
   fseek(tempfile, 0, SEEK_SET);
 
   char *address, *id;
-  long int p1, p2;
-  read_cfg(&id, &address, &p1, &p2);
+  long int p1;
+  read_cfg(&id, &address, &p1);
 
   fail_if(strcmp(address, "127.0.0.2") != 0);
   fail_if(p1 != 951);
-  fail_if(p2 != 789);
   fail_if(id != NULL);
 
   ssds_free(address);
@@ -70,12 +69,11 @@ int invalid_file()
   fseek(tempfile, 0, SEEK_SET);
 
   char *address, *id;
-  long int p1, p2;
-  read_cfg(&id, &address, &p1, &p2);
+  long int p1;
+  read_cfg(&id, &address, &p1);
 
   fail_if(strcmp(address, "127.0.0.1") != 0);
   fail_if(p1 != 2345);
-  fail_if(p2 != 2346);
   fail_if(id != NULL);
 
   ssds_free(address);
@@ -101,8 +99,8 @@ int param_too_long()
   fseek(tempfile, 0, SEEK_SET);
 
   char *address, *id;
-  long int p1, p2;
-  read_cfg(&id, &address, &p1, &p2);
+  long int p1;
+  read_cfg(&id, &address, &p1);
 
   fail_if(p1 != 4815);
   

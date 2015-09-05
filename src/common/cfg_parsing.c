@@ -1,7 +1,7 @@
 
 #include "cfg_parsing.h"
 
-int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* ret_data_port)
+int read_cfg(char **id, char** ret_address, long int* ret_comm_port)
 {
   /*
   ** reads connection configuration from CFG file
@@ -12,7 +12,7 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* r
   /********************************************************************/
   *id = NULL;
 
-  char *address, *comm_port, *data_port;
+  char *address, *comm_port;
   FILE* cfg_file;
   cfg_file = fopen(CFG_FILE, "r");
   if (cfg_file == NULL)
@@ -23,7 +23,6 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* r
     strncpy(*ret_address, "127.0.0.1\0", 10);
 
     *ret_comm_port = 2345;
-    *ret_data_port = 2346;
     return 1;
   }
  
@@ -34,11 +33,9 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* r
 
   char* address_sstr = "address=";
   char* comm_port_sstr = "port=";
-  char* data_port_sstr = "data-port=";
 
   int address_parsed = 0;
   int comm_port_parsed = 0;
-  int data_port_parsed = 0;
 
   do
   {
@@ -52,8 +49,6 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* r
           fmstate = 'a';
         else if (act_c == 'p') //port
           fmstate = 'p';
-        else if (act_c == 'd') //data-port
-          fmstate = 'd';
         else fmstate = 'c'; //ignore invalid lines
       break;
 
@@ -104,26 +99,6 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* r
         }
       break;
 
-      case 'd':
-        for (int i1 = 2; i1 <= 9; i1++)
-        {
-          act_c = fgetc(cfg_file);
-          if (act_c != data_port_sstr[i1])
-          {
-            fmstate = 'c';
-            break;
-          }
-        }
-        if (fmstate == 'd')
-        {
-          data_port = file_read_value(cfg_file, 5);
-          *ret_data_port = strtol(data_port, NULL, 10);
-          ssds_free(data_port);
-          data_port_parsed = 1;
-          fmstate = 'e';
-        }
-      break;
-
       default:
       break;
     }
@@ -141,12 +116,90 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port, long int* r
   {
     *ret_comm_port = 2345;
   }
-  if (!data_port_parsed)
+
+  ssds_log(logDEBUG, "server: %s, comm port: %ld\n", *ret_address, *ret_comm_port);
+
+  return 0;
+}
+
+int read_srv_cfg(long int* ret_comm_port)
+{
+  /*
+   * reads connection configuration from CFG file
+   */
+
+  char *comm_port;
+  FILE* cfg_file;
+  cfg_file = fopen(CFG_FILE, "r");
+  if (cfg_file == NULL)
   {
-    *ret_data_port = 2346;
+    ssds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
+
+    *ret_comm_port = 2345;
+    return 1;
   }
 
-  ssds_log(logDEBUG, "server: %s, comm port: %ld, data port: %ld\n", *ret_address, *ret_comm_port, *ret_data_port);
+  ssds_log(logDEBUG, "CFG file opened.\n");
+
+  char fmstate = 'e';
+  char act_c;
+
+  char* comm_port_sstr = "port=";
+
+  int comm_port_parsed = 0;
+
+  do
+  {
+    act_c = fgetc(cfg_file);
+    switch (fmstate)
+    {
+      case 'e':
+        if (act_c == '#') //comment
+          fmstate = 'c';
+        else if (act_c == 'p') //port
+          fmstate = 'p';
+        else fmstate = 'c'; //ignore invalid lines
+      break;
+
+      case 'c':
+        if (act_c == '\n')
+          fmstate = 'e';
+      break;
+
+      case 'p':
+        for (int i1 = 2; i1 <= 4; i1++)
+        {
+          act_c = fgetc(cfg_file);
+          if (act_c != comm_port_sstr[i1])
+          {
+            fmstate = 'c';
+            break;
+          }
+        }
+        if (fmstate == 'p')
+        {
+          comm_port = file_read_value(cfg_file, 5);
+          *ret_comm_port = strtol(comm_port, NULL, 10);
+          ssds_free(comm_port);
+          comm_port_parsed = 1;
+          fmstate = 'e';
+        }
+      break;
+
+      default:
+      break;
+    }
+  }
+  while (act_c != EOF);
+
+  fclose(cfg_file);
+
+  if (!comm_port_parsed)
+  {
+    *ret_comm_port = 2345;
+  }
+
+  ssds_log(logDEBUG, "comm port: %ld\n", *ret_comm_port);
 
   return 0;
 }
