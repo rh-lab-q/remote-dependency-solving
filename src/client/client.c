@@ -420,3 +420,51 @@ int ssds_answer_process(int socket, int action)
 
   return rc;
 }
+
+int ssds_question(char* question, int possibilities)
+{
+	
+	int status = NO, repeat = 1;;
+        char answer;
+	switch(possibilities)
+	{
+		case YES_NO: ssds_log(logQUESTION, "%s\n[y/n]: ", question);
+			     while(repeat)
+			     {
+			     	scanf("%c\n", &answer);
+				switch(answer)
+				{
+					case 'y': status = YES;
+						  repeat = 0;
+						  break;
+					case 'n': repeat = 0;
+						  break;
+					default: ssds_log(logWARNING, "Unsupported answer. You should choose y for yes or n for no.\n");
+						 break;
+				}
+			     }
+			     break;
+		case YES_NO_DOWNLOAD: ssds_log(logQUESTION, "%s\n[y/n/d]: ", question);
+                            	      while(repeat)
+	                              {
+         		                 scanf("%c\n", &answer);
+                        		 switch(answer)
+                                	 {
+                                        	case 'y': status = YES;
+                                                	  repeat = 0;
+	                                                  break;
+        	                                case 'n': repeat = 0;
+                	                                  break;
+						case 'd': status = DOWNLOAD;
+							  repeat = 0;
+							  break;
+                        	                default: ssds_log(logWARNING, "Unsupported answer. You should choose y for yes, n for no or d for download only.\n");     
+                                	                 break;
+                     		         }
+		     		      }
+				      break;
+	}
+		
+	return status;
+
+}

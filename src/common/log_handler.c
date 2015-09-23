@@ -20,7 +20,7 @@
 
 #include "log_handler.h"
 
-const char* log_lvl_msg[6] = {"INFO", "MESSAGE", "WARNING", "ERROR", "DEBUG", "SSDS"};
+const char* log_lvl_msg[7] = {"INFO", "MESSAGE", "WARNING", "ERROR", "DEBUG", "SSDS", "QUESTION"};
 int __verbose = 0;
 int __debug = 0;
 
@@ -52,6 +52,11 @@ void ssds_log(int log_level, const char *message, ...)
       fprintf(stdout, "\033[92m[%d/%d/%d %02d:%02d:%02d SSDS]\033[0m: ",
                 ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
                 ts->tm_hour, ts->tm_min, ts->tm_sec);
+      vfprintf(stdout, message, args);
+      break;
+
+    case logQUESTION:
+      fprintf(stdout, "\033[1;92m[QUESTION]\033[0m: ");
       vfprintf(stdout, message, args);
       break;
 

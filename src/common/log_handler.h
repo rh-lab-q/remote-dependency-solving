@@ -38,11 +38,12 @@ enum LogClass{
   logWARNING,       /**< WARNING is for describing unorthodox or undefined behaviour */
   logERROR,         /**< ERROR is for fatal situations */
   logDEBUG,         /**< DEBUG is only for debugging - prints only when __debug == 1*/
-  logSSDS	    /**< SSDS is just for first and last message of server and client - printed everytime */
+  logSSDS,	    /**< SSDS is just for first and last message of server and client - printed everytime */
+  logQUESTION	    /**< QUESTION is for messages, which will wait for user interaction */
 };        
   
 /** Contains severence level message for ssds_log function */
-extern const char* log_lvl_msg[6];
+extern const char* log_lvl_msg[7];
 
 /**
  * Used on global scope to indicate if verbose option is on. 

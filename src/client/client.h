@@ -48,6 +48,14 @@ extern "C"{
 #include "../common/detect_missing_repos.h"
 #include "../common/packages.h"
 
+enum{
+	YES,
+	NO,
+	DOWNLOAD,
+	YES_NO,
+	YES_NO_DOWNLOAD,
+};
+
 /**
  * Asking for new client ID from server.
  * @param socket    int socket handler
@@ -92,6 +100,14 @@ int ssds_check_repo(int socket, char **message);
  * @return          Returns OK if the recieved json is valid, otherwise error code.
  */
 int ssds_answer_process(int socket, int action);
+
+/**
+ * Asking user for his wish.
+ * @param question  	char* string for print
+ * @param possibilities int type (number) of offered possibilities
+ * @return              Returns chosen possibility.
+ */
+int ssds_question(char* question, int possibilities);
 
 #ifdef __cplusplus
 }
