@@ -58,6 +58,14 @@ char* sock_recv(int sock_fd);
 ssize_t sock_solv_recv(int sock_fd, char **buffer);
 
 /** 
+ * Function for secure transfer data to client/server . 
+ * @param socket   communication socket
+ * @param *message transfered message
+ * @param length   length of message
+ */
+void secure_write(int socket, char* message, ssize_t length);
+
+/** 
  * Function to connect client to server. 
  * @param  *socket  		communication socket
  * @param  *server_address	IP of server

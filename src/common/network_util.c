@@ -108,6 +108,11 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer)
 }
  
  
+void secure_write(int socket, char* message, ssize_t length)
+{
+
+	write(socket, message, length);
+}
 
 int client_connect(int *socket, char *server_address, long int port)
 {

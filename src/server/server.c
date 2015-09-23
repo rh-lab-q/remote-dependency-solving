@@ -122,7 +122,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
                 ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
 		ssds_js_cr_set_message(json_send, "Error while creating @System.solv file on server side.");
                 msg = ssds_js_cr_to_string(json_send);
-		write(socket, msg, strlen(msg));
+		secure_write(socket, msg, strlen(msg));
                 status = FILE_ERROR;
                 goto processEnd;
             }
@@ -157,7 +157,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
 				   (((double)bytes_written/(double)bytes_to_write)*100));
             }
             msg = ssds_js_cr_to_string(json_send);
-            write(socket, msg, strlen(msg));
+            secure_write(socket, msg, strlen(msg));
             fclose(f);
 	    ssds_log(logDEBUG, "Finished writing @System.solv file.\n");
             break;
@@ -169,7 +169,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             ssds_log(logDEBUG, "Repo files checking.\n");
 
             msg = ssds_js_cr_to_string(json_send);
-            write(socket, msg, strlen(msg));
+            secure_write(socket, msg, strlen(msg));
 
             /* Dependency solving part */
             ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
@@ -218,7 +218,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             ssds_js_cr_dump(json_send);
             msg = ssds_js_cr_to_string(json_send);
 //             printf("%s\n\n", msg);
-            write(socket, msg, strlen(msg));
+            secure_write(socket, msg, strlen(msg));
             *client_end = 1;
             break;
 
@@ -230,7 +230,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
            ssds_log(logDEBUG, "Repo files checking.\n");
 
            msg = ssds_js_cr_to_string(json_send);
-           write(socket, msg, strlen(msg));
+           secure_write(socket, msg, strlen(msg));
            *client_end = 1;
            break;
 

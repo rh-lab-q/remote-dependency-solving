@@ -38,7 +38,7 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release)
   ssds_log(logDEBUG, "Message string generated: \t%s\n", message);
 
   ssds_log(logMESSAGE, "Sending message to server.\n");
-  write(socket, message, strlen(message));
+  secure_write(socket, message, strlen(message));
   ssds_log(logMESSAGE, "Message sent.\n");
 
   *id = NULL;
@@ -77,7 +77,7 @@ int ssds_send_System_solv(int socket, char *path)
   ssds_log(logDEBUG, "Size of @System.solv file is %d.\n", size);
   ssds_js_cr_set_read_bytes(json_msg, (int) size);
   msg_output = ssds_js_cr_to_string(json_msg);
-  write(socket, msg_output, strlen(msg_output));
+  secure_write(socket, msg_output, strlen(msg_output));
   ssds_log(logDEBUG, "Preparing .solv variables.\n");
 
   char buffer[131072];
@@ -86,7 +86,7 @@ int ssds_send_System_solv(int socket, char *path)
   ssds_log(logDEBUG, "Sending @System.solv file.\n");
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
-      write(socket, buffer, bytes_read);
+      secure_write(socket, buffer, bytes_read);
       ssds_log(logDEBUG, "Data sent.\n");
   }
   ssds_free(json_msg);
@@ -149,7 +149,7 @@ int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int socket, i
   /* Sending repo info to server                             */
   /***********************************************************/
   ssds_log(logMESSAGE, "Sending message with repo info to server.\n");
-  write(socket, repo_output, strlen(repo_output));
+  secure_write(socket, repo_output, strlen(repo_output));
   ssds_log(logDEBUG, "Message sent.\n");
 
   return OK;
