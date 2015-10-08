@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
  
   while(1){
 	status = ssds_server_accept_connection(comm_desc, comm_addr_len);
-	if(status != OK) goto end;
+	if(status == EXIT) goto end;
   }
 end:
   ssds_gc_cleanup();

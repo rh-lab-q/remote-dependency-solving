@@ -38,7 +38,8 @@ enum ERRORS
 	INSTALL_ERROR,
         UPDATE_ERROR,
         ERASE_ERROR,
-        ACTION_ERROR
+        ACTION_ERROR,
+	EXIT
 };
 
 #endif
