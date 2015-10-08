@@ -65,7 +65,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list);
  * @param answer              SsdsJsonCreate*
  * @param sack                HySack*
  */
-void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack);
+//void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack);
 
 /**
  * Solves dependency for one package. Needs to be called in loop for all packages.
@@ -74,7 +74,7 @@ void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* 
  * @param answer    SsdsJsonCreate*
  * @param sack      HySack*
  */
-void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack);
+int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack);
 
 
 #ifdef __cplusplus

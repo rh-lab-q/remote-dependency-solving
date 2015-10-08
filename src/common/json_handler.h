@@ -160,7 +160,7 @@ void ssds_js_cr_pkgs_init(SsdsJsonCreate* json);
  * @param goal      HyGoal*
  * @param name      const char*
  */
-void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name);
+void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal);
 
 /** 
  * Converts json_create into string so that it can be sent over network
@@ -367,7 +367,7 @@ int ssds_js_rd_get_code(SsdsJsonRead* json);
  * @param pkgs      SsdsPkgInfo*
  * @param json      SsdsJsonRead*
  */
-void ssds_js_rd_get_packages(SsdsPkgInfo* pkgs, SsdsJsonRead* json);
+void ssds_js_rd_get_packages(char** pkgs, SsdsJsonRead* json);
 
 /**
  * Used by server to get information about repos owned by client.

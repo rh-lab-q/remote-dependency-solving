@@ -390,15 +390,15 @@ void ssds_js_cr_pkgs_init(SsdsJsonCreate* json)
 }
 
 
-void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
+void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
 {
-  if(!json_object_has_member(json->dataObj,(const gchar*)"install_pkgs"))
+  if(!json_object_has_member(json->dataObj,(const gchar*)"install"))
   {
-    ssds_js_cr_pkgs_init(json);
+    ssds_js_cr_new_data(json, JS_ARRAY, "install", NULL);
   }
   else
   {
-    json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"install_pkgs");
+    json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"install");
   }
   
   JsonNode* new_node = json_node_new(JSON_NODE_OBJECT);
@@ -410,19 +410,15 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
   
   HyPackageList goal_pkgs = hy_packagelist_create();
   HyPackage pkg;
-  
-  //"name" in install_pkgs in json
+  //array of objects in install in json
   goal_pkgs = hy_goal_list_installs(*goal);
-  json_object_set_string_member(json->currObj, (gchar*)"name", name);
-  
-  //array "install" in install_pkgs in json
-  goal_pkgs = hy_goal_list_installs(*goal);
-  JsonNode* new_inside = json_node_new(JSON_NODE_ARRAY);
-  new_inside = json_node_new(JSON_NODE_ARRAY);
-  json_object_set_member(json->currObj, (gchar*)"install", new_inside);
-  JsonArray* new_arr = json_array_new();
-  new_arr = json_array_new();
-  json_node_take_array(new_inside, new_arr);
+	
+//   JsonNode* new_inside = json_node_new(JSON_NODE_ARRAY);
+//   new_inside = json_node_new(JSON_NODE_ARRAY);
+//   json_object_set_member(json->currObj, (gchar*)"install", new_inside);
+//   JsonArray* new_arr = json_array_new();
+//   new_arr = json_array_new();
+//   json_node_take_array(new_inside, new_arr);
 
   //adding objects to install array
   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
@@ -430,7 +426,7 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     new_node = json_node_new(JSON_NODE_OBJECT);
     new_obj = json_object_new();
     json_node_take_object(new_node, new_obj);
-    json_array_add_object_element(new_arr, new_obj);
+    json_array_add_object_element(json->currArray, new_obj);
     
     pkg = hy_packagelist_get(goal_pkgs, i);
     
@@ -449,50 +445,31 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal, const char* name)
     }
   }
   
+  //TODO - sem jenom pridat to samy pro erase a upgrade
+  
+//   goal_pkgs = hy_goal_list_erasures(*goal);
 //   new_inside = json_node_new(JSON_NODE_ARRAY);
-//   json_object_set_member(json->currObj, (gchar*)"download_address", new_inside);
+//   json_object_set_member(json->currObj, (gchar*)"erase", new_inside);
 //   new_arr = json_array_new();
 //   json_node_take_array(new_inside, new_arr);
-  
-//   GSList* possible_urls = NULL;
+//   
 //   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
 //   {
 //     pkg = hy_packagelist_get(goal_pkgs, i);
-//     if(hy_package_get_baseurl(pkg)==NULL)
-//     {
-//       if(g_slist_find_custom(possible_urls, hy_package_get_reponame(pkg), ssds_strcmp)==NULL)
-//       {
-//         json_array_add_string_element(new_arr, hy_package_get_reponame(pkg));
-//         possible_urls = g_slist_append(possible_urls ,(char *)hy_package_get_reponame(pkg));
-//       }
-//     }
-//     else
-//       json_array_add_string_element(new_arr, hy_package_get_baseurl(pkg));
+//     json_array_add_string_element(new_arr,hy_package_get_location(pkg));
 //   }
-  
-  goal_pkgs = hy_goal_list_erasures(*goal);
-  new_inside = json_node_new(JSON_NODE_ARRAY);
-  json_object_set_member(json->currObj, (gchar*)"erase", new_inside);
-  new_arr = json_array_new();
-  json_node_take_array(new_inside, new_arr);
-  
-  for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
-  {
-    pkg = hy_packagelist_get(goal_pkgs, i);
-    json_array_add_string_element(new_arr,hy_package_get_location(pkg));
-  }
-  
-  goal_pkgs = hy_goal_list_upgrades(*goal);
-  new_inside = json_node_new(JSON_NODE_ARRAY);
-  json_object_set_member(json->currObj, (gchar*)"upgrade", new_inside);
-  new_arr = json_array_new();
-  json_node_take_array(new_inside, new_arr);
-  
-  for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
-  {
-    pkg = hy_packagelist_get(goal_pkgs, i);
-    json_array_add_string_element(new_arr, hy_package_get_location(pkg));
-  }
+//   
+//   goal_pkgs = hy_goal_list_upgrades(*goal);
+//   new_inside = json_node_new(JSON_NODE_ARRAY);
+//   json_object_set_member(json->currObj, (gchar*)"upgrade", new_inside);
+//   new_arr = json_array_new();
+//   json_node_take_array(new_inside, new_arr);
+//   
+//   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
+//   {
+//     pkg = hy_packagelist_get(goal_pkgs, i);
+//     json_array_add_string_element(new_arr, hy_package_get_location(pkg));
+//   }
 }
 
 int ssds_strcmp(gconstpointer a, gconstpointer b){

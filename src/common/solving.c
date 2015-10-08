@@ -32,7 +32,7 @@
 //   return ret;
 // }
 
-void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
+void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)//TODO - sem dostat spravny sack asi pomoci pool_set_installed
 {
  // for(ssds_repo::metadata_files_location* loc : metadata.files_locations)
   guint i;
@@ -58,54 +58,46 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)
   }
 }
 
-void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack)
+int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack)
 {
+	//TODO - pridat moznost erase a upgrade jako typ operace do hlavicky - jestli to jde!!
+	
   HyQuery query = hy_query_create(*sack);
-  hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request);
-  hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
+  hy_query_filter_in(query, HY_PKG_NAME, HY_SUBSTR, request); //TODO - sem dostat misto stringu pole stringu
+  //hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
   hy_query_filter_latest_per_arch(query, 1);
     
   /* Getting list of packages from the query */
   HyPackageList plist = hy_packagelist_create();
   plist = hy_query_run(query);
-    
-  HyPackage test;
-  ssds_log(logMESSAGE,"No. of packages found by query: %d.\n", hy_packagelist_count(plist));
-  
+	
+  HyPackage pkg;
+	HyGoal goal = hy_goal_create(*sack);
   for(int i = 0; i < hy_packagelist_count(plist); i++)
   {
-    test = hy_packagelist_get(plist, i);
-    if(hy_package_get_baseurl(test) == NULL)
-      printf("Pkgs're from: %s\n",hy_package_get_reponame(test));
+    pkg = hy_packagelist_get(plist, i);
+    hy_goal_install(goal, pkg);
+		
+    if(hy_goal_run(goal) == 0)
+			ssds_log(logMESSAGE, "Dependencies for %s are ok.\n", hy_package_get_name(pkg));
   }
-    
-  HyPackage pkg;
-  pkg = hy_packagelist_get(plist, 0);
-    
-  /* GOAL */
-  HyGoal goal = hy_goal_create(*sack);
-  hy_goal_install(goal, pkg);
-  if(hy_goal_run(goal) == 0)
-    ssds_log(logMESSAGE, "Dependencies are ok.\n");
-    
-//     answer.install_pkgs_init();
-  ssds_js_cr_pkgs_insert(answer, &goal, request);
-//     answer.install_pkgs_insert(&goal, request);
-}
-
-
-void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack)
-{
-  ssds_log(logDEBUG,"Dependencies answer.\n");
-  SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
-  ssds_js_rd_get_packages(pkgs, client_data);
   
-  ssds_log(logDEBUG,"Answer after get_packages.\n");
-  int i;
-  for(i = 0; i < pkgs->length; i++)
-  {
-    ssds_log(logDEBUG,"Answer in for loop.\n");
-    ssds_dep_query(pkgs->packages[i], answer, sack);
-//     query(pkgs->packages[i], answer);
-  }
+  ssds_js_cr_pkgs_insert(answer, &goal);
 }
+
+
+// void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack)
+// {
+//   ssds_log(logDEBUG,"Dependencies answer.\n");
+//   SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
+//   ssds_js_rd_get_packages(pkgs, client_data);
+//   
+//   ssds_log(logDEBUG,"Answer after get_packages.\n");
+//   int i;
+//   for(i = 0; i < pkgs->length; i++)
+//   {
+//     ssds_log(logDEBUG,"Answer in for loop.\n");
+//     ssds_dep_query(pkgs->packages[i], answer, sack);
+// //     query(pkgs->packages[i], answer);
+//   }
+// }

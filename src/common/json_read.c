@@ -101,20 +101,21 @@ int ssds_js_rd_get_code(SsdsJsonRead* json)
   return ret;
 }
 
-void ssds_js_rd_get_packages(struct SsdsPkgInfo* pkgs, SsdsJsonRead* json)
+void ssds_js_rd_get_packages(char** pkgs, SsdsJsonRead* json)
 {
   JsonArray* array = json_object_get_array_member(json->dataObj, "req_pkgs");
   guint len = json_array_get_length(array);
-  pkgs->packages = (char**)ssds_malloc(len*sizeof(char*));
+  //pkgs->packages = (char**)ssds_malloc(len*sizeof(char*));
   
   guint i;
   for(i = 0; i < len; i++)
   {
-    pkgs->packages[i] = (char*)ssds_malloc((strlen((char*)json_array_get_string_element(array,i)) + 1)*sizeof(char));
+    pkgs[i] = (char*)malloc((strlen((char*)json_array_get_string_element(array,i)) + 1)*sizeof(char));
     char* word = (char*)json_array_get_string_element(array, i);
-    strcpy(pkgs->packages[i], word);
-    pkgs->length++;
+    strcpy(pkgs[i], word);
   }
+  
+  pkgs[++i]=NULL;
 }
 
 

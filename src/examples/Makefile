@@ -1,13 +1,12 @@
-#soubor: Makefile
-# Michal Ruprich, xrupri00, RedHat, SSDS - hawkey example
+GCC= gcc
+FLAGS= -std=c11
+INCLUDE=-I/usr/include/solv -I/usr/include/hawkey
+LINK=-l hawkey -l solv
 
-CC=gcc
-CFLAGS= -std=c11
+all: custom_solv
 
-all: server client
-server:
-	$(CC) $(CFLAGS) server.c -o server
-client: 
-	$(CC) $(CFLAGS) client.c -o client
+custom_solv:
+	$(GCC) $(FLAGS) $(INCLUDE) $(LINK) custom_solv.c -o custom_solv
+
 clean:
-	rm -rf server client *.o
+	rm custom_solv

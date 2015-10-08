@@ -123,11 +123,12 @@ int main(int argc, char* argv[]){
 			ssds_log(logWARNING,"%s\n", message);
 		}
 
+		
 		status = ssds_answer_process(socket, GET_INSTALL);
 		break;
 
 	case PAR_UPDATE: 
-		ssds_log(logMESSAGE, "Update of packages was selected.\n");
+          ssds_log(logMESSAGE, "Update of packages was selected.\n");
 	        ssds_log(logERROR, "Update option has not been implemented yet.\n");
 
 		/*status = ssds_send_repo(params, arch, release, socket, GET_UPDATE);

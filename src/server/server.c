@@ -174,13 +174,15 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             /* Dependency solving part */
             ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
 
-            SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
+            //SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
+						int pkg_count = ssds_js_rd_get_count(json_read, "req_pkgs");
+						char** pkgs = (char**)malloc((pkg_count+1)*sizeof(char*));
             ssds_js_rd_get_packages(pkgs, json_read);
 
             ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
-            for(int i = 0; i < pkgs->length; i++)
+            for(int i = 0; i < pkg_count; i++)
             {
-              ssds_log(logDEBUG, "\t%s\n", pkgs->packages[i]);
+              ssds_log(logDEBUG, "\t%s\n", pkgs[i]);
             }
 
             ssds_log(logDEBUG, "Getting repo info from client.\n");
@@ -200,7 +202,6 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
             ssds_locate_repo_metadata(/*json, */list, meta_list);
 
-            //TODO - change this so that it doesn't need to be created manually
             HySack sack;
             #if VERSION_HAWKEY
                 sack = hy_sack_create(NULL, NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
@@ -212,8 +213,9 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             HySack* sack_p = &sack;
             ssds_fill_sack(sack_p, meta_list);
             
+						ssds_dep_query(pkgs, json_send, sack_p);
             ssds_js_cr_insert_code(json_send, ANSWER_OK);
-            ssds_dep_answer(json_read, json_send, sack_p);
+//             ssds_dep_answer(json_read, json_send, sack_p);
 
             ssds_js_cr_dump(json_send);
             msg = ssds_js_cr_to_string(json_send);

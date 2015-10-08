@@ -191,6 +191,7 @@ int ssds_answer_process(int socket, int action)
   }
   ssds_log(logDEBUG, "Some answer has been delivered.\n\n%s\n\n", buf);
 
+	return;
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
   
@@ -294,7 +295,7 @@ int ssds_answer_process(int socket, int action)
           {
              ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
           }else{
-  	     ssds_log(logMESSAGE, "No package to download.\n");
+  	         ssds_log(logMESSAGE, "No package to download.\n");
           }
         }
 	/*********************************************************/
