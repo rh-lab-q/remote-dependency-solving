@@ -393,59 +393,92 @@ void ssds_js_cr_pkgs_init(SsdsJsonCreate* json)
 void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
 {
   if(!json_object_has_member(json->dataObj,(const gchar*)"install"))
-  {
     ssds_js_cr_new_data(json, JS_ARRAY, "install", NULL);
-  }
   else
-  {
     json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"install");
-  }
-  
-  JsonNode* new_node = json_node_new(JSON_NODE_OBJECT);
-  JsonObject* new_obj = json_object_new();
-  json_node_take_object(new_node, new_obj);
-  
-  json_array_add_object_element(json->currArray, new_obj);
-  json->currObj = new_obj;
   
   HyPackageList goal_pkgs = hy_packagelist_create();
   HyPackage pkg;
   //array of objects in install in json
   goal_pkgs = hy_goal_list_installs(*goal);
 	
-//   JsonNode* new_inside = json_node_new(JSON_NODE_ARRAY);
-//   new_inside = json_node_new(JSON_NODE_ARRAY);
-//   json_object_set_member(json->currObj, (gchar*)"install", new_inside);
-//   JsonArray* new_arr = json_array_new();
-//   new_arr = json_array_new();
-//   json_node_take_array(new_inside, new_arr);
-
   //adding objects to install array
   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
   {
-    new_node = json_node_new(JSON_NODE_OBJECT);
-    new_obj = json_object_new();
-    json_node_take_object(new_node, new_obj);
-    json_array_add_object_element(json->currArray, new_obj);
-    
-    pkg = hy_packagelist_get(goal_pkgs, i);
-    
-    json_object_set_string_member(new_obj, (gchar*)"pkg_name", hy_package_get_name(pkg));
-    json_object_set_string_member(new_obj, (gchar*)"pkg_loc", hy_package_get_location(pkg));
-    
-    if(hy_package_get_baseurl(pkg) == NULL)
+		pkg = hy_packagelist_get(goal_pkgs, i);
+		
+		ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
+		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
+		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
+		
+		if(hy_package_get_baseurl(pkg) == NULL)
     {
-      json_object_set_string_member(new_obj, (gchar*)"base_url", NULL);
-      json_object_set_string_member(new_obj, (gchar*)"metalink", hy_package_get_reponame(pkg));
+			ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
     }
     else
     {
-      json_object_set_string_member(new_obj, (gchar*)"base_url", hy_package_get_baseurl(pkg));
-      json_object_set_string_member(new_obj, (gchar*)"metalink", hy_package_get_reponame(pkg));
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
     }
   }
   
-  //TODO - sem jenom pridat to samy pro erase a upgrade
+  if(!json_object_has_member(json->dataObj,(const gchar*)"update"))
+    ssds_js_cr_new_data(json, JS_ARRAY, "update", NULL);
+  else
+    json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"update");
+	
+	goal_pkgs = hy_goal_list_upgrades(*goal);
+	
+	//adding objects to update array
+  for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
+  {
+		pkg = hy_packagelist_get(goal_pkgs, i);
+		
+		ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
+		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
+		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
+		
+		if(hy_package_get_baseurl(pkg) == NULL)
+    {
+			ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+    }
+    else
+    {
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+    }
+  }
+	
+	if(!json_object_has_member(json->dataObj,(const gchar*)"erase"))
+    ssds_js_cr_new_data(json, JS_ARRAY, "erase", NULL);
+  else
+    json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"erase");
+  
+	goal_pkgs = hy_goal_list_erasures(*goal);
+	
+	//adding objects to install array
+  for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
+  {
+		pkg = hy_packagelist_get(goal_pkgs, i);
+		
+		ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
+		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
+		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
+		
+		if(hy_package_get_baseurl(pkg) == NULL)
+    {
+			ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+    }
+    else
+    {
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+    }
+  }
+  //TODO - udelat to trosku min redundantne nejlepe jako funkci at se da vyuzit cely spektrum moznosti toho get_list
   
 //   goal_pkgs = hy_goal_list_erasures(*goal);
 //   new_inside = json_node_new(JSON_NODE_ARRAY);
