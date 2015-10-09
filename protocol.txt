@@ -67,23 +67,19 @@ Example:
   possible child tags of "data" sent from server side:
   
     result of dependency solving - packages to install:
-      "install_pkgs" :
-      [
-      	{
-      	  "name" : String //name of package requested by client
-          "install" : [
-             {
-               "pkg_name": String,
-               "pkg_loc": pkg1,
-               "base_url": String, (even NULL)
-               //if download_address will be removed
-	       "metalink": String
-	       //if download_address will stay
-               "metalink": Int
-             }, 
-             {pkg2}, {pkg3} ... ]
-          "erase" : [pkg1, pkg2, pkg3 ...]
-          "update" : [pkg1, pkg2, pkg3 ...] // same as in install array
+        "install" : [
+           {
+             "pkg_name": String,
+             "pkg_loc": pkg1,
+             "base_url": String, (even NULL)
+             //if download_address will be removed
+	     "metalink": String
+	     //if download_address will stay
+             "metalink": Int
+           }, 
+           {pkg2}, {pkg3} ... ]
+        "erase" : [pkg1, pkg2, pkg3 ...]
+        "update" : [pkg1, pkg2, pkg3 ...] // same as in install array
       	},
       	{}...
       ],
@@ -95,39 +91,35 @@ Example coresponding to client example above:
   "code" : 1,
   "data" :
   {
-    "install_pkgs":
+    "install" : 
     [
       {
-        "name" : "emacs",
-        "install" : 
-        [
-          {
-		"pkg_name":"why-xemacs-2.34-13.fc21-noarch",
-                "pkg_loc": "Packages/w/why-xemacs-2.34-13.fc21-noarch.rpm",
-                "base_url": NULL,
-	        //if download_address will be removed vvvv
-                "metalink": "https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64"
-		//if download_address will stay
-		"metalink": 0
+	"pkg_name":"why-xemacs-2.34-13.fc21-noarch",
+        "pkg_loc": "Packages/w/why-xemacs-2.34-13.fc21-noarch.rpm",
+        "base_url": NULL,
+	//if download_address will be removed vvvv
+        "metalink": "https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64"
+	//if download_address will stay
+	"metalink": 0
 			
-          } // vvvv same as previous
+      } // vvvv same as previous
 
-	  "why-2.34-13.fc21-x86_64",
-	  "xemacs-21.5.34-8.20140605hgacf1c26e3019.fc21-x86_64",
-	  "Canna-libs-3.7p3-44.fc21-x86_64",
-	  "compface-1.5.2-18.fc21-x86_64",
-	  "neXtaw-0.15.1-22.fc21-x86_64",
-	  "xemacs-common-21.5.34-8.20140605hgacf1c26e3019.fc21-x86_64",
-	  "xemacs-packages-base-20140715-1.fc21-noarch",
-	  "xorg-x11-fonts-ISO8859-1-100dpi-7.5-14.fc21-noarch",
-	  "xorg-x11-fonts-ISO8859-1-75dpi-7.5-14.fc21-noarch"
+	"why-2.34-13.fc21-x86_64",
+	"xemacs-21.5.34-8.20140605hgacf1c26e3019.fc21-x86_64",
+	"Canna-libs-3.7p3-44.fc21-x86_64",
+	"compface-1.5.2-18.fc21-x86_64",
+	"neXtaw-0.15.1-22.fc21-x86_64",
+	"xemacs-common-21.5.34-8.20140605hgacf1c26e3019.fc21-x86_64",
+	"xemacs-packages-base-20140715-1.fc21-noarch",
+	"xorg-x11-fonts-ISO8859-1-100dpi-7.5-14.fc21-noarch",
+	"xorg-x11-fonts-ISO8859-1-75dpi-7.5-14.fc21-noarch"
 	],
 	"erase" : [],
 	"upgrade" : []
 	"download_address":
     	[
-      		"https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",
-      		"https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64"
+      	  "https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",
+      	  "https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64"
     	]
       },
       {
