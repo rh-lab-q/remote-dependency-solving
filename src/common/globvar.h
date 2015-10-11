@@ -41,6 +41,7 @@ extern "C"{
        GET_INSTALL,
        GET_UPDATE,
        GET_ERASE,
+			 GET_UPDATE_ALL,
        ANSWER_OK,
        ANSWER_WARNING,
        ANSWER_ERROR

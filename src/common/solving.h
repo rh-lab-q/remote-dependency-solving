@@ -74,7 +74,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list);
  * @param answer    SsdsJsonCreate*
  * @param sack      HySack*
  */
-int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack);
+int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, int operation, int pkg_count);
 
 
 #ifdef __cplusplus

@@ -163,6 +163,8 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             break;
 
         case GET_INSTALL:
+				case GET_UPDATE:
+				case GET_UPDATE_ALL:
 
             /* Checking repo files */
             /* TODO here should be checking of cached repo files !!! */
@@ -174,17 +176,21 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             /* Dependency solving part */
             ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
 
+						char** pkgs;
+						int pkg_count;
             //SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
-						int pkg_count = ssds_js_rd_get_count(json_read, "req_pkgs");
-						char** pkgs = (char**)malloc((pkg_count+1)*sizeof(char*));
-            ssds_js_rd_get_packages(pkgs, json_read);
+						if(ssds_js_rd_get_code(json_read) != GET_UPDATE_ALL)
+						{
+							pkg_count = ssds_js_rd_get_count(json_read, "req_pkgs");
+							pkgs = (char**)malloc((pkg_count+1)*sizeof(char*));
+							ssds_js_rd_get_packages(pkgs, json_read);
 
-            ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
-            for(int i = 0; i < pkg_count; i++)
-            {
-              ssds_log(logDEBUG, "\t%s\n", pkgs[i]);
-            }
-
+							ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
+							for(int i = 0; i < pkg_count; i++)
+							{
+								ssds_log(logDEBUG, "\t%s\n", pkgs[i]);
+							}
+						}
             ssds_log(logDEBUG, "Getting repo info from client.\n");
 
             SsdsRepoInfoList* list = ssds_js_rd_list_init();
@@ -213,7 +219,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             HySack* sack_p = &sack;
             ssds_fill_sack(sack_p, meta_list);
             
-						ssds_dep_query(pkgs, json_send, sack_p);
+						ssds_dep_query(pkgs, json_send, sack_p, ssds_js_rd_get_code(json_read), pkg_count);
             ssds_js_cr_insert_code(json_send, ANSWER_OK);
 //             ssds_dep_answer(json_read, json_send, sack_p);
 
@@ -224,7 +230,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             *client_end = 1;
             break;
 
-        case GET_UPDATE:
+        
         case GET_DEPENDENCY:
         case GET_ERASE:
            /* Checking repo files */

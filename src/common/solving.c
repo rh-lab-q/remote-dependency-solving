@@ -58,30 +58,56 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)//TODO - sem dostat
   }
 }
 
-int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack)
+int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, int operation, int pkg_count)
 {
+	printf("dep_query \n");
 	//TODO - pridat moznost erase a upgrade jako typ operace do hlavicky - jestli to jde!!
-	
-  HyQuery query = hy_query_create(*sack);
-  hy_query_filter_in(query, HY_PKG_NAME, HY_SUBSTR, request); //TODO - sem dostat misto stringu pole stringu
-  //hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
-  hy_query_filter_latest_per_arch(query, 1);
-    
-  /* Getting list of packages from the query */
-  HyPackageList plist = hy_packagelist_create();
-  plist = hy_query_run(query);
-	
-  HyPackage pkg;
+	HyQuery query = hy_query_create(*sack);
 	HyGoal goal = hy_goal_create(*sack);
-  for(int i = 0; i < hy_packagelist_count(plist); i++)
-  {
-    pkg = hy_packagelist_get(plist, i);
-    hy_goal_install(goal, pkg);
+	HyPackageList plist = hy_packagelist_create();
+	HyPackage pkg;
+	
+	if(operation == GET_UPDATE_ALL)
+	{
+		printf("get_update_all\n");
+// 		hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
+		hy_goal_upgrade_all(sack);
+		hy_goal_run(goal);
+		printf("po run\n");
+	}
+	else
+	{
+		if(pkg_count >1)
+			hy_query_filter_in(query, HY_PKG_NAME, HY_SUBSTR, request); 
+		else
+			hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request[0]);
 		
-    if(hy_goal_run(goal) == 0)
-			ssds_log(logMESSAGE, "Dependencies for %s are ok.\n", hy_package_get_name(pkg));
-  }
-  
+		
+		hy_query_filter_latest_per_arch(query, 1);
+			
+		/* Getting list of packages from the query */
+		plist = hy_query_run(query);
+		
+		for(int i = 0; i < hy_packagelist_count(plist); i++)
+		{
+			pkg = hy_packagelist_get(plist, i);
+			switch(operation)
+			{
+				case GET_INSTALL:
+					hy_goal_install(goal, pkg);
+					break;
+				case GET_UPDATE:
+					hy_goal_upgrade_to(goal, pkg);
+					break;
+				case GET_ERASE:
+					hy_goal_erase(goal, pkg);
+					break;
+			}
+			if(hy_goal_run(goal) == 0)
+				ssds_log(logMESSAGE, "Dependencies for %s are ok.\n", hy_package_get_name(pkg));
+		}
+	}
+	printf("pred insert\n");
   ssds_js_cr_pkgs_insert(answer, &goal);
 }
 

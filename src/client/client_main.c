@@ -60,11 +60,13 @@ int main(int argc, char* argv[]){
     status = PARAMS_ERROR;
     goto end;
   }
-
+  
   ssds_log(logDEBUG, "Client params initialized.\n");
   ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
   ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
  
+	if((params->pkg_count == 0) && (params->command == PAR_UPDATE))
+		params->command = PAR_UPDATE_ALL;
   /********************************************************************/
   /* Load configuration                                               */
   /********************************************************************/
@@ -131,7 +133,7 @@ int main(int argc, char* argv[]){
           ssds_log(logMESSAGE, "Update of packages was selected.\n");
 	        ssds_log(logERROR, "Update option has not been implemented yet.\n");
 
-		/*status = ssds_send_repo(params, arch, release, socket, GET_UPDATE);
+		status = ssds_send_repo(params, arch, release, socket, GET_UPDATE);
                 if(status != OK) break;
 
                 if(ssds_check_repo(socket, &message) != ANSWER_OK)
@@ -139,7 +141,7 @@ int main(int argc, char* argv[]){
                         ssds_log(logWARNING,"%s\n", message);
                 }
 
-                status = ssds_answer_process(socket, GET_UPDATE);*/
+                status = ssds_answer_process(socket, GET_UPDATE);
 
                 break;
 
@@ -194,6 +196,19 @@ int main(int argc, char* argv[]){
 	case PAR_CHK_DEP: 
 		ssds_log(logMESSAGE, "Dependency check of packages was selected.\n");
 		ssds_log(logERROR, "Dependency check option has not been implemented yet.\n");
+		break;
+		
+	case PAR_UPDATE_ALL:
+		ssds_log(logMESSAGE, "Update all packages was initiated.\n");
+		status = ssds_send_repo(params, arch, release, socket, GET_UPDATE_ALL);
+		if(status != OK) break;
+
+    if(ssds_check_repo(socket, &message) != ANSWER_OK)
+		{
+			ssds_log(logWARNING,"%s\n", message);
+		}
+
+		status = ssds_answer_process(socket, GET_UPDATE);
 		break;
   } 
   

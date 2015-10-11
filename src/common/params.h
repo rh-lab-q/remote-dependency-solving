@@ -38,7 +38,8 @@ enum ParamsOptions{
   PAR_INSTALL,      /**< 1 Install option chosen */
   PAR_CHK_DEP,      /**< 2 Only check if dependencies are fulfilled */
   PAR_UPDATE,       /**< 3 Update option choosen */
-  PAR_ERASE         /**< 4 Erase option choosen */
+  PAR_ERASE,        /**< 4 Erase option choosen */
+  PAR_UPDATE_ALL		/**< 5 Update all packages */
 }ParOpt;
  
 /********************************/
