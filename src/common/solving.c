@@ -54,7 +54,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)//TODO - sem dostat
     hy_repo_set_string(repo, HY_REPO_NAME, file->repo_name);
     
     hy_sack_load_yum_repo(*sack, repo, 0);
-    ssds_log(logDEBUG, "One repo loaded to sack.\n");
+    ssds_log(logDEBUG, "%s repo loaded to sack.\n", file->repo_name);
   }
 }
 
@@ -64,28 +64,22 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 	
 	if(operation == GET_UPDATE_ALL)
 	{
-		printf("get_update_all\n");
-		if(sack==NULL)
-			printf("sack je prazdny\n");
 		hy_goal_upgrade_all(goal);
 		hy_goal_run(goal);
-		printf("po run\n");
 	}
 	else
 	{
 		HyPackageList plist = hy_packagelist_create();
 		HyPackage pkg;
 		HyQuery query = hy_query_create(*sack);
+		
 		if(pkg_count >1)
 			hy_query_filter_in(query, HY_PKG_NAME, HY_SUBSTR, request);
 		else
 			hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request[0]);
 		
 		hy_query_filter_latest_per_arch(query, 1);//TODO-zkusit jestli v nazvu neni i verze
-			
-		/* Getting list of packages from the query */
-		plist = hy_query_run(query);
-		printf("pokus na pkg_count: %d\n", hy_packagelist_count(plist));
+		plist = hy_query_run(query);	
 		
 		for(int i = 0; i < hy_packagelist_count(plist); i++)
 		{
@@ -94,11 +88,9 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 			switch(operation)
 			{
 				case GET_INSTALL:
-					printf("GET_INSTALL");
 					hy_goal_install(goal, pkg);
 					break;
 				case GET_UPDATE:
-					printf("GET_UPDATE\n");
 					hy_goal_upgrade_to(goal, pkg);
 					break;
 				case GET_ERASE:

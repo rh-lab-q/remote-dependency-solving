@@ -46,6 +46,16 @@ extern "C"{
        ANSWER_WARNING,
        ANSWER_ERROR
   };
+	
+	typedef enum {
+	JS_ARR_INSTALL = 0,
+	JS_ARR_UPGRADE,
+	JS_ARR_ERASE,
+	JS_ARR_OBSOLETE,
+	JS_ARR_UNNEEDED
+	}SsdsJsArrayName;
+
+	static const char* const SsdsJsArrayStr[] = {"install", "upgrade", "erase", "obsolete", "unneeded"};
 
 
 #ifdef __cplusplus

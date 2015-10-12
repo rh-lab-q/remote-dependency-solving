@@ -392,100 +392,67 @@ void ssds_js_cr_pkgs_init(SsdsJsonCreate* json)
 
 void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
 {
-	printf("ssds_js_cr_pkgs_insert\n");
-  if(!json_object_has_member(json->dataObj,(const gchar*)"install"))
-    ssds_js_cr_new_data(json, JS_ARRAY, "install", NULL);
-  else
-    json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"install");
-  
-	printf("pred goal_pkgs\n");
-  HyPackageList goal_pkgs = hy_packagelist_create();
-  HyPackage pkg;
-  //array of objects in install in json
-	printf("pred_list_installs\n");
-  goal_pkgs = hy_goal_list_installs(*goal);
-	int install_count = hy_packagelist_count(goal_pkgs);
-	
-	
-  //adding objects to install array
-  for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
-  {
-		pkg = hy_packagelist_get(goal_pkgs, i);
+	int count;
+	for(int i=0; i<=JS_ARR_OBSOLETE; i++)
+	{
+		if(!json_object_has_member(json->dataObj,(const gchar*)SsdsJsArrayStr[i]))
+			ssds_js_cr_new_data(json, JS_ARRAY, SsdsJsArrayStr[i], NULL);
+		else
+			json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)SsdsJsArrayStr[i]);
 		
-		ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
-		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
-		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
+		HyPackageList goal_pkgs = hy_packagelist_create();
+		HyPackage pkg;
 		
-		if(hy_package_get_baseurl(pkg) == NULL)
-    {
-			ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
-    }
-    else
-    {
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
-    }
-  }
-  
-  if(!json_object_has_member(json->dataObj,(const gchar*)"update"))
-    ssds_js_cr_new_data(json, JS_ARRAY, "update", NULL);
-  else
-    json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"update");
-	
-	goal_pkgs = hy_goal_list_upgrades(*goal);
-	int upgrade_count = hy_packagelist_count(goal_pkgs);
-	//adding objects to update array
-  for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
-  {
-		pkg = hy_packagelist_get(goal_pkgs, i);
+		switch(i)
+		{
+			case JS_ARR_INSTALL:
+				goal_pkgs = hy_goal_list_installs(*goal);
+				count += hy_packagelist_count(goal_pkgs);
+				break;
+				
+			case JS_ARR_UPGRADE:
+				goal_pkgs = hy_goal_list_upgrades(*goal);
+				count += hy_packagelist_count(goal_pkgs);
+				break;
+				
+			case JS_ARR_ERASE:
+				goal_pkgs = hy_goal_list_erasures(*goal);
+				count += hy_packagelist_count(goal_pkgs);
+				break;
+				
+			case JS_ARR_OBSOLETE:
+				goal_pkgs = hy_goal_list_obsoleted(*goal);
+				count += hy_packagelist_count(goal_pkgs);
+				break;
+				
+			case JS_ARR_UNNEEDED:
+				goal_pkgs = hy_goal_list_unneeded(*goal);
+				count += hy_packagelist_count(goal_pkgs);
+				break;
+		}
 		
-		ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
-		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
-		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
-		
-		if(hy_package_get_baseurl(pkg) == NULL)
-    {
-			ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
-    }
-    else
-    {
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
-    }
-  }
-	
-	if(!json_object_has_member(json->dataObj,(const gchar*)"erase"))
-    ssds_js_cr_new_data(json, JS_ARRAY, "erase", NULL);
-  else
-    json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"erase");
-  
-	goal_pkgs = hy_goal_list_erasures(*goal);
-	int erase_count = hy_packagelist_count(goal_pkgs);
-	//adding objects to install array
-  for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
-  {
-		pkg = hy_packagelist_get(goal_pkgs, i);
-		
-		ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
-		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
-		ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
-		
-		if(hy_package_get_baseurl(pkg) == NULL)
-    {
-			ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
-    }
-    else
-    {
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
-    }
-  }
-  
-  printf("install: %d\nupgrade: %d\nerase: %d\nalltogether: %d\n", install_count, upgrade_count, erase_count, install_count+upgrade_count+erase_count);
-  //TODO - udelat to trosku min redundantne nejlepe jako funkci at se da vyuzit cely spektrum moznosti toho get_list
+		//adding objects to install array
+		for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
+		{
+			pkg = hy_packagelist_get(goal_pkgs, i);
+			
+			ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
+			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
+			
+			if(hy_package_get_baseurl(pkg) == NULL)
+			{
+				ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
+				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+			}
+			else
+			{
+				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
+				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+			}
+		}
+	}
+	ssds_log(logINFO, "Total packages to install: %d\n", count);
 }
 
 int ssds_strcmp(gconstpointer a, gconstpointer b){
