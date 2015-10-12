@@ -60,43 +60,45 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list)//TODO - sem dostat
 
 int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, int operation, int pkg_count)
 {
-	printf("dep_query \n");
-	//TODO - pridat moznost erase a upgrade jako typ operace do hlavicky - jestli to jde!!
-	HyQuery query = hy_query_create(*sack);
 	HyGoal goal = hy_goal_create(*sack);
-	HyPackageList plist = hy_packagelist_create();
-	HyPackage pkg;
 	
 	if(operation == GET_UPDATE_ALL)
 	{
 		printf("get_update_all\n");
-// 		hy_query_filter(query, HY_PKG_REPONAME, HY_NEQ, HY_SYSTEM_REPO_NAME);
-		hy_goal_upgrade_all(sack);
+		if(sack==NULL)
+			printf("sack je prazdny\n");
+		hy_goal_upgrade_all(goal);
 		hy_goal_run(goal);
 		printf("po run\n");
 	}
 	else
 	{
+		HyPackageList plist = hy_packagelist_create();
+		HyPackage pkg;
+		HyQuery query = hy_query_create(*sack);
 		if(pkg_count >1)
-			hy_query_filter_in(query, HY_PKG_NAME, HY_SUBSTR, request); 
+			hy_query_filter_in(query, HY_PKG_NAME, HY_SUBSTR, request);
 		else
 			hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request[0]);
 		
-		
-		hy_query_filter_latest_per_arch(query, 1);
+		hy_query_filter_latest_per_arch(query, 1);//TODO-zkusit jestli v nazvu neni i verze
 			
 		/* Getting list of packages from the query */
 		plist = hy_query_run(query);
+		printf("pokus na pkg_count: %d\n", hy_packagelist_count(plist));
 		
 		for(int i = 0; i < hy_packagelist_count(plist); i++)
 		{
 			pkg = hy_packagelist_get(plist, i);
+			printf("pkg v query: %s\n", hy_package_get_name(pkg));
 			switch(operation)
 			{
 				case GET_INSTALL:
+					printf("GET_INSTALL");
 					hy_goal_install(goal, pkg);
 					break;
 				case GET_UPDATE:
+					printf("GET_UPDATE\n");
 					hy_goal_upgrade_to(goal, pkg);
 					break;
 				case GET_ERASE:
@@ -105,6 +107,11 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 			}
 			if(hy_goal_run(goal) == 0)
 				ssds_log(logMESSAGE, "Dependencies for %s are ok.\n", hy_package_get_name(pkg));
+			else
+			{
+				ssds_log(logMESSAGE, "Dependencies for %s are not ok. Package cannot be installed.\n", hy_package_get_name(pkg));
+				return -1;
+			}
 		}
 	}
 	printf("pred insert\n");

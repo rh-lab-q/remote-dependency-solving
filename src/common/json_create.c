@@ -392,15 +392,20 @@ void ssds_js_cr_pkgs_init(SsdsJsonCreate* json)
 
 void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
 {
+	printf("ssds_js_cr_pkgs_insert\n");
   if(!json_object_has_member(json->dataObj,(const gchar*)"install"))
     ssds_js_cr_new_data(json, JS_ARRAY, "install", NULL);
   else
     json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"install");
   
+	printf("pred goal_pkgs\n");
   HyPackageList goal_pkgs = hy_packagelist_create();
   HyPackage pkg;
   //array of objects in install in json
+	printf("pred_list_installs\n");
   goal_pkgs = hy_goal_list_installs(*goal);
+	int install_count = hy_packagelist_count(goal_pkgs);
+	
 	
   //adding objects to install array
   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
@@ -429,7 +434,7 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
     json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"update");
 	
 	goal_pkgs = hy_goal_list_upgrades(*goal);
-	
+	int upgrade_count = hy_packagelist_count(goal_pkgs);
 	//adding objects to update array
   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
   {
@@ -457,7 +462,7 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
     json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)"erase");
   
 	goal_pkgs = hy_goal_list_erasures(*goal);
-	
+	int erase_count = hy_packagelist_count(goal_pkgs);
 	//adding objects to install array
   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
   {
@@ -478,31 +483,9 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
 			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
     }
   }
-  //TODO - udelat to trosku min redundantne nejlepe jako funkci at se da vyuzit cely spektrum moznosti toho get_list
   
-//   goal_pkgs = hy_goal_list_erasures(*goal);
-//   new_inside = json_node_new(JSON_NODE_ARRAY);
-//   json_object_set_member(json->currObj, (gchar*)"erase", new_inside);
-//   new_arr = json_array_new();
-//   json_node_take_array(new_inside, new_arr);
-//   
-//   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
-//   {
-//     pkg = hy_packagelist_get(goal_pkgs, i);
-//     json_array_add_string_element(new_arr,hy_package_get_location(pkg));
-//   }
-//   
-//   goal_pkgs = hy_goal_list_upgrades(*goal);
-//   new_inside = json_node_new(JSON_NODE_ARRAY);
-//   json_object_set_member(json->currObj, (gchar*)"upgrade", new_inside);
-//   new_arr = json_array_new();
-//   json_node_take_array(new_inside, new_arr);
-//   
-//   for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
-//   {
-//     pkg = hy_packagelist_get(goal_pkgs, i);
-//     json_array_add_string_element(new_arr, hy_package_get_location(pkg));
-//   }
+  printf("install: %d\nupgrade: %d\nerase: %d\nalltogether: %d\n", install_count, upgrade_count, erase_count, install_count+upgrade_count+erase_count);
+  //TODO - udelat to trosku min redundantne nejlepe jako funkci at se da vyuzit cely spektrum moznosti toho get_list
 }
 
 int ssds_strcmp(gconstpointer a, gconstpointer b){

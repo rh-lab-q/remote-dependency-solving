@@ -176,8 +176,8 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             /* Dependency solving part */
             ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
 
-						char** pkgs;
-						int pkg_count;
+						char** pkgs = NULL;
+						int pkg_count = 0;
             //SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
 						if(ssds_js_rd_get_code(json_read) != GET_UPDATE_ALL)
 						{
