@@ -219,8 +219,13 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
             HySack* sack_p = &sack;
             ssds_fill_sack(sack_p, meta_list);
             
-						ssds_dep_query(pkgs, json_send, sack_p, ssds_js_rd_get_code(json_read), pkg_count);
-            ssds_js_cr_insert_code(json_send, ANSWER_OK);
+						if(ssds_dep_query(pkgs, json_send, sack_p, ssds_js_rd_get_code(json_read), pkg_count) == -1)
+						{
+							ssds_js_cr_insert_code(json_send, ANSWER_NO_DEP);
+							ssds_js_cr_set_message(json_send, "Dependencies for requested package were not resolved. Package cannot be installed\n");
+						}
+						else
+							ssds_js_cr_insert_code(json_send, ANSWER_OK);
 //             ssds_dep_answer(json_read, json_send, sack_p);
 
             ssds_js_cr_dump(json_send);

@@ -255,14 +255,14 @@ typedef struct SsdsRepoInfoList SsdsRepoInfoList;
 typedef struct SsdsJsonRead SsdsJsonRead;
 
 /**
- * GSList of SsdsJsonInstall
+ * GSList of SsdsJsonPkg
  */
 typedef struct SsdsJsonAnswer SsdsJsonAnswer;
 
 /**
  * Structure used for parsing incoming answer from server
  */
-typedef struct SsdsJsonInstall SsdsJsonInstall;
+typedef struct SsdsJsonPkg SsdsJsonPkg;
 
 struct SsdsPkgInfo{
   char** packages;  /**< names of packages requested by user */
@@ -291,10 +291,10 @@ struct SsdsJsonRead{
 
 struct SsdsJsonAnswer{
   char* name;       /** < name of app that was requested for install */
-  GSList* pkgList;  /** < holds list of SsdsJsonInstall */
+  GSList* pkgList;  /** < holds list of SsdsJsonPkg */
 };
 
-struct SsdsJsonInstall{
+struct SsdsJsonPkg{
   char* pkg_name;   /** < name of requested package */
   char* pkg_loc;    /** < location of package on repository */
   char* base_url;   /** < base_url for package download or null */
@@ -403,10 +403,10 @@ SsdsJsonAnswer* ssds_js_rd_answer_init();
 
 /**
  * Returns newly allocated structure that holds info about one particular rpm to be installed.
- * This structure is used in SsdsJsonAnswer in a GSList of SsdsJsonInstall
- * @return          SsdsJsonInstall
+ * This structure is used in SsdsJsonAnswer in a GSList of SsdsJsonPkg
+ * @return          SsdsJsonPkg
  */
-SsdsJsonInstall* ssds_js_rd_install_init();
+SsdsJsonPkg* ssds_js_rd_pkg_init();
 
 /**
  * Parses incoming json and creates a list of packages to be installed for one app
@@ -416,7 +416,7 @@ SsdsJsonInstall* ssds_js_rd_install_init();
  *                  ssds_js_rd_get_count to get number of objects holding particular apps. With this number simply go through all
  *                  objects in a loop and use nmr as an order indicator.
  */
-void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json, int nmr);
+GSList* ssds_js_rd_parse_answer(const char *name, SsdsJsonRead* json);
 
 /**
  * Returns number of objects or elements in an array specified by name

@@ -34,17 +34,18 @@ extern "C"{
 
   enum{
        GENERATE_ID = 1,	
-       SEND_SOLV,
-       SOLV_MORE_FRAGMENT,
-       SOLV_NO_MORE_FRAGMENT,
-       GET_DEPENDENCY,
-       GET_INSTALL,
-       GET_UPDATE,
-       GET_ERASE,
-			 GET_UPDATE_ALL,
-       ANSWER_OK,
-       ANSWER_WARNING,
-       ANSWER_ERROR
+       SEND_SOLV,//2
+       SOLV_MORE_FRAGMENT,//3
+       SOLV_NO_MORE_FRAGMENT,//4
+       GET_DEPENDENCY,//5
+       GET_INSTALL,//6
+       GET_UPDATE,//7
+       GET_ERASE,//8
+			 GET_UPDATE_ALL,//9
+       ANSWER_OK,//10
+       ANSWER_WARNING,//11
+       ANSWER_ERROR,//12
+			 ANSWER_NO_DEP //13 when dependencies are not ok
   };
 	
 	typedef enum {

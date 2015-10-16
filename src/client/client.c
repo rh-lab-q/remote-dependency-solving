@@ -191,7 +191,6 @@ int ssds_answer_process(int socket, int action)
   }
   ssds_log(logDEBUG, "Some answer has been delivered.\n\n%s\n\n", buf);
 
-	return;
   // parse response
   ssds_log(logDEBUG, "Parsing answer.\n");
   
@@ -206,7 +205,7 @@ int ssds_answer_process(int socket, int action)
   if(rc == ANSWER_WARNING)
   {
      ssds_log(logWARNING,"%s\n", ssds_js_rd_get_message(json));
-     return rc;
+     return rc;//TODO - asi vymyslet co s warningama protoze warningem by to koncit nemuselo ten program
   }
 
   if(rc == ANSWER_ERROR)
@@ -215,8 +214,32 @@ int ssds_answer_process(int socket, int action)
      return rc;
   }
 
+  if(rc == ANSWER_NO_DEP)
+	{
+		ssds_log(logERROR, "");
+		return rc;
+	}
+	
   int num_pkg;
-
+	int num_install, num_update, num_obsolete, num_erase, num_unneeded; //to num_unneeded zatim nepouzijem protoze to hazi divny vysledky
+	num_install = ssds_js_rd_get_count(json, "install");
+	num_update = ssds_js_rd_get_count(json, "upgrade");
+	num_erase = ssds_js_rd_get_count(json, "erase");
+	num_obsolete = ssds_js_rd_get_count(json, "obsolete");
+	printf("Number of packages to\n\tinstall: %d\n\tupdate: %d\n\terase: %d\n\tmaybe erase: %d\n", num_install, num_update, num_erase, num_obsolete);
+	
+	GSList* install_pkgs = ssds_js_rd_parse_answer("install", json);
+	
+	for(guint i = 1; i<g_slist_length(install_pkgs); i++)
+	{
+		
+		SsdsJsonPkg* pkg = (SsdsJsonPkg*)g_slist_nth_data(install_pkgs, i);
+		printf("\tname: %s, location: %s, metalink: %s\n", pkg->pkg_name, pkg->pkg_loc, pkg->metalink);
+	}
+	
+	return;
+	
+	
   switch(action)
   {
      case GET_INSTALL: num_pkg = ssds_js_rd_get_count(json, "install_pkgs");
@@ -236,7 +259,7 @@ int ssds_answer_process(int socket, int action)
         SsdsJsonAnswer* answer_from_srv = ssds_js_rd_answer_init();
         ssds_log(logDEBUG, "Parse answer.\n");
 
-        ssds_js_rd_parse_answer(answer_from_srv, json, id_app);
+        //ssds_js_rd_parse_answer(answer_from_srv, json, id_app); TODO - tady jsem to zakomentoval, je potreba tu funkci od ted pouzit jinak
 
         ssds_log(logDEBUG, "Answer parsed.\n");
 
@@ -261,7 +284,7 @@ int ssds_answer_process(int socket, int action)
           GError *error = NULL;
 
           for(guint i = 0; i < g_slist_length(answer_from_srv->pkgList); i++){
-             SsdsJsonInstall* inst = (SsdsJsonInstall*)g_slist_nth_data(answer_from_srv->pkgList, i);
+             SsdsJsonPkg* inst = (SsdsJsonPkg*)g_slist_nth_data(answer_from_srv->pkgList, i);
              ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
 
              ssds_log(logDEBUG, "Downloading preparation.\n");

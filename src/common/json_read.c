@@ -191,9 +191,9 @@ SsdsJsonAnswer* ssds_js_rd_answer_init()
   return new;
 }
 
-SsdsJsonInstall* ssds_js_rd_install_init()
+SsdsJsonPkg* ssds_js_rd_pkg_init()
 {
-  SsdsJsonInstall* new = (SsdsJsonInstall*)ssds_malloc(sizeof(SsdsJsonInstall));
+  SsdsJsonPkg* new = (SsdsJsonPkg*)ssds_malloc(sizeof(SsdsJsonPkg));
   new->pkg_name = NULL;
   new->pkg_loc = NULL;
   new->base_url = NULL;
@@ -221,49 +221,83 @@ int ssds_js_rd_get_count(SsdsJsonRead* json, char* name)
   return ret;
 }
 
-void ssds_js_rd_parse_answer(SsdsJsonAnswer* ans_list, SsdsJsonRead* json, int nmr)
+GSList* ssds_js_rd_parse_answer(const char* name, SsdsJsonRead* json)
 {
-  //TODO - multiple apps in answer
-  //right now only one app can be parsed at a time
-  JsonArray*array = json_object_get_array_member(json->dataObj, "install_pkgs");
-  
-  JsonObject* main_obj = json_array_get_object_element(array, nmr);
-  char* name = (char*)json_object_get_string_member(main_obj, "name");
-  ans_list->name = (char*)ssds_malloc((strlen(name)+1)*sizeof(char));
-  strcpy(ans_list->name, name);
-  
-  JsonArray* inner_array = json_object_get_array_member(main_obj, "install");
-  guint len = json_array_get_length(inner_array);
-  //through all the packages for one app
-  for(guint i = 0; i < len; i++)
-  {
-    SsdsJsonInstall* install = ssds_js_rd_install_init();
-    JsonObject* obj = json_array_get_object_element(inner_array, i);
-    
-    //name of one package to install
-    char* pkg_name = (char*)json_object_get_string_member(obj, "pkg_name");
-    install->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
-    strcpy(install->pkg_name, pkg_name);
+  JsonArray* array = json_object_get_array_member(json->dataObj, name);
+	int count = ssds_js_rd_get_count(json, name);
+	GSList* ret = g_slist_alloc();
+	
+	for(int i=0; i<count; i++)
+	{
+		SsdsJsonPkg* one_pkg = ssds_js_rd_pkg_init();
+    JsonObject* obj = json_array_get_object_element(array, i);
+		
+		char* pkg_name = (char*)json_object_get_string_member(obj, "pkg_name");
+    one_pkg->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
+    strcpy(one_pkg->pkg_name, pkg_name);
     
     //name of package location on repository
     char* pkg_loc = (char*)json_object_get_string_member(obj, "pkg_loc");
-    install->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
-    strcpy(install->pkg_loc, pkg_loc);
+    one_pkg->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
+    strcpy(one_pkg->pkg_loc, pkg_loc);
     
     //baseurl or null
     if(json_object_get_null_member(obj, "base_url"))
     {
       char* meta = (char*)json_object_get_string_member(obj, "metalink");
-      install->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
-      strcpy(install->metalink, meta);
+      one_pkg->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
+      strcpy(one_pkg->metalink, meta);
     }
     else
     {
       char* base = (char*)json_object_get_string_member(obj, "base_url");
-      install->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
-      strcpy(install->base_url, base);
+      one_pkg->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
+      strcpy(one_pkg->base_url, base);
     }
     
-    ans_list->pkgList = g_slist_append(ans_list->pkgList, install);
-  }
+    ret = g_slist_append(ret, one_pkg);
+	}
+	
+	return ret;
+	
+  
+//   JsonObject* main_obj = json_array_get_object_element(array, nmr);
+//   char* name = (char*)json_object_get_string_member(main_obj, "name");
+//   ans_list->name = (char*)ssds_malloc((strlen(name)+1)*sizeof(char));
+//   strcpy(ans_list->name, name);
+//   
+//   JsonArray* inner_array = json_object_get_array_member(main_obj, "install");
+//   guint len = json_array_get_length(inner_array);
+//   //through all the packages for one app
+//   for(guint i = 0; i < len; i++)
+//   {
+//     SsdsJsonInstall* install = ssds_js_rd_install_init();
+//     JsonObject* obj = json_array_get_object_element(inner_array, i);
+//     
+//     //name of one package to install
+//     char* pkg_name = (char*)json_object_get_string_member(obj, "pkg_name");
+//     install->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
+//     strcpy(install->pkg_name, pkg_name);
+//     
+//     //name of package location on repository
+//     char* pkg_loc = (char*)json_object_get_string_member(obj, "pkg_loc");
+//     install->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
+//     strcpy(install->pkg_loc, pkg_loc);
+//     
+//     //baseurl or null
+//     if(json_object_get_null_member(obj, "base_url"))
+//     {
+//       char* meta = (char*)json_object_get_string_member(obj, "metalink");
+//       install->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
+//       strcpy(install->metalink, meta);
+//     }
+//     else
+//     {
+//       char* base = (char*)json_object_get_string_member(obj, "base_url");
+//       install->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
+//       strcpy(install->base_url, base);
+//     }
+//     
+//     ans_list->pkgList = g_slist_append(ans_list->pkgList, install);
+//   }
 }
