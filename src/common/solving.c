@@ -73,13 +73,31 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 		HyPackage pkg;
 		HyQuery query = hy_query_create(*sack);
 		
+		//try exact match
 		if(pkg_count >1)
-			hy_query_filter_in(query, HY_PKG_NAME, HY_SUBSTR, request);
+			hy_query_filter_in(query, HY_PKG_NAME, HY_EQ, request);
 		else
-			hy_query_filter(query, HY_PKG_NAME, HY_SUBSTR, request[0]);
+			hy_query_filter(query, HY_PKG_NAME, HY_EQ, request[0]);
 		
-		hy_query_filter_latest_per_arch(query, 1);//TODO-zkusit jestli v nazvu neni i verze
-		plist = hy_query_run(query);	
+		
+		plist = hy_query_run(query);
+		if(hy_packagelist_count(plist)==0)
+		{//exact match didn't work - I need to try 
+			hy_query_free(query);
+			query = hy_query_create(*sack);
+			printf("pred adjust\n");
+			adjust_glob(request, pkg_count);
+			printf("pokus na adjust: %s\n", request[0]);
+			
+			if(pkg_count >1)
+				hy_query_filter_in(query, HY_PKG_NAME, HY_GLOB, request);
+			else
+				hy_query_filter(query, HY_PKG_NAME, HY_GLOB, request[0]);
+		}
+		hy_query_filter_latest_per_arch(query, 1);
+		plist = hy_query_run(query);
+		
+		printf("za query %d\n", hy_packagelist_count(plist));
 		
 		for(int i = 0; i < hy_packagelist_count(plist); i++)
 		{
@@ -110,6 +128,21 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
   ssds_js_cr_pkgs_insert(answer, &goal);
 }
 
+
+void adjust_glob(char** pkgs, int pkg_count)
+{
+	if(pkgs==NULL)
+		return;
+	
+	for(int i=0; i<pkg_count; i++)
+	{
+		printf("for\n");
+		pkgs[i]=(char*)realloc(pkgs[i], strlen(pkgs[i]+1));//adds space for one char in the end
+		printf("za realloc\n");
+		strcat(pkgs[i], "*");
+		printf("%s\n", pkgs[i]);
+	}
+}
 
 // void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack)
 // {

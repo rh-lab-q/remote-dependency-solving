@@ -77,6 +77,13 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list);
 int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, int operation, int pkg_count);
 
 
+/**
+ * Puts * into every string in array of package names (["vim", "emacs", NULL] becomes ["vim*", "emacs*", NULL])
+ * @param pkgs**	char**
+ * @param pkg_count	int
+ */
+void adjust_glob(char** pkgs, int pkg_count);
+
 #ifdef __cplusplus
 }
 #endif

@@ -432,23 +432,27 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
 		}
 		
 		//adding objects to install array
-		for(int i = hy_packagelist_count(goal_pkgs)-1; i >= 0; i--)
+		int pkg_count=hy_packagelist_count(goal_pkgs);
+		if(pkg_count >0)
 		{
-			pkg = hy_packagelist_get(goal_pkgs, i);
-			
-			ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
-			ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
-			
-			if(hy_package_get_baseurl(pkg) == NULL)
+			for(int i = pkg_count-1; i >= 0; i--)
 			{
-				ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
-				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
-			}
-			else
-			{
-				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
-				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+				pkg = hy_packagelist_get(goal_pkgs, i);
+				
+				ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
+				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
+				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
+				
+				if(hy_package_get_baseurl(pkg) == NULL)
+				{
+					ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
+					ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+				}
+				else
+				{
+					ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
+					ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+				}
 			}
 		}
 	}
