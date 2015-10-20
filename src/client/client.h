@@ -109,7 +109,7 @@ int ssds_answer_process(int socket, int action);
  * @param erase		list of packages to erase  
  * @return          Returns OK, otherwise error code.
  */
-int ssds_download{int answer, GSList *install, GSList *update, GSList *erase};
+int ssds_download(int answer, GSList *install, GSList *update, GSList *erase);
 
 /**
  * Install/update/erase requested packages.

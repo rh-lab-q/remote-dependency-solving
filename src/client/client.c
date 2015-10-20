@@ -176,7 +176,7 @@ int ssds_check_repo(int socket, char **message)
 
 int ssds_answer_process(int socket, int action)
 {
-	ssds_log(logMESSAGE, "Reading answer from server.\n");
+	ssds_log(logMESSAGE, "Waiting for answer from server.\n");
 	
 	char *buf = sock_recv(socket);
 	SsdsJsonRead *json = ssds_js_rd_init();
@@ -218,7 +218,7 @@ int ssds_answer_process(int socket, int action)
 	
 	if(rc == ANSWER_NO_DEP)
 	{
-		ssds_log(logERROR, "Answer no dep.");
+		ssds_log(logERROR, "Answer no dep.\n");
 		goto End;
 	}
 	
@@ -232,7 +232,7 @@ int ssds_answer_process(int socket, int action)
 	
 	if(!num_install && !num_update && !num_erase && !num_obsolete)
 	{
-		ssds_log(logMESSAGE,"Nothing to do.");
+		ssds_log(logMESSAGE,"Nothing to do.\n");
 		goto End;
 	}
 	
@@ -275,12 +275,7 @@ int ssds_answer_process(int socket, int action)
 		}
 	}			
 	
-	if(!num_install && !num_update && num_erase)
-	{
-		int ans = ssds_question("Is it ok?", YES_NO_DOWNLOAD);
-	}else{
-		int ans = ssds_question("Is it ok?", YES_NO);
-	}
+	int ans = ssds_question("Is it ok?",((!num_install && !num_update && num_erase)? YES_NO : YES_NO_DOWNLOAD));
 	
 	if(ans == NO)
 	{
@@ -300,7 +295,7 @@ int ssds_answer_process(int socket, int action)
 	return rc;
 }
 
-int ssds_download{int answer, GSList *install, GSList *update, GSList *erase}
+int ssds_download(int answer, GSList *install, GSList *update, GSList *erase)
 {
 	int rc = OK;
 	GSList  *install_list = NULL,
@@ -311,7 +306,6 @@ int ssds_download{int answer, GSList *install, GSList *update, GSList *erase}
 	/***********************************************************/
 	
 	ssds_log(logDEBUG, "Begin downloading part.\n");
-	ssds_log(logMESSAGE, "Working on package: %s.\n", answer_from_srv->name);
 	
 	// required variables for downloading
 	gboolean return_status;
@@ -385,7 +379,7 @@ int ssds_download{int answer, GSList *install, GSList *update, GSList *erase}
 			{
 				ssds_log(logMESSAGE, "Packages are in %s.\n", DOWNLOAD_TARGET);
 			}else{
-				rc = ssds_rpm_process(package_list, update_list, erase);
+				rc = ssds_rpm_process(install_list, update_list, erase);
 			}
 		}
 	}
@@ -448,12 +442,12 @@ int ssds_rpm_process(GSList *install, GSList *update, GSList *erase)
     	}
     }
 
-    if(erase != NULL)
+    if(g_slist_length(erase) > 1)
     {
     	ssds_log(logMESSAGE, "Erasing packages.\n");
         for(GSList *elem = erase; elem; elem = g_slist_next(elem))
         {
-			SsdsJsonPkg *pkg = (SsdsJsonPkg)elem;
+			SsdsJsonPkg *pkg = (SsdsJsonPkg*)elem;
 			printf("erase %s\n", pkg->pkg_name);
         	/*rc = ssds_add_to_erase(ts, (char *)elem);
             if(rc != OK){
@@ -483,7 +477,7 @@ int ssds_rpm_process(GSList *install, GSList *update, GSList *erase)
 int ssds_question(char* question, int possibilities)
 {
 	
-	int status = NO, repeat = 1;;
+	int status = NO, repeat = 1;
     char answer;
 	switch(possibilities)
 	{

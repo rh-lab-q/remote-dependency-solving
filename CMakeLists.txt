@@ -181,7 +181,6 @@ target_link_libraries(ssds-client
 	${CHECK_LDFLAGS})
 
 file(MAKE_DIRECTORY /tmp/ssds/)
-file(MAKE_DIRECTORY /var/cache/ssds/packages/install/)
-file(MAKE_DIRECTORY /var/cache/ssds/packages/update/)
+file(MAKE_DIRECTORY /var/cache/ssds/packages/)
 enable_testing()
 add_subdirectory(tests)

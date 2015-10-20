@@ -147,41 +147,8 @@ int main(int argc, char* argv[]){
 
 	case PAR_ERASE: 
 		ssds_log(logMESSAGE, "Erase of packages was selected.\n");
-		rpmts ts;
-		int rc, noticeFlags = 0;
 
-	        rpmReadConfigFiles(NULL, NULL);
-        	ts = rpmtsCreate();
-	        rpmtsSetRootDir(ts, NULL);
-		
-		for(int i = 0; i < params->pkg_count; i++){
- 		    char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
-                    rc = ssds_add_to_erase(ts, pkg);
-		    if(rc != OK){
-			ssds_log(logERROR, "Unable to erase requested package.\n");
-			status = ERASE_ERROR;
-			goto end;
-		    }   
-		}
-
-		rpmprobFilterFlags flag = 0;
-
-        	noticeFlags |= INSTALL_LABEL | INSTALL_HASH;
-	        rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) noticeFlags);
-
-        	rc = rpmtsRun(ts, NULL, flag);
-	        if(rc == 0){
-        	       ssds_log(logMESSAGE, "All packages was correctly erased.\n");
-		       status = OK;
-	        }else{
-                       ssds_log(logERROR, "Erasing ends with code %d\n", rc);
-		       status = ERASE_ERROR;
-	        }
-
-        	rpmtsClean(ts);
-	        rpmtsFree(ts);
-
-		/*status = ssds_send_repo(params, arch, release, socket, GET_ERASE);
+		status = ssds_send_repo(params, arch, release, socket, GET_ERASE);
                 if(status != OK) break;
 
                 if(ssds_check_repo(socket, &message) != ANSWER_OK)
@@ -189,7 +156,7 @@ int main(int argc, char* argv[]){
                         ssds_log(logWARNING,"%s\n", message);
                 }
 
-                status = ssds_answer_process(socket, GET_ERASE);*/
+                status = ssds_answer_process(socket, GET_ERASE);
 
 		break;
 
