@@ -102,6 +102,25 @@ int ssds_check_repo(int socket, char **message);
 int ssds_answer_process(int socket, int action);
 
 /**
+ * Download requested packages.
+ * @param answer	user's answer 
+ * @param install	list of packages to install
+ * @param update	list of packages to update
+ * @param erase		list of packages to erase  
+ * @return          Returns OK, otherwise error code.
+ */
+int ssds_download{int answer, GSList *install, GSList *update, GSList *erase};
+
+/**
+ * Install/update/erase requested packages.
+ * @param install	list of packages to install
+ * @param update	list of packages to update
+ * @param erase		list of packages to erase  
+ * @return          Returns OK, otherwise error code.
+ */
+int ssds_rpm_process(GSList *install, GSList *update, GSList *erase);
+
+/**
  * Asking user for his wish.
  * @param question  	char* string for print
  * @param possibilities int type (number) of offered possibilities

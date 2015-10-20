@@ -176,273 +176,308 @@ int ssds_check_repo(int socket, char **message)
 
 int ssds_answer_process(int socket, int action)
 {
-  ssds_log(logMESSAGE, "Reading answer from server.\n");
-
-  char *buf = sock_recv(socket);
-  SsdsJsonRead *json = ssds_js_rd_init();
-  int rc = -1;
-
-  ssds_log(logDEBUG, "Checking answer.\n");
-
-  if(buf == NULL)
-  {
-    ssds_log(logERROR, "Error while recieving data\n");
-    return NETWORKING_ERROR;
-  }
-  ssds_log(logDEBUG, "Some answer has been delivered.\n\n%s\n\n", buf);
-
-  // parse response
-  ssds_log(logDEBUG, "Parsing answer.\n");
-  
-  if(!ssds_js_rd_parse(buf, json))
-  {
-     ssds_log(logERROR, "Error while parsing answer from the server\n");
-     return JSON_ERROR;
-  }
-  
-  rc = ssds_js_rd_get_code(json);
-
-  if(rc == ANSWER_WARNING)
-  {
-     ssds_log(logWARNING,"%s\n", ssds_js_rd_get_message(json));
-     return rc;//TODO - asi vymyslet co s warningama protoze warningem by to koncit nemuselo ten program
-  }
-
-  if(rc == ANSWER_ERROR)
-  {
-     ssds_log(logERROR,"%s\n", ssds_js_rd_get_message(json));
-     return rc;
-  }
-
-  if(rc == ANSWER_NO_DEP)
+	ssds_log(logMESSAGE, "Reading answer from server.\n");
+	
+	char *buf = sock_recv(socket);
+	SsdsJsonRead *json = ssds_js_rd_init();
+	int rc = -1;
+	
+	ssds_log(logDEBUG, "Checking answer.\n");
+	
+	if(buf == NULL)
 	{
-		ssds_log(logERROR, "");
-		return rc;
+		ssds_log(logERROR, "Error while recieving data\n");
+		rc = NETWORKING_ERROR;
+		goto End;
+	}
+	ssds_log(logDEBUG, "Some answer has been delivered.\n\n%s\n\n", buf);
+	
+	// parse response
+	ssds_log(logDEBUG, "Parsing answer.\n");
+	
+	if(!ssds_js_rd_parse(buf, json))
+	{
+		ssds_log(logERROR, "Error while parsing answer from the server\n");
+		rc = JSON_ERROR;
+		goto End;
 	}
 	
-  int num_pkg;
-	int num_install, num_update, num_obsolete, num_erase, num_unneeded; //to num_unneeded zatim nepouzijem protoze to hazi divny vysledky
-	num_install = ssds_js_rd_get_count(json, "install");
-	num_update = ssds_js_rd_get_count(json, "upgrade");
-	num_erase = ssds_js_rd_get_count(json, "erase");
-	num_obsolete = ssds_js_rd_get_count(json, "obsolete");
+	rc = ssds_js_rd_get_code(json);
+	
+	if(rc == ANSWER_WARNING)
+	{
+	   	ssds_log(logWARNING,"%s\n", ssds_js_rd_get_message(json));
+	   	goto End;//TODO - asi vymyslet co s warningama protoze warningem by to koncit nemuselo ten program
+	}
+	
+	if(rc == ANSWER_ERROR)
+	{
+		ssds_log(logERROR,"%s\n", ssds_js_rd_get_message(json));
+	   	goto End;
+	}
+	
+	if(rc == ANSWER_NO_DEP)
+	{
+		ssds_log(logERROR, "Answer no dep.");
+		goto End;
+	}
+	
+  	int num_install = ssds_js_rd_get_count(json, "install"),
+		num_update = ssds_js_rd_get_count(json, "upgrade"),
+		num_erase = ssds_js_rd_get_count(json, "erase"),
+		num_obsolete = ssds_js_rd_get_count(json, "obsolete"),
+		num_unneeded; //to num_unneeded zatim nepouzijem protoze to hazi divny vysledky
+	
 	printf("Number of packages to\n\tinstall: %d\n\tupdate: %d\n\terase: %d\n\tmaybe erase: %d\n", num_install, num_update, num_erase, num_obsolete);
 	
-	GSList* install_pkgs = ssds_js_rd_parse_answer("install", json);
-	
-	for(guint i = 1; i<g_slist_length(install_pkgs); i++)
+	if(!num_install && !num_update && !num_erase && !num_obsolete)
 	{
-		
-		SsdsJsonPkg* pkg = (SsdsJsonPkg*)g_slist_nth_data(install_pkgs, i);
-		printf("\tname: %s, location: %s, metalink: %s\n", pkg->pkg_name, pkg->pkg_loc, pkg->metalink);
+		ssds_log(logMESSAGE,"Nothing to do.");
+		goto End;
 	}
 	
-	return;
+	GSList 	*install_pkgs = ssds_js_rd_parse_answer("install", json),
+			*update_pkgs = ssds_js_rd_parse_answer("upgrade", json),
+			*erase_pkgs = ssds_js_rd_parse_answer("erase", json);	
+
+	ssds_log(logMESSAGE, "Result from server:\n");
 	
+	if(num_install)
+	{								
+		printf("Packages for install\n");
+		
+		for(guint i = 1; i < g_slist_length(install_pkgs); i++)
+		{
+			SsdsJsonPkg* pkg = (SsdsJsonPkg*)g_slist_nth_data(install_pkgs, i);
+			printf("\t%s\n", pkg->pkg_name);
+		}
+	}
+
+	if(num_update)
+	{								
+		printf("Packages for update\n");
+		
+		for(guint i = 1; i < g_slist_length(update_pkgs); i++)
+		{
+			SsdsJsonPkg* pkg = (SsdsJsonPkg*)g_slist_nth_data(update_pkgs, i);
+			printf("\t%s\n", pkg->pkg_name);
+		}
+	}
 	
-  switch(action)
-  {
-     case GET_INSTALL: num_pkg = ssds_js_rd_get_count(json, "install_pkgs");
-		       break;
-     case GET_UPDATE:  num_pkg = ssds_js_rd_get_count(json, "update_pkgs");
-                       break;
-     case GET_ERASE:   num_pkg = ssds_js_rd_get_count(json, "erase_pkgs");
-                       break;
-     default: ssds_log(logWARNING, "Unsupported type of action.\n");
-	      ssds_free(json);
-	      return ACTION_ERROR;
-  }
-
-  for(int id_app = 0; id_app < num_pkg; id_app++){
-
-        ssds_log(logDEBUG, "Parse init.\n");
-        SsdsJsonAnswer* answer_from_srv = ssds_js_rd_answer_init();
-        ssds_log(logDEBUG, "Parse answer.\n");
-
-        //ssds_js_rd_parse_answer(answer_from_srv, json, id_app); TODO - tady jsem to zakomentoval, je potreba tu funkci od ted pouzit jinak
-
-        ssds_log(logDEBUG, "Answer parsed.\n");
-
-        
-	GSList *package_install_list = NULL,
-               *package_update_list = NULL,
-               *package_erase_list = NULL;
-
-	if(action != GET_ERASE)
-        {
-          /***********************************************************/
-          /* Downloading packages part                               */
-          /***********************************************************/
-
-          ssds_log(logDEBUG, "Begin downloading part.\n");
-          ssds_log(logMESSAGE, "Working on package: %s.\n", answer_from_srv->name);
-
-          // required variables for downloading
-          gboolean return_status;
-          LrHandle *handler;
-          LrPackageTarget *target;
-          GError *error = NULL;
-
-          for(guint i = 0; i < g_slist_length(answer_from_srv->pkgList); i++){
-             SsdsJsonPkg* inst = (SsdsJsonPkg*)g_slist_nth_data(answer_from_srv->pkgList, i);
-             ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
-
-             ssds_log(logDEBUG, "Downloading preparation.\n");
-             handler = lr_handle_init();
-             ssds_log(logDEBUG, "Download handler initied.\n");
-             lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
-             ssds_log(logDEBUG, "Array of URLs is set.\n");
-             lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
-             ssds_log(logDEBUG, "Repo type is set.\n");
-             lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
-             ssds_log(logDEBUG, "Progress callback is set.\n");
-
-             // Prepare list of target
-             target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET_INSTALL,
-                                              LR_CHECKSUM_UNKNOWN, NULL, 0, inst->base_url, TRUE,
-                                              progress_callback, inst->pkg_name, end_callback, NULL, &error);
-             package_install_list = g_slist_append(package_install_list, target);
-          }
-
-          // Download all packages        
-          ssds_log(logMESSAGE, "Downloading packages.\n");
-          return_status = lr_download_packages(package_install_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
-          
-          if(!return_status || error != NULL){
-            ssds_log(logERROR, "%d: %s\n", error->code, error->message);
-            g_error_free(error);
-            return DOWNLOAD_ERROR;
-          }
-          
-          if(return_status && (package_install_list != NULL || package_update_list != NULL))
-          {
-             ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
-          }else{
-  	         ssds_log(logMESSAGE, "No package to download.\n");
-          }
-        }
-	/*********************************************************/
-        /* Installing / Updating / Erasing packages              */
-        /*********************************************************/
-
-        // required variables for rpmlib
-        rpmts ts;
-
-        rpmReadConfigFiles(NULL, NULL);
-        ts = rpmtsCreate();
-        rpmtsSetRootDir(ts, NULL);
-
-
-        if(package_install_list != NULL)
-        {
-          ssds_log(logMESSAGE, "Installing packages.\n");
-          for(GSList *elem = package_install_list; elem; elem = g_slist_next(elem))
-          {
-              LrPackageTarget *target = (LrPackageTarget *)elem->data;
-
-              if(!target->err)
-              {
-                ssds_add_to_transaction(ts, target->local_path, SSDS_INSTALL);
-              }else{
-                  ssds_log(logERROR, "Package Error: %s\n", target->err);
-		  rc = INSTALL_ERROR;
-		  goto rpmEnd;
-              }
-          }
-        } 
-
-	if(package_update_list != NULL) 
-        {
-          ssds_log(logMESSAGE, "Updating packages.\n");
-          for(GSList *elem = package_update_list; elem; elem = g_slist_next(elem))
-          {
-              LrPackageTarget *target = (LrPackageTarget *)elem->data;
-
-              if(!target->err)
-              {
-                ssds_add_to_transaction(ts, target->local_path, SSDS_UPDATE);
-              }else{
-                  ssds_log(logERROR, "Package Error: %s\n", target->err);
-		  rc = UPDATE_ERROR;
-		  goto rpmEnd;
-              }
-          }
-        }
-
-        if(package_erase_list != NULL)
-        {
-          ssds_log(logMESSAGE, "Erasing packages.\n");
-          for(GSList *elem = package_erase_list; elem; elem = g_slist_next(elem))
-          {
-              rc = ssds_add_to_erase(ts, (char *)elem);
-              if(rc != OK){
-		ssds_log(logERROR, "Unable to erase requested package.\n");
-                rc = ERASE_ERROR;
-		goto rpmEnd;
-              }
-          }
-        }
-        rpmprobFilterFlags flag = 0;
-
-        int nf = 0;
-
-        nf |= INSTALL_LABEL | INSTALL_HASH;
-        rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) nf);
-
-        rc = rpmtsRun(ts, NULL, flag);
-        if(rc == OK && 
-	   (package_install_list != NULL || package_update_list != NULL || package_erase_list != NULL))
+	if(num_erase)
+	{								
+		printf("Packages for erase\n");
+		
+		for(guint i = 1; i < g_slist_length(erase_pkgs); i++)
+		{
+			SsdsJsonPkg* pkg = (SsdsJsonPkg*)g_slist_nth_data(erase_pkgs, i);
+			printf("\t%s\n", pkg->pkg_name);
+		}
+	}			
+	
+	if(!num_install && !num_update && num_erase)
 	{
-	  switch(action){
+		int ans = ssds_question("Is it ok?", YES_NO_DOWNLOAD);
+	}else{
+		int ans = ssds_question("Is it ok?", YES_NO);
+	}
+	
+	if(ans == NO)
+	{
+		ssds_log(logMESSAGE,"Action interupted by user.\n");
+		goto parseEnd;
+	}
 
-		case GET_INSTALL:
-                     ssds_log(logMESSAGE, "All packages was installed correctly.\n\n\tPackage %s is ready to use.\n\n",answer_from_srv->name);
-		     break;
+	rc = ssds_download(ans, install_pkgs, update_pkgs, erase_pkgs);
+	    
+    parseEnd:
+	    g_slist_free_full(install_pkgs, (GDestroyNotify) ssds_free);
+	    g_slist_free_full(update_pkgs, (GDestroyNotify) ssds_free);
+	    g_slist_free_full(erase_pkgs, (GDestroyNotify) ssds_free);
+	End:
+		ssds_free(json);
+	
+	return rc;
+}
 
-                case GET_UPDATE:
-                     ssds_log(logMESSAGE, "All packages was updated correctly.\n\n\tPackage %s is ready to use.\n\n",answer_from_srv->name);
-                     break;
-                case GET_ERASE:
-                     ssds_log(logMESSAGE, "All packages was erased correctly.\n");
-                     break;
+int ssds_download{int answer, GSList *install, GSList *update, GSList *erase}
+{
+	int rc = OK;
+	GSList  *install_list = NULL,
+			*update_list = NULL;
 
-          }
+	/***********************************************************/
+	/* Downloading packages part                               */
+	/***********************************************************/
+	
+	ssds_log(logDEBUG, "Begin downloading part.\n");
+	ssds_log(logMESSAGE, "Working on package: %s.\n", answer_from_srv->name);
+	
+	// required variables for downloading
+	gboolean return_status;
+	LrHandle *handler;
+	LrPackageTarget *target;
+	GError *error = NULL;
+	
+	for(guint i = 1; i < g_slist_length(install); i++){
+	   SsdsJsonPkg* inst = (SsdsJsonPkg*)g_slist_nth_data(install, i);
+	   ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
+	
+	   ssds_log(logDEBUG, "Downloading preparation.\n");
+	   handler = lr_handle_init();
+	   ssds_log(logDEBUG, "Download handler initied.\n");
+	   lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
+	   ssds_log(logDEBUG, "Array of URLs is set.\n");
+	   lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
+	   ssds_log(logDEBUG, "Repo type is set.\n");
+	   lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
+	   ssds_log(logDEBUG, "Progress callback is set.\n");
+	
+	   // Prepare list of target
+	   target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET,
+	                                    LR_CHECKSUM_UNKNOWN, NULL, 0, inst->base_url, TRUE,
+	                                    progress_callback, inst->pkg_name, end_callback, NULL, &error);
+	   install_list = g_slist_append(install_list, target);
+	}
+	
+	for(guint i = 1; i < g_slist_length(update); i++){
+	   SsdsJsonPkg* inst = (SsdsJsonPkg*)g_slist_nth_data(update, i);
+	   ssds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
+	
+	   ssds_log(logDEBUG, "Downloading preparation.\n");
+	   handler = lr_handle_init();
+	   ssds_log(logDEBUG, "Download handler initied.\n");
+	   lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
+	   ssds_log(logDEBUG, "Array of URLs is set.\n");
+	   lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
+	   ssds_log(logDEBUG, "Repo type is set.\n");
+	   lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
+	   ssds_log(logDEBUG, "Progress callback is set.\n");
+	
+	   // Prepare list of target
+	   target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET,
+	                                    LR_CHECKSUM_UNKNOWN, NULL, 0, inst->base_url, TRUE,
+	                                    progress_callback, inst->pkg_name, end_callback, NULL, &error);
+	   update_list = g_slist_append(update_list, target);
+	}
+	
+	// Download all packages        
+	ssds_log(logMESSAGE, "Downloading packages.\n");
+	return_status = lr_download_packages(install_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
+	
+	if(!return_status || error != NULL){
+	
+	  ssds_log(logERROR, "%d: %s\n", error->code, error->message);
+	  rc = DOWNLOAD_ERROR;
+	
+	}else{
+	
+	 	return_status = lr_download_packages(update_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
+	
+		if(!return_status || error != NULL){
+	
+	  		ssds_log(logERROR, "%d: %s\n", error->code, error->message);
+	  		rc = DOWNLOAD_ERROR;
+	
+		}else{
+			ssds_log(logMESSAGE, "All packages were downloaded successfully.\n");
+			if(answer == DOWNLOAD)
+			{
+				ssds_log(logMESSAGE, "Packages are in %s.\n", DOWNLOAD_TARGET);
+			}else{
+				rc = ssds_rpm_process(package_list, update_list, erase);
+			}
+		}
+	}
 
-        }else{
-	  if(rc != OK){
-  	  	switch(action){
+	g_error_free(error);
+	g_slist_free_full(install_list, (GDestroyNotify) lr_packagetarget_free);
+	g_slist_free_full(update_list, (GDestroyNotify) lr_packagetarget_free);
+	
+	return rc;
+}
 
-                	case GET_INSTALL:        
-	                     ssds_log(logWARNING, "Installation of package %s end with code %d.\n",
-                                      answer_from_srv->name, rc);
-        	             break;
+int ssds_rpm_process(GSList *install, GSList *update, GSList *erase)
+{
+	/*********************************************************/
+	/* Installing / Updating / Erasing packages              */
+	/*********************************************************/
+	
+	// required variables for rpmlib
+	int rc = OK;
+	rpmts ts;
+	
+	rpmReadConfigFiles(NULL, NULL);
+	ts = rpmtsCreate();
+	rpmtsSetRootDir(ts, NULL);
+	
+	
+	if(install != NULL)
+	{
+		ssds_log(logMESSAGE, "Installing packages.\n");
+		for(GSList *elem = install; elem; elem = g_slist_next(elem))
+		{
+		    LrPackageTarget *target = (LrPackageTarget *)elem->data;
+		
+		    if(!target->err)
+		    {
+		      	ssds_add_to_transaction(ts, target->local_path, SSDS_INSTALL);
+		    }else{
+		        ssds_log(logERROR, "Package Error: %s\n", target->err);
+				rc = INSTALL_ERROR;
+				goto rpmEnd;
+		    }
+		}
+	} 
 
-                	case GET_UPDATE:
-	                     ssds_log(logWARNING, "Updating of package %s end with code %d.\n",
-				      answer_from_srv->name, rc);
-        	             break;
-                	case GET_ERASE:
-	                     ssds_log(logWARNING, "Erasing of package %s end with code %d.\n",
-				      answer_from_srv->name, rc);
-        	             break;
+	if(update != NULL) 
+    {
+        ssds_log(logMESSAGE, "Updating packages.\n");
+        for(GSList *elem = update; elem; elem = g_slist_next(elem))
+        {
+        	LrPackageTarget *target = (LrPackageTarget *)elem->data;
 
-          	}
-          }else{
-		ssds_log(logMESSAGE, "Nothing to do.\n");
-          }
+            if(!target->err)
+            {
+            	ssds_add_to_transaction(ts, target->local_path, SSDS_UPDATE);
+            }else{
+                ssds_log(logERROR, "Package Error: %s\n", target->err);
+		  		rc = UPDATE_ERROR;
+		  		goto rpmEnd;
+            }
+    	}
+    }
+
+    if(erase != NULL)
+    {
+    	ssds_log(logMESSAGE, "Erasing packages.\n");
+        for(GSList *elem = erase; elem; elem = g_slist_next(elem))
+        {
+			SsdsJsonPkg *pkg = (SsdsJsonPkg)elem;
+			printf("erase %s\n", pkg->pkg_name);
+        	/*rc = ssds_add_to_erase(ts, (char *)elem);
+            if(rc != OK){
+				ssds_log(logERROR, "Unable to erase requested package.\n");
+                rc = ERASE_ERROR;
+				goto rpmEnd;
+            } */
         }
+    }
+    
+	rpmprobFilterFlags flag = 0;
 
+    int nf = 0;
+
+    nf |= INSTALL_LABEL | INSTALL_HASH;
+    rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) nf);
+
+    rc = rpmtsRun(ts, NULL, flag);
+    
   rpmEnd:
-        rpmtsClean(ts);
-        rpmtsFree(ts);
-        g_slist_free_full(package_install_list, (GDestroyNotify) lr_packagetarget_free);
-        g_slist_free_full(package_update_list, (GDestroyNotify) lr_packagetarget_free);
-	//g_slist_free_full(package_erase_list, (GDestroyNotify) ssds_free);
-        ssds_free(answer_from_srv);
-	ssds_free(json);
-  }
-
-  return rc;
+    rpmtsClean(ts);
+    rpmtsFree(ts);
+    
+    return rc;
 }
 
 int ssds_question(char* question, int possibilities)
