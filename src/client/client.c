@@ -449,46 +449,64 @@ int ssds_question(char* question, int possibilities)
 {
 	
 	int status = NO, repeat = 1;;
-        char answer;
+    char answer;
 	switch(possibilities)
 	{
-		case YES_NO: ssds_log(logQUESTION, "%s\n[y/n]: ", question);
-			     while(repeat)
-			     {
-			     	scanf("%c\n", &answer);
+		case YES_NO: 
+			while(repeat)
+			{
+				ssds_log(logQUESTION, "%s\n[y/n]: ", question);
+				scanf("%c", &answer);
+				
 				switch(answer)
 				{
-					case 'y': status = YES;
-						  repeat = 0;
-						  break;
-					case 'n': repeat = 0;
-						  break;
-					default: ssds_log(logWARNING, "Unsupported answer. You should choose y for yes or n for no.\n");
-						 break;
+					case 'y': 
+						status = YES;
+						repeat = 0;
+						break;
+						
+					case 'n': 
+						repeat = 0;
+						break;
+						
+					default: 
+						ssds_log(logWARNING, "Unsupported answer. You should choose y for yes or n for no.\n");
+						scanf("%c", &answer); //eliminating enter		
+						break;
 				}
-			     }
-			     break;
-		case YES_NO_DOWNLOAD: ssds_log(logQUESTION, "%s\n[y/n/d]: ", question);
-                            	      while(repeat)
-	                              {
-         		                 scanf("%c\n", &answer);
-                        		 switch(answer)
-                                	 {
-                                        	case 'y': status = YES;
-                                                	  repeat = 0;
-	                                                  break;
-        	                                case 'n': repeat = 0;
-                	                                  break;
-						case 'd': status = DOWNLOAD;
-							  repeat = 0;
-							  break;
-                        	                default: ssds_log(logWARNING, "Unsupported answer. You should choose y for yes, n for no or d for download only.\n");     
-                                	                 break;
-                     		         }
-		     		      }
-				      break;
+			}
+			break;
+			
+		case YES_NO_DOWNLOAD: 
+			while(repeat)
+	        {
+         		ssds_log(logQUESTION, "%s\n[y/n/d]: ", question);
+                scanf("%c", &answer);
+				
+				switch(answer)
+                {
+                	case 'y': 
+						status = YES;
+                        repeat = 0;
+	                    break;
+	                    
+					case 'n': 
+						repeat = 0;
+                	    break;
+                	    
+					case 'd': 
+						status = DOWNLOAD;
+						repeat = 0;
+						break;
+						
+					default: 
+						ssds_log(logWARNING, "Unsupported answer. You should choose y for yes, n for no or d for download only.\n");
+						scanf("%c", &answer); //eliminating enter     
+						break;
+				}
+			}
+			break;
 	}
 		
 	return status;
-
-}
+}    
