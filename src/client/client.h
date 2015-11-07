@@ -67,12 +67,13 @@ enum{
 int ssds_get_new_id(int socket, char **id, char *arch, char *release);
 
 /**
- * Send @System.solv to server.
+ * Send file to server.
  * @param socket    int communication socket handler
- * @param path      char* path to @System.solv file
+ * @param type      int type of file 
+ * @param path      char* path to file
  * @return          Returns OK if the recieved json is valid, otherwise error code.
  */
-int ssds_send_System_solv(int socket, char *path);
+int ssds_send_file(int socket, int type, char *path);
 
 /**
  * Send type of operation, names of packages and addresses of repos to server. 

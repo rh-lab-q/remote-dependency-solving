@@ -48,42 +48,42 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release)
   return OK;
 }
 
-int ssds_send_System_solv(int socket, char *path)
+int ssds_send_file(int socket, int type, char *path)
 {
-  SsdsJsonCreate* json_msg = ssds_js_cr_init(SEND_SOLV);
+  SsdsJsonCreate* json_msg = ssds_js_cr_init(type);
 
   char* msg_output;
 
   /***********************************************************/
-  /* Sending @System.solv file                               */
+  /* Sending file                                            */
   /***********************************************************/
-  ssds_log(logDEBUG, "Path to sys.solv file : %s\n",path);
+  ssds_log(logDEBUG, "Path to file : %s\n",path);
   FILE * f;
   f = fopen(path,"rb");
 
-  ssds_log(logDEBUG, "Opening @System.solv file.\n");
+  ssds_log(logDEBUG, "Opening file.\n");
   if(f == NULL)
   {
-    ssds_log(logERROR,"Error while opening @System.solv file.\n");
+    ssds_log(logERROR,"Error while opening file %s.\n", path);
     return FILE_ERROR;
   }
 
-  ssds_log(logDEBUG, "Getting size of @System.solv file.\n");
+  ssds_log(logDEBUG, "Getting size of file.\n");
 
   fseek(f, 0, SEEK_END);
   ssize_t size = ftell(f);
   fseek(f, 0, SEEK_SET);
 
-  ssds_log(logDEBUG, "Size of @System.solv file is %d.\n", size);
+  ssds_log(logDEBUG, "Size of file is %d.\n", size);
   ssds_js_cr_set_read_bytes(json_msg, (int) size);
   msg_output = ssds_js_cr_to_string(json_msg);
   secure_write(socket, msg_output, strlen(msg_output));
-  ssds_log(logDEBUG, "Preparing .solv variables.\n");
+  ssds_log(logDEBUG, "Preparing variables.\n");
 
   char buffer[131072];
   size_t bytes_read = 0;
 
-  ssds_log(logDEBUG, "Sending @System.solv file.\n");
+  ssds_log(logDEBUG, "Sending file.\n");
   while((bytes_read = fread(buffer, 1, 131072, f)) != 0)
   {
       secure_write(socket, buffer, bytes_read);

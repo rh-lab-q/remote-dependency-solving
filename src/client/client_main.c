@@ -78,9 +78,9 @@ int main(int argc, char* argv[]){
   /********************************************************************/
   /*  Getting architecture, release and path to @System.solv          */ 
   /********************************************************************/
-  char path[100];
+  char pathToSolv[100], *pathToYum = "/etc/yum.conf";
   char *arch = NULL, *release = NULL, *message = NULL;
-  ssds_resolve_dependency_file_path(path, &arch, &release);
+  ssds_resolve_dependency_file_path(pathToSolv, &arch, &release);
 
   /********************************************************************/
   /* Networking part - connecting to server                           */
@@ -104,9 +104,11 @@ int main(int argc, char* argv[]){
         status = ssds_get_new_id(socket, &id, arch, release);
 	if(status != OK) goto end;
 
-	status = ssds_send_System_solv(socket, path);
+	status = ssds_send_file(socket, SEND_SOLV, pathToSolv);
         if(status != OK) goto end;
 
+    status = ssds_send_file(socket, SEND_YUM_CONF, pathToYum);
+        if(status != OK) goto end;
   }
 
 

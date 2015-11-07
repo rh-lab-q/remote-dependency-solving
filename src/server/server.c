@@ -162,6 +162,58 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
 	    ssds_log(logDEBUG, "Finished writing @System.solv file.\n");
             break;
 
+        case SEND_YUM_CONF:
+            ssds_log(logDEBUG, "Got message with code %d (client is going to send yum.conf file).\n", SEND_YUM_CONF);
+
+            int bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
+            
+ 	    FILE * f = fopen("yum.conf","wb"); //for now the file is in the same directory as server;
+            if(f == NULL)
+            {
+                ssds_log(logERROR,"Error while creating yum.conf file.\n");
+                ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+		ssds_js_cr_set_message(json_send, "Error while creating yum.conf file on server side.");
+                msg = ssds_js_cr_to_string(json_send);
+		secure_write(socket, msg, strlen(msg));
+                status = FILE_ERROR;
+                goto processEnd;
+            }
+
+            char* comm_buffer;
+            int bytes_written = 0, bytes_read;
+
+            while(1)
+            {
+                bytes_read = sock_solv_recv(socket, &comm_buffer);
+                if(fwrite(comm_buffer ,1 ,bytes_read ,f) != bytes_read){
+			ssds_log(logERROR, "Error while writing to yum.conf file.\n");
+			ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+			ssds_js_cr_set_message(json_send, "Error while writing to yum.conf file on server side.\n");
+			*client_end = 1;
+			break;
+		}
+		ssds_free(comm_buffer);
+		bytes_written += bytes_read;
+	
+		if(bytes_read < 0){
+			ssds_js_cr_set_message(json_send, "Error while reading data fom client.");
+			*client_end = 1;
+			break;
+		}
+		if(bytes_written == bytes_to_write)
+                {
+                  break;
+                }
+
+                ssds_log(logDEBUG, "%.0f %% of yum.conf file is written.\n", 
+				   (((double)bytes_written/(double)bytes_to_write)*100));
+            }
+            msg = ssds_js_cr_to_string(json_send);
+            secure_write(socket, msg, strlen(msg));
+            fclose(f);
+	    ssds_log(logDEBUG, "Finished writing yum.conf file.\n");
+            break;
+
         case GET_INSTALL:
 				case GET_UPDATE:
 				case GET_UPDATE_ALL:
