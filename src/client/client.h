@@ -76,6 +76,22 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release);
 int ssds_send_file(int socket, int type, char *path);
 
 /**
+ * Compare two files
+ * @param fileOne   char* path to first file 
+ * @param fileTwo   char* path to second file 
+ * @return          Returns OK if files are identical, else error code.
+ */
+int compare_files(char *fileOne, char *fileTwo);
+
+/**
+ * Compare two files
+ * @param source        char* path to source file 
+ * @param destination   char* path to destination file 
+ * @return              Returns OK, else error code.
+ */
+int copy_file(char *source, char *destination);
+
+/**
  * Send type of operation, names of packages and addresses of repos to server. 
  * @param params    ParamOptsCl* structure of command line parsed parameters
  * @param arch	    char* type of computer architecture

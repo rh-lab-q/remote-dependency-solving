@@ -78,9 +78,13 @@ int main(int argc, char* argv[]){
   /********************************************************************/
   /*  Getting architecture, release and path to @System.solv          */ 
   /********************************************************************/
-  char pathToSolv[100], *pathToYum = "/etc/yum.conf";
+  char pathToOriginalSolv[100], 
+       *pathToOriginalYum = "/etc/yum.conf",
+       *pathToBackupSolv = "/var/cache/ssds/@System.solv",
+       *pathToBackupYum = "/var/cache/ssds/yum.conf";
+              
   char *arch = NULL, *release = NULL, *message = NULL;
-  ssds_resolve_dependency_file_path(pathToSolv, &arch, &release);
+  ssds_resolve_dependency_file_path(pathToOriginalSolv, &arch, &release);
 
   /********************************************************************/
   /* Networking part - connecting to server                           */
@@ -103,12 +107,39 @@ int main(int argc, char* argv[]){
   {     
         status = ssds_get_new_id(socket, &id, arch, release);
 	if(status != OK) goto end;
-
-	status = ssds_send_file(socket, SEND_SOLV, pathToSolv);
+	    
+	status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
         if(status != OK) goto end;
-
-    status = ssds_send_file(socket, SEND_YUM_CONF, pathToYum);
+        if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
+        {
+            ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
+        }
+        
+    status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
         if(status != OK) goto end;
+        if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
+        {
+            ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
+        }
+        
+  }else{
+        if( compare_files(pathToOriginalSolv, pathToBackupSolv) != OK ){
+            status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
+            if(status != OK) goto end;
+            if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
+            {
+                ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
+            }
+        }
+        
+        if( compare_files(pathToOriginalYum, pathToBackupYum) != OK ){
+            status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
+            if(status != OK) goto end;
+            if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
+            {
+                ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
+            }
+        }       
   }
 
 

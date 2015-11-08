@@ -111,6 +111,81 @@ int ssds_send_file(int socket, int type, char *path)
   return rc; 
 }
 
+int compare_files(char *fileOne, char *fileTwo){
+  
+  FILE *f1, *f2;
+  f1 = fopen(fileOne,"r");
+  f2 = fopen(fileTwo,"r");
+
+  ssds_log(logDEBUG, "Opening files for compare.\n");
+  if(f1 == NULL)
+  {
+    ssds_log(logERROR,"Error while opening file %s.\n", fileOne);
+    return FILE_ERROR;
+  }
+
+  if(f2 == NULL)
+  {
+    ssds_log(logERROR,"Error while opening file %s.\n", fileTwo);
+    return FILE_ERROR;
+  }
+  
+  char ch1 = fgetc(f1), 
+       ch2 = fgetc(f2);
+  
+  while((ch1 != EOF) && (ch2 != EOF) && (ch1 == ch2))
+  {
+      ch1 = fgetc(f1), 
+      ch2 = fgetc(f2);
+  }
+  
+  if(ch1 == ch2)
+  {
+     ssds_log(logDEBUG, "Files are identical.\n");
+     rc = OK;
+  }else{
+     ssds_log(logDEBUG, "Files are different.\n");
+     rc = FILE_ERROR;
+  }
+
+  fclose(f1);
+  fclose(f2);
+  
+  return rc; 
+}
+
+int copy_file(char *source, char *destination)
+{
+  FILE *s, *d;
+  s = fopen(source,"r");
+  d = fopen(destination,"w");
+
+  ssds_log(logDEBUG, "Opening files for copy.\n");
+  if(s == NULL)
+  {
+    ssds_log(logERROR,"Error while opening file %s.\n", source);
+    return FILE_ERROR;
+  }
+
+  if(d == NULL)
+  {
+    ssds_log(logERROR,"Error while opening file %s.\n", destination);
+    return FILE_ERROR;
+  }
+  
+  char ch;
+  
+  while((ch = fgetc(source)) != EOF)
+  {
+      fputc(ch, d);
+  }
+  
+  fclose(s);
+  fclose(d);
+  
+  return OK; 
+}
+
 int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int socket, int action)
 {
   
