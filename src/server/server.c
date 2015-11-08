@@ -89,8 +89,9 @@ acceptEnd:
 
 int ssds_server_process(int socket, char *client_ip, int *client_end)
 {
-  int status = OK;
-  char *buf = sock_recv(socket), *msg;
+  int status = OK, bytes_to_write, bytes_written = 0, bytes_read;
+  FILE * f;
+  char *buf = sock_recv(socket), *msg, *comm_buffer;
   SsdsJsonCreate *json_send = ssds_js_cr_init(ANSWER_OK);
   SsdsJsonRead *json_read = ssds_js_rd_init();
 
@@ -113,9 +114,9 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
         case SEND_SOLV:
             ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SEND_SOLV);
 
-            int bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
+            bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
             
- 	    FILE * f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
+ 	    f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
             if(f == NULL)
             {
                 ssds_log(logERROR,"Error while creating @System.solv file.\n");
@@ -127,8 +128,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
                 goto processEnd;
             }
 
-            char* comm_buffer;
-            int bytes_written = 0, bytes_read;
+            bytes_written = 0;
 
             while(1)
             {
@@ -165,9 +165,9 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
         case SEND_YUM_CONF:
             ssds_log(logDEBUG, "Got message with code %d (client is going to send yum.conf file).\n", SEND_YUM_CONF);
 
-            int bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
+            bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
             
- 	    FILE * f = fopen("yum.conf","wb"); //for now the file is in the same directory as server;
+ 	    f = fopen("yum.conf","wb"); //for now the file is in the same directory as server;
             if(f == NULL)
             {
                 ssds_log(logERROR,"Error while creating yum.conf file.\n");
@@ -179,8 +179,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
                 goto processEnd;
             }
 
-            char* comm_buffer;
-            int bytes_written = 0, bytes_read;
+            bytes_written = 0;
 
             while(1)
             {

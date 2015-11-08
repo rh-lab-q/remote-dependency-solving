@@ -116,7 +116,7 @@ int compare_files(char *fileOne, char *fileTwo){
   FILE *f1, *f2;
   f1 = fopen(fileOne,"r");
   f2 = fopen(fileTwo,"r");
-
+  int rc = OK;
   ssds_log(logDEBUG, "Opening files for compare.\n");
   if(f1 == NULL)
   {
@@ -142,7 +142,6 @@ int compare_files(char *fileOne, char *fileTwo){
   if(ch1 == ch2)
   {
      ssds_log(logDEBUG, "Files are identical.\n");
-     rc = OK;
   }else{
      ssds_log(logDEBUG, "Files are different.\n");
      rc = FILE_ERROR;
@@ -157,8 +156,8 @@ int compare_files(char *fileOne, char *fileTwo){
 int copy_file(char *source, char *destination)
 {
   FILE *s, *d;
-  s = fopen(source,"r");
-  d = fopen(destination,"w");
+  s = fopen(source,"rb");
+  d = fopen(destination,"wb");
 
   ssds_log(logDEBUG, "Opening files for copy.\n");
   if(s == NULL)
@@ -173,11 +172,11 @@ int copy_file(char *source, char *destination)
     return FILE_ERROR;
   }
   
-  char ch;
+  char ch[1];
   
-  while((ch = fgetc(source)) != EOF)
+  while(fread(ch,1,1,s) != 0)
   {
-      fputc(ch, d);
+      fwrite(ch, 1, 1, d);
   }
   
   fclose(s);
