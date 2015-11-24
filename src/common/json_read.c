@@ -259,45 +259,4 @@ GSList* ssds_js_rd_parse_answer(const char* name, SsdsJsonRead* json)
 	}
 	
 	return ret;
-	
-  
-//   JsonObject* main_obj = json_array_get_object_element(array, nmr);
-//   char* name = (char*)json_object_get_string_member(main_obj, "name");
-//   ans_list->name = (char*)ssds_malloc((strlen(name)+1)*sizeof(char));
-//   strcpy(ans_list->name, name);
-//   
-//   JsonArray* inner_array = json_object_get_array_member(main_obj, "install");
-//   guint len = json_array_get_length(inner_array);
-//   //through all the packages for one app
-//   for(guint i = 0; i < len; i++)
-//   {
-//     SsdsJsonInstall* install = ssds_js_rd_install_init();
-//     JsonObject* obj = json_array_get_object_element(inner_array, i);
-//     
-//     //name of one package to install
-//     char* pkg_name = (char*)json_object_get_string_member(obj, "pkg_name");
-//     install->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
-//     strcpy(install->pkg_name, pkg_name);
-//     
-//     //name of package location on repository
-//     char* pkg_loc = (char*)json_object_get_string_member(obj, "pkg_loc");
-//     install->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
-//     strcpy(install->pkg_loc, pkg_loc);
-//     
-//     //baseurl or null
-//     if(json_object_get_null_member(obj, "base_url"))
-//     {
-//       char* meta = (char*)json_object_get_string_member(obj, "metalink");
-//       install->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
-//       strcpy(install->metalink, meta);
-//     }
-//     else
-//     {
-//       char* base = (char*)json_object_get_string_member(obj, "base_url");
-//       install->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
-//       strcpy(install->base_url, base);
-//     }
-//     
-//     ans_list->pkgList = g_slist_append(ans_list->pkgList, install);
-//   }
 }
