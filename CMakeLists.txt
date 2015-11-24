@@ -73,7 +73,7 @@ configure_file(${PROJECT_SOURCE_DIR}/cmake/Config/version_conf.h.in ${PROJECT_SO
 include_directories(${PROJECT_SOURCE_DIR}/cmake/Config)
 
 if(CMAKE_COMPILER_IS_GNUCC) 
-	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0 -lrpm -lrpmio")
+	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0 -lrpm -lrpmio -lssl -lcrypto -L/usr/lib")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
   set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
@@ -94,7 +94,8 @@ set (ssds_common_srcs
 	src/common/packages.c
 	src/common/mem_management.c
 	src/common/cfg_parsing.c
-	src/common/detect_missing_repos.c)
+	src/common/detect_missing_repos.c
+	src/common/network_security.c)
 set (ssds_common_headers
 	src/common/includes.h
 	src/common/json_handler.h
@@ -107,7 +108,8 @@ set (ssds_common_headers
 	src/common/mem_management.h
 	src/common/cfg_parsing.h
 	src/common/errors.h
-	src/common/detect_missing_repos.h)
+	src/common/detect_missing_repos.h
+	src/common/network_security.h)
 add_library(lib_ssds_common SHARED ${ssds_common_srcs} ${ssds_common_headers})
 target_link_libraries(lib_ssds_common
 	${LIBS}
