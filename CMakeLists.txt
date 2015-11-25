@@ -158,6 +158,8 @@ add_executable(ssds-server
 	${ssds_server_srcs}
 	${ssds_common_srcs})
 
+target_compile_definitions(ssds-server PUBLIC __CASE_SERVER)
+
 #add_library(lib_serv SHARED ${SERVSRC})
 
 target_link_libraries(
@@ -173,6 +175,8 @@ PROJECT(ssds-client)
 add_executable(ssds-client
 	${ssds_client_srcs}
 	${ssds_common_srcs})
+
+target_compile_definitions(ssds-client PUBLIC __CASE_CLIENT)
 
 target_link_libraries(ssds-client
 	${LIBS}

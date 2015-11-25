@@ -26,7 +26,9 @@
 #include "includes.h"
 #include "cfg_parsing.h"
 #include "errors.h"
-#
+
+#include "network_security.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif

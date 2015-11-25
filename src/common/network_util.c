@@ -24,7 +24,7 @@ char* sock_recv(int sock_fd)
 {
   char* reply = (char*)ssds_malloc(MAX_INPUT_LEN*sizeof(char));
   memset(reply, 0, MAX_INPUT_LEN);
-  ssize_t ret = read(sock_fd, reply , MAX_INPUT_LEN);
+  ssize_t ret = ssds_read(sock_fd, reply , MAX_INPUT_LEN);
   
   if(ret == -1)
   {
@@ -50,7 +50,7 @@ char* sock_recv(int sock_fd)
       if(read_count*MAX_INPUT_LEN >= buff_size*BUFF_SIZE)
         buffer = ssds_realloc(buffer, ++buff_size*BUFF_SIZE);
       
-      ret = read(sock_fd, reply , MAX_INPUT_LEN);
+      ret = ssds_read(sock_fd, reply , MAX_INPUT_LEN);
       memcpy(buffer+read_count*MAX_INPUT_LEN, reply, MAX_INPUT_LEN);
       
       
@@ -67,7 +67,7 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer)
 {
   *buffer = (char*)ssds_malloc(MAX_INPUT_LEN*sizeof(char));
   memset(*buffer, 0, MAX_INPUT_LEN);
-  ssize_t retVal = read(sock_fd, *buffer , MAX_INPUT_LEN);
+  ssize_t retVal = ssds_read(sock_fd, *buffer , MAX_INPUT_LEN);
 
   if(retVal == -1)
   {
@@ -94,7 +94,7 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer)
       if(read_count*MAX_INPUT_LEN >= buff_size*BUFF_SIZE)
         buff = ssds_realloc(buff, ++buff_size*BUFF_SIZE);
 
-      ret = read(sock_fd, *buffer , MAX_INPUT_LEN);
+      ret = ssds_read(sock_fd, *buffer , MAX_INPUT_LEN);
       retVal += ret;
       memcpy(buff+read_count*MAX_INPUT_LEN, *buffer, MAX_INPUT_LEN);
 
@@ -111,7 +111,7 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer)
 void secure_write(int socket, char* message, ssize_t length)
 {
 
-	write(socket, message, length);
+	ssds_write(socket, message, length);
 }
 
 int client_connect(int *socket, char *server_address, long int port)
