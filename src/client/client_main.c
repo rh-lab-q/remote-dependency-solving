@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
             ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
         }
         
-    status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
+        status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
         if(status != OK) goto end;
         if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
         {
@@ -124,7 +124,15 @@ int main(int argc, char* argv[]){
         
   }else{
         if( compare_files(pathToOriginalSolv, pathToBackupSolv) != OK ){
-            status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
+            int ans = ssds_question("DNF install packages by themself. We need to make initial steps again. If you don't want to use SSDS call ssds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
+
+  	    if(ans == NO)
+            {
+                ssds_log(logMESSAGE,"Action interupted by user.\n");
+                goto end;
+            }
+ 
+	    status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
             if(status != OK) goto end;
             if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
             {
@@ -133,7 +141,13 @@ int main(int argc, char* argv[]){
         }
         
         if( compare_files(pathToOriginalYum, pathToBackupYum) != OK ){
-            status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
+   	    int ans = ssds_question("New yum configuration will be sent to server. Do yout agree?", YES_NO);
+	    if(ans == NO){
+	        ssds_log(logMESSAGE,"Action interupted by user.\n");
+                goto end;
+	    }
+	    
+ status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
             if(status != OK) goto end;
             if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
             {
