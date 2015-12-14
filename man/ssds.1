@@ -1,0 +1,44 @@
+.TH SERVER SIDE DEPENDENCY SOLVING 1 2015-12-01 "" "Linux User's Manual"
+.SH NAME
+ssds-client/server \- installs/update packages based on solving received from server
+
+.SH SYNOPSIS
+.B ssds-client
+[\fIOPTION\fR]... \fIPACKAGE(S)\fR
+
+.SH DESCRIPTION
+\fBssds-client\fP is the tool which installs packages based of dependencies
+calculated by ssds-server.
+
+Mandatory arguments to long options are mandatory for short options too.
+.TP
+\fB\-\-install\fR
+installs packages based on server dependencies
+
+.TP
+\fB\-\-update\fR
+update packages based on server dependencies
+
+.TP
+\fB\-\-erase\fR
+erase packages based on server dependencies
+
+.TP
+\fB\-\-chkdep\fR
+only show required packages - do not install them
+
+.TP
+\fB\-\-help\fR
+displays help
+
+.TP
+\fB\-v\fR
+verbose mode - turned off by default
+
+.TP
+\fB\-d\fR
+debug mode - turned off by default
+
+
+.SH AUTHOR
+Written by Petr Hracek, Simon Matej, Josef Ridky, Michal Ruprich (alphabetically) 
