@@ -25,8 +25,16 @@
 #include "log_handler.h"
 #include "mem_management.h"
 
-#define CFG_FILE "../connection.cfg"
 
-int read_cfg(char **id, char** address, long int* comm_port);
+#ifdef __CASE_CLIENT
+#define CFG_FILE "../etc/ssds-client.conf"
+#else
+#define CFG_FILE "../etc/ssds-server.conf"
+#endif
+
+int read_cfg(char **ret_client_id, char **address, long int *comm_port);
+int write_to_cfg(char *name, char *value);
 int read_srv_cfg(long int* comm_port);
+int write_to_cfg(char *name, char *value);
 char* file_read_value(FILE* file, int max_length);
+void compare(FILE* file, char* str, int len, char *state, char *act_c);

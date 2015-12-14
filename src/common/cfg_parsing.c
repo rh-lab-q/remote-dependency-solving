@@ -1,18 +1,15 @@
 
 #include "cfg_parsing.h"
 
-int read_cfg(char **id, char** ret_address, long int* ret_comm_port)
+
+int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
 {
   /*
   ** reads connection configuration from CFG file
   */
  
-  /********************************************************************/
-  /* TODO: loading ID string from cfg file                            */
-  /********************************************************************/
-  *id = NULL;
 
-  char *address, *comm_port;
+  char *address, *comm_port, *client_id;
   FILE* cfg_file;
   cfg_file = fopen(CFG_FILE, "r");
   if (cfg_file == NULL)
@@ -31,10 +28,8 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port)
   char fmstate = 'e';
   char act_c;
 
-  char* address_sstr = "address=";
-  char* comm_port_sstr = "port=";
-
   int address_parsed = 0;
+  int client_id_parsed = 0;
   int comm_port_parsed = 0;
 
   do
@@ -43,12 +38,16 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port)
     switch (fmstate)
     {
       case 'e':
-        if (act_c == '#') //comment
+        if ((act_c == '#') || (act_c == '[')) //comment
           fmstate = 'c';
-        else if (act_c == 'a') //adress
+        else if (act_c == 'a') //address
           fmstate = 'a';
+        else if (act_c == 's') //address (alternative)
+          fmstate = 's';
         else if (act_c == 'p') //port
           fmstate = 'p';
+        else if (act_c == 'i') //id
+          fmstate = 'i';
         else fmstate = 'c'; //ignore invalid lines
       break;
 
@@ -58,18 +57,7 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port)
       break;
 
       case 'a':
-        for (int i1 = 2; i1 <= 7; i1++)
-        {
-          act_c = fgetc(cfg_file);
-          if (act_c != address_sstr[i1])
-          {
-            fmstate = 'c';
-            break;
-          }
-          else
-          {
-          }
-        }
+        compare(cfg_file, "address=", 7, &fmstate, &act_c);
         if (fmstate == 'a')
         {
           address = file_read_value(cfg_file, 0);
@@ -79,22 +67,36 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port)
         }
       break;
 
-      case 'p':
-        for (int i1 = 2; i1 <= 4; i1++)
+      case 's':
+        compare(cfg_file, "server=", 6, &fmstate, &act_c);
+        if (fmstate == 's')
         {
-          act_c = fgetc(cfg_file);
-          if (act_c != comm_port_sstr[i1])
-          {
-            fmstate = 'c';
-            break;
-          }
+          address = file_read_value(cfg_file, 0);
+          *ret_address = address;
+          address_parsed = 1;
+          fmstate = 'e';
         }
+      break;
+
+      case 'p':
+        compare(cfg_file, "port=", 4, &fmstate, &act_c);
         if (fmstate == 'p')
         {
           comm_port = file_read_value(cfg_file, 5);
           *ret_comm_port = strtol(comm_port, NULL, 10);
           ssds_free(comm_port);
           comm_port_parsed = 1;
+          fmstate = 'e';
+        }
+      break;
+
+      case 'i':
+        compare(cfg_file, "id=", 2, &fmstate, &act_c);
+        if (fmstate == 'i')
+        {
+          client_id = file_read_value(cfg_file, 0);
+          *ret_client_id = client_id;
+          client_id_parsed = 1;
           fmstate = 'e';
         }
       break;
@@ -111,6 +113,10 @@ int read_cfg(char **id, char** ret_address, long int* ret_comm_port)
   {
     *ret_address = (char*)ssds_malloc(10*sizeof(char));
     strncpy(*ret_address, "127.0.0.1\0", 10);
+  }
+  if (client_id_parsed == 0)
+  {
+    *ret_client_id = NULL; // client do not have an Id yet
   }
   if (!comm_port_parsed)
   {
@@ -144,8 +150,6 @@ int read_srv_cfg(long int* ret_comm_port)
   char fmstate = 'e';
   char act_c;
 
-  char* comm_port_sstr = "port=";
-
   int comm_port_parsed = 0;
 
   do
@@ -167,15 +171,7 @@ int read_srv_cfg(long int* ret_comm_port)
       break;
 
       case 'p':
-        for (int i1 = 2; i1 <= 4; i1++)
-        {
-          act_c = fgetc(cfg_file);
-          if (act_c != comm_port_sstr[i1])
-          {
-            fmstate = 'c';
-            break;
-          }
-        }
+        compare(cfg_file, "port=", 4, &fmstate, &act_c);
         if (fmstate == 'p')
         {
           comm_port = file_read_value(cfg_file, 5);
@@ -201,6 +197,131 @@ int read_srv_cfg(long int* ret_comm_port)
 
   ssds_log(logDEBUG, "comm port: %ld\n", *ret_comm_port);
 
+  return 0;
+}
+
+int write_to_cfg(char *name, char *value)
+{
+  FILE* cfg_file;
+  cfg_file = fopen(CFG_FILE, "r+");
+  if (cfg_file == NULL)
+  {
+    ssds_log(logDEBUG, "Conf file not found.\n");
+    return 1;
+  }
+
+  ssds_log(logDEBUG, "CFG file opened for write.\n");
+
+  char fmstate = 'e';
+  char *act_val;
+  int already_exists = 0;
+
+  int len = 0;
+  while (name[len] != '\0')
+  {
+    len++;
+  }
+  int val_len = 0;
+  while (value[val_len] != '\0')
+  {
+    val_len++;
+  }
+
+  char act_c;
+  int position;
+
+  do
+  {
+    act_c = fgetc(cfg_file);
+    switch (fmstate)
+    {
+      case 'e':
+        if (act_c == name[0]) //desired value
+          fmstate = 'v';
+        else fmstate = 'c'; //ignore invalid lines
+      break;
+
+      case 'c':
+        if (act_c == '\n')
+          fmstate = 'e';
+      break;
+
+
+      case 'v':
+        compare(cfg_file, name, len - 1, &fmstate, &act_c);
+        act_c = fgetc(cfg_file);
+        if (act_c != '=')
+        {
+          fmstate = 'c';
+        }
+        if (fmstate == 'v')
+        {
+          already_exists = 1;
+          fmstate = 'e';
+          position = ftell(cfg_file);
+        }
+      break;
+
+
+      default:
+      break;
+    }
+  }
+  while (act_c != EOF);
+
+  if (already_exists == 1)
+  {
+    //clone file with changed value
+    fseek(cfg_file, 0, SEEK_SET);
+    char *tempcfg = (void*)ssds_malloc((position + 1) * sizeof(char));
+    fread(tempcfg, sizeof(char), position, cfg_file);
+    tempcfg[position] = '\0';
+    FILE *new_file = fopen("../etc/ssds-client.conf.tmp", "w");
+    fwrite(tempcfg, sizeof(char), position, new_file);
+    fwrite(value, sizeof(char), val_len, new_file);
+
+    
+    do
+    {
+      act_c = fgetc(cfg_file);
+    }
+    while ((act_c != '\n') && (act_c != EOF));
+    while (act_c != EOF)
+    {
+      fputc(act_c, new_file);
+      act_c = fgetc(cfg_file);
+    }
+
+    fclose(cfg_file);
+    fclose(new_file);
+    
+    if (remove(CFG_FILE) != 0)
+    {
+      ssds_log(logERROR, "cannot delete old conf. file\n");
+      return 1;
+    }
+
+    if (rename("../etc/ssds-client.conf.tmp", CFG_FILE) != 0)
+    {
+      ssds_log(logERROR, "cannot rename new conf. file\n");
+      return 1;
+    }
+
+    ssds_log(logDEBUG, "there is already [%s] in config file, updating its value\n", name);
+    return 0;
+  }
+  else
+  {
+    fseek(cfg_file, 0, SEEK_END);
+    fwrite(name, sizeof(char), len, cfg_file);
+    fwrite("=", sizeof(char), 1, cfg_file);
+    fwrite(value, sizeof(char), val_len, cfg_file);
+    fwrite("\n", sizeof(char), 1, cfg_file);
+  
+    ssds_log(logDEBUG, "[%s = %s] written to configuration file\n", name, value);
+  
+    fclose(cfg_file);
+  }
   return 0;
 }
 
@@ -236,4 +357,20 @@ char* file_read_value(FILE* file, int max_length)
   }
   //ssds_log(logDEBUG, "***read \"%s\" of lenght %d\n", value, value_lenght);
   return value;
+}
+
+
+void compare(FILE* file, char* str, int len, char *state, char *act_c)
+{
+  for (int i1 = 1; i1 <= len; i1++)
+    {
+      if (*act_c != str[i1])
+      {
+        *state = 'c';
+      }
+      if (i1 < len)
+      {
+        *act_c = fgetc(file);
+      }
+    }
 }
