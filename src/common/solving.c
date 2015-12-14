@@ -73,6 +73,8 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 		HyPackage pkg;
 		HyQuery query = hy_query_create(*sack);
 		
+		
+		
 		//try exact match
 		if(pkg_count >1)
 			hy_query_filter_in(query, HY_PKG_NAME, HY_EQ, request);
@@ -85,9 +87,6 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 		{//exact match didn't work - I need to try 
 			hy_query_free(query);
 			query = hy_query_create(*sack);
-			printf("pred adjust\n");
-			adjust_glob(request, pkg_count);
-			printf("pokus na adjust: %s\n", request[0]);
 			
 			if(pkg_count >1)
 				hy_query_filter_in(query, HY_PKG_NAME, HY_GLOB, request);
@@ -96,8 +95,6 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 		}
 		hy_query_filter_latest_per_arch(query, 1);
 		plist = hy_query_run(query);
-		
-		printf("za query %d\n", hy_packagelist_count(plist));
 		
 		for(int i = 0; i < hy_packagelist_count(plist); i++)
 		{
