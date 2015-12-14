@@ -44,14 +44,14 @@ if(NOT HAWKEY_FOUND)
 	message(FATAL_ERROR "Library hawkey not found.")
 else (NOT HAWKEY_FOUND)
           string(REGEX MATCH "[0-9]?$" HKY_REGEX_VERSION ${HAWKEY_VERSION})
-			message("Hawkey version " ${HAWKEY_VERSION})
+#			message("Hawkey version " ${HAWKEY_VERSION})
  
 			if(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
 	            set(HKY_22 1)
-				message("Hawkey version higher than 0.5.3")         
+#				message("Hawkey version higher than 0.5.3")         
 			else(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
 				set(HKY_22 0)
-				message("Hawkey version lower than 0.5.3")         
+#				message("Hawkey version lower than 0.5.3")         
 #          math(EXPR HKY_NUM "${HKY_REGEX_VERSION}+0")
 #          if(${HKY_NUM} GREATER 3)#hawkey version is higher than 0.5.3
 
