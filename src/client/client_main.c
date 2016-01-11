@@ -105,55 +105,55 @@ int main(int argc, char* argv[]){
 
   if(id == NULL)
   {     
-        status = ssds_get_new_id(socket, &id, arch, release);
-	if(status != OK) goto end;
-	    
-	status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
-        if(status != OK) goto end;
-        if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
-        {
-            ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
-        }
-        
-        status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
-        if(status != OK) goto end;
-        if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
-        {
-            ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
-        }
-        
-  }else{
-        if( compare_files(pathToOriginalSolv, pathToBackupSolv) != OK ){
-            int ans = ssds_question("DNF install packages by themself. We need to make initial steps again. If you don't want to use SSDS call ssds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
+		status = ssds_get_new_id(socket, &id, arch, release);
+		if(status != OK) goto end;
 
-  	    if(ans == NO)
-            {
-                ssds_log(logMESSAGE,"Action interupted by user.\n");
-                goto end;
-            }
- 
-	    status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
-            if(status != OK) goto end;
-            if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
-            {
-                ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
-            }
-        }
-        
-        if( compare_files(pathToOriginalYum, pathToBackupYum) != OK ){
-   	    int ans = ssds_question("New yum configuration will be sent to server. Do yout agree?", YES_NO);
-	    if(ans == NO){
-	        ssds_log(logMESSAGE,"Action interupted by user.\n");
-                goto end;
-	    }
-	    
- status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
-            if(status != OK) goto end;
-            if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
-            {
-                ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
-            }
-        }       
+		status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
+		if(status != OK) goto end;
+		if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
+		{
+			ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
+		}
+
+		status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
+		if(status != OK) goto end;
+		if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
+		{
+			ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
+		}
+			
+  }else{
+		if( compare_files(pathToOriginalSolv, pathToBackupSolv) != OK ){
+			int ans = ssds_question("DNF install packages by themself. We need to make initial steps again. If you don't want to use SSDS call ssds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
+
+			if(ans == NO)
+			{
+				ssds_log(logMESSAGE,"Action interupted by user.\n");
+				goto end;
+			}
+
+			status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
+			if(status != OK) goto end;
+			if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
+			{
+				ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
+			}
+		}
+
+		if( compare_files(pathToOriginalYum, pathToBackupYum) != OK ){
+			int ans = ssds_question("New yum configuration will be sent to server. Do yout agree?", YES_NO);
+			if(ans == NO){
+				ssds_log(logMESSAGE,"Action interupted by user.\n");
+				goto end;
+			}
+
+			status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
+			if(status != OK) goto end;
+			if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
+			{
+				ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
+			}
+		}       
   }
 
 
@@ -164,46 +164,46 @@ int main(int argc, char* argv[]){
 	case PAR_INSTALL: 
 		ssds_log(logMESSAGE, "Installation of packages was selected.\n");
 
-                status = ssds_send_repo(params, arch, release, socket, GET_INSTALL);
+		status = ssds_send_repo(params, arch, release, socket, GET_INSTALL);
 		if(status != OK) break; 
-				
-                if(ssds_check_repo(socket, &message) != ANSWER_OK)
+
+		if(ssds_check_repo(socket, &message) != ANSWER_OK)
 		{
 			ssds_log(logWARNING,"%s\n", message);
 		}
 
-		
+
 		status = ssds_answer_process(socket, GET_INSTALL);
-		break;
+	break;
 
 	case PAR_UPDATE: 
-          ssds_log(logMESSAGE, "Update of packages was selected.\n");
-	        ssds_log(logERROR, "Update option has not been implemented yet.\n");
+		ssds_log(logMESSAGE, "Update of packages was selected.\n");
+		ssds_log(logERROR, "Update option has not been implemented yet.\n");
 
 		status = ssds_send_repo(params, arch, release, socket, GET_UPDATE);
-                if(status != OK) break;
+		if(status != OK) break;
 
-                if(ssds_check_repo(socket, &message) != ANSWER_OK)
-                {
-                        ssds_log(logWARNING,"%s\n", message);
-                }
+		if(ssds_check_repo(socket, &message) != ANSWER_OK)
+		{
+			ssds_log(logWARNING,"%s\n", message);
+		}
 
-                status = ssds_answer_process(socket, GET_UPDATE);
+		status = ssds_answer_process(socket, GET_UPDATE);
 
-                break;
+	break;
 
 	case PAR_ERASE: 
 		ssds_log(logMESSAGE, "Erase of packages was selected.\n");
 
 		status = ssds_send_repo(params, arch, release, socket, GET_ERASE);
-                if(status != OK) break;
+		if(status != OK) break;
 
-                if(ssds_check_repo(socket, &message) != ANSWER_OK)
-                {
-                        ssds_log(logWARNING,"%s\n", message);
-                }
+		if(ssds_check_repo(socket, &message) != ANSWER_OK)
+		{
+			ssds_log(logWARNING,"%s\n", message);
+		}
 
-                status = ssds_answer_process(socket, GET_ERASE);
+		status = ssds_answer_process(socket, GET_ERASE);
 
 		break;
 

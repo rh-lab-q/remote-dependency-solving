@@ -76,8 +76,8 @@ int ssds_server_accept_connection(int comm_desc, int comm_addr_len)
   // FORK HERE ?
 
   while(!client_end){
-	status = ssds_server_process(socket, client_ip, &client_end);
-	if(status != OK) goto acceptEnd;
+		status = ssds_server_process(socket, client_ip, &client_end);
+		if(status != OK) goto acceptEnd;
   }
 
 acceptEnd:
@@ -116,7 +116,6 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
 	
   switch(ssds_js_rd_get_code(json_read))
   {
-		printf("switch\n");
 		case SEND_SOLV:
 			ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SEND_SOLV);
 
@@ -306,6 +305,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
 		break;
 
 		default: //client_end = 1;
+			printf("default switch action\n");
 		break;
   }
 //

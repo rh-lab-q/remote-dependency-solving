@@ -120,7 +120,7 @@ int client_connect(int *socket, char *server_address, long int port)
   int connection_try = 1;
 
   *socket = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  ssds_log(logDEBUG, "Setted up socket descriptor.\n");
+  ssds_log(logDEBUG, "Set up socket descriptor.\n");
 
   ssds_log(logDEBUG, "Setting up connection to server.\n");
   struct sockaddr_in server_comm;
@@ -134,19 +134,19 @@ int client_connect(int *socket, char *server_address, long int port)
   server_comm.sin_port = htons(port);
   ssds_log(logDEBUG, "Set server port.\n");
 
-  ssds_log(logDEBUG, "Socket controll.\n");
+  ssds_log(logDEBUG, "Socket control.\n");
   if(*socket == -1)
   {
     ssds_log(logERROR, "Client encountered an error when creating socket for communication.\n");
     return SOCKET_ERROR;
   }
 
-  ssds_log(logDEBUG, "Socket controll - OK.\n");
+  ssds_log(logDEBUG, "Socket control - OK.\n");
 
   ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
   while((connect(*socket, (struct sockaddr *)&server_comm, sizeof(server_comm)) < 0) && (connection_try < 3))
   {
-     ssds_log(logMESSAGE, "Unable to connect to comm. socket on server. Trying that again above 5 sec.\n");
+     ssds_log(logMESSAGE, "Unable to connect to comm. socket on server. Another attempt will be executed in 5 seconds.\n");
      sleep(5);
      ssds_log(logMESSAGE, "Trying to connect to server...(%d of 3)\n", ++connection_try);
   }

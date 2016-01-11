@@ -37,7 +37,7 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release)
   message = ssds_js_cr_to_string(json_gen);
   ssds_log(logDEBUG, "Message string generated: \t%s\n", message);
 
-  ssds_log(logMESSAGE, "Sending message to server.\n");
+  ssds_log(logMESSAGE, "Sending initial message to server.\n");
   secure_write(socket, message, strlen(message));
   ssds_log(logMESSAGE, "Message sent.\n");
 
