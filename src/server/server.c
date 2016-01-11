@@ -102,205 +102,211 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
     goto processEnd;
   }
 
+  printf("buf is ok:\n%s\n, try to parse the json\n", buf);
+  
   if(!ssds_js_rd_parse(buf, json_read))//parse incoming message
   {
      ssds_log(logERROR, "False data recieved from %s. Client rejected.\n", client_ip);
      goto processEnd;
   }
+  
+  printf("json parsing seems ok, try other stuff\n");
 
   ssds_log(logDEBUG, "%s\n\n", buf);
 	
   switch(ssds_js_rd_get_code(json_read))
   {
-        case SEND_SOLV:
-            ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SEND_SOLV);
+		printf("switch\n");
+		case SEND_SOLV:
+			ssds_log(logDEBUG, "Got message with code %d (client is going to send @System.solv file).\n", SEND_SOLV);
 
-            bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
-            
- 	    f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
-            if(f == NULL)
-            {
-                ssds_log(logERROR,"Error while creating @System.solv file.\n");
-                ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
-		ssds_js_cr_set_message(json_send, "Error while creating @System.solv file on server side.");
-                msg = ssds_js_cr_to_string(json_send);
-		secure_write(socket, msg, strlen(msg));
-                status = FILE_ERROR;
-                goto processEnd;
-            }
+			bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
 
-            bytes_written = 0;
+			f = fopen("@System.solv","wb"); //for now the file is in the same directory as server;
+			if(f == NULL)
+			{
+				ssds_log(logERROR,"Error while creating @System.solv file.\n");
+				ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+				ssds_js_cr_set_message(json_send, "Error while creating @System.solv file on server side.");
+				msg = ssds_js_cr_to_string(json_send);
+				secure_write(socket, msg, strlen(msg));
+				status = FILE_ERROR;
+				goto processEnd;
+			}
 
-            while(1)
-            {
-                bytes_read = sock_solv_recv(socket, &comm_buffer);
-                if(fwrite(comm_buffer ,1 ,bytes_read ,f) != bytes_read){
-			ssds_log(logERROR, "Error while writing to @System.solv file.\n");
-			ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
-			ssds_js_cr_set_message(json_send, "Error while writing to @System.solv file on server side.\n");
+			bytes_written = 0;
+
+			while(1)
+			{
+				bytes_read = sock_solv_recv(socket, &comm_buffer);
+				if(fwrite(comm_buffer ,1 ,bytes_read ,f) != bytes_read){
+					ssds_log(logERROR, "Error while writing to @System.solv file.\n");
+					ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+					ssds_js_cr_set_message(json_send, "Error while writing to @System.solv file on server side.\n");
+					*client_end = 1;
+					break;
+				}
+			
+				ssds_free(comm_buffer);
+				bytes_written += bytes_read;
+
+				if(bytes_read < 0){
+					ssds_js_cr_set_message(json_send, "Error while reading data from client.");
+					*client_end = 1;
+					break;
+				}
+				if(bytes_written == bytes_to_write)
+				{
+					break;
+				}
+
+				ssds_log(logDEBUG, "%.0f %% of @System.solv file is written.\n", 
+				(((double)bytes_written/(double)bytes_to_write)*100));
+			}
+			msg = ssds_js_cr_to_string(json_send);
+			secure_write(socket, msg, strlen(msg));
+			fclose(f);
+			ssds_log(logDEBUG, "Finished writing @System.solv file.\n");
+		break;
+
+		case SEND_YUM_CONF:
+			ssds_log(logDEBUG, "Got message with code %d (client is going to send yum.conf file).\n", SEND_YUM_CONF);
+
+			bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
+
+			f = fopen("yum.conf","wb"); //for now the file is in the same directory as server;
+			if(f == NULL)
+			{
+				ssds_log(logERROR,"Error while creating yum.conf file.\n");
+				ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+				ssds_js_cr_set_message(json_send, "Error while creating yum.conf file on server side.");
+				msg = ssds_js_cr_to_string(json_send);
+				secure_write(socket, msg, strlen(msg));
+				status = FILE_ERROR;
+				goto processEnd;
+			}
+
+			bytes_written = 0;
+
+			while(1)
+			{
+				bytes_read = sock_solv_recv(socket, &comm_buffer);
+				if(fwrite(comm_buffer ,1 ,bytes_read ,f) != bytes_read){
+					ssds_log(logERROR, "Error while writing to yum.conf file.\n");
+					ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
+					ssds_js_cr_set_message(json_send, "Error while writing to yum.conf file on server side.\n");
+					*client_end = 1;
+					break;
+				}
+				ssds_free(comm_buffer);
+				bytes_written += bytes_read;
+
+				if(bytes_read < 0){
+					ssds_js_cr_set_message(json_send, "Error while reading data fom client.");
+					*client_end = 1;
+					break;
+				}
+				if(bytes_written == bytes_to_write)
+				{
+					break;
+				}
+
+				ssds_log(logDEBUG, "%.0f %% of yum.conf file is written.\n", 
+				(((double)bytes_written/(double)bytes_to_write)*100));
+			}
+			msg = ssds_js_cr_to_string(json_send);
+			secure_write(socket, msg, strlen(msg));
+			fclose(f);
+			ssds_log(logDEBUG, "Finished writing yum.conf file.\n");
+		break;
+
+		case GET_INSTALL:
+		case GET_UPDATE:
+		case GET_UPDATE_ALL:
+			ssds_js_rd_get_count(json_read, "pokus");
+			/* Checking repo files */
+			/* TODO here should be checking of cached repo files !!! */
+			ssds_log(logDEBUG, "Repo files checking.\n");
+
+			msg = ssds_js_cr_to_string(json_send);
+			secure_write(socket, msg, strlen(msg));
+
+			/* Dependency solving part */
+			ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
+
+			char** pkgs = NULL;
+			int pkg_count = 0;
+			//SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
+			if(ssds_js_rd_get_code(json_read) != GET_UPDATE_ALL)
+			{
+				pkg_count = ssds_js_rd_get_count(json_read, "req_pkgs");
+				pkgs = (char**)malloc((pkg_count+1)*sizeof(char*));
+				ssds_js_rd_get_packages(pkgs, json_read);
+
+				ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
+				for(int i = 0; i < pkg_count; i++)
+				{
+					ssds_log(logDEBUG, "\t%s\n", pkgs[i]);
+				}
+			}
+			ssds_log(logDEBUG, "Getting repo info from client.\n");
+
+			SsdsRepoInfoList* list = ssds_js_rd_list_init();
+			ssds_js_rd_repo_info(json_read, list);
+
+			guint len = g_slist_length(list->repoInfoList);
+
+			ssds_log(logDEBUG, "Repositories, count: %d: \n", len);
+			for(unsigned int i = 0; i < len; i++)
+			{
+				SsdsRepoInfo* info = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
+				ssds_log(logDEBUG, "\t%d: %s\n", i, info->name);
+			}
+
+			SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
+			ssds_locate_repo_metadata(/*json, */list, meta_list);
+
+			HySack sack;
+			#if VERSION_HAWKEY
+			sack = hy_sack_create(NULL, NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
+			#else
+			sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
+			#endif
+
+			hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
+			HySack* sack_p = &sack;
+			ssds_fill_sack(sack_p, meta_list);
+
+			if(ssds_dep_query(pkgs, json_send, sack_p, ssds_js_rd_get_code(json_read), pkg_count) == -1)
+			{
+				ssds_js_cr_insert_code(json_send, ANSWER_NO_DEP);
+				ssds_js_cr_set_message(json_send, "Dependencies for requested package were not resolved. Package cannot be installed\n");
+			}
+			else
+				ssds_js_cr_insert_code(json_send, ANSWER_OK);
+			//             ssds_dep_answer(json_read, json_send, sack_p);
+
+			ssds_js_cr_dump(json_send);
+			msg = ssds_js_cr_to_string(json_send);
+			//             printf("%s\n\n", msg);
+			secure_write(socket, msg, strlen(msg));
 			*client_end = 1;
-			break;
-		}
-		ssds_free(comm_buffer);
-		bytes_written += bytes_read;
-	
-		if(bytes_read < 0){
-			ssds_js_cr_set_message(json_send, "Error while reading data fom client.");
-			*client_end = 1;
-			break;
-		}
-		if(bytes_written == bytes_to_write)
-                {
-                  break;
-                }
-
-                ssds_log(logDEBUG, "%.0f %% of @System.solv file is written.\n", 
-				   (((double)bytes_written/(double)bytes_to_write)*100));
-            }
-            msg = ssds_js_cr_to_string(json_send);
-            secure_write(socket, msg, strlen(msg));
-            fclose(f);
-	    ssds_log(logDEBUG, "Finished writing @System.solv file.\n");
-            break;
-
-        case SEND_YUM_CONF:
-            ssds_log(logDEBUG, "Got message with code %d (client is going to send yum.conf file).\n", SEND_YUM_CONF);
-
-            bytes_to_write = ssds_js_rd_get_read_bytes(json_read);
-            
- 	    f = fopen("yum.conf","wb"); //for now the file is in the same directory as server;
-            if(f == NULL)
-            {
-                ssds_log(logERROR,"Error while creating yum.conf file.\n");
-                ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
-		ssds_js_cr_set_message(json_send, "Error while creating yum.conf file on server side.");
-                msg = ssds_js_cr_to_string(json_send);
-		secure_write(socket, msg, strlen(msg));
-                status = FILE_ERROR;
-                goto processEnd;
-            }
-
-            bytes_written = 0;
-
-            while(1)
-            {
-                bytes_read = sock_solv_recv(socket, &comm_buffer);
-                if(fwrite(comm_buffer ,1 ,bytes_read ,f) != bytes_read){
-			ssds_log(logERROR, "Error while writing to yum.conf file.\n");
-			ssds_js_cr_insert_code(json_send, ANSWER_ERROR);
-			ssds_js_cr_set_message(json_send, "Error while writing to yum.conf file on server side.\n");
-			*client_end = 1;
-			break;
-		}
-		ssds_free(comm_buffer);
-		bytes_written += bytes_read;
-	
-		if(bytes_read < 0){
-			ssds_js_cr_set_message(json_send, "Error while reading data fom client.");
-			*client_end = 1;
-			break;
-		}
-		if(bytes_written == bytes_to_write)
-                {
-                  break;
-                }
-
-                ssds_log(logDEBUG, "%.0f %% of yum.conf file is written.\n", 
-				   (((double)bytes_written/(double)bytes_to_write)*100));
-            }
-            msg = ssds_js_cr_to_string(json_send);
-            secure_write(socket, msg, strlen(msg));
-            fclose(f);
-	    ssds_log(logDEBUG, "Finished writing yum.conf file.\n");
-            break;
-
-        case GET_INSTALL:
-				case GET_UPDATE:
-				case GET_UPDATE_ALL:
-ssds_js_rd_get_count(json_read, "pokus");
-            /* Checking repo files */
-            /* TODO here should be checking of cached repo files !!! */
-            ssds_log(logDEBUG, "Repo files checking.\n");
-
-            msg = ssds_js_cr_to_string(json_send);
-            secure_write(socket, msg, strlen(msg));
-
-            /* Dependency solving part */
-            ssds_log(logMESSAGE, "\n\nDEPENDENCY SOLVING.\n\n");
-
-						char** pkgs = NULL;
-						int pkg_count = 0;
-            //SsdsPkgInfo* pkgs = ssds_js_rd_pkginfo_init();
-						if(ssds_js_rd_get_code(json_read) != GET_UPDATE_ALL)
-						{
-							pkg_count = ssds_js_rd_get_count(json_read, "req_pkgs");
-							pkgs = (char**)malloc((pkg_count+1)*sizeof(char*));
-							ssds_js_rd_get_packages(pkgs, json_read);
-
-							ssds_log(logDEBUG, "Packages parsed. Packages from client:\n");
-							for(int i = 0; i < pkg_count; i++)
-							{
-								ssds_log(logDEBUG, "\t%s\n", pkgs[i]);
-							}
-						}
-            ssds_log(logDEBUG, "Getting repo info from client.\n");
-
-            SsdsRepoInfoList* list = ssds_js_rd_list_init();
-            ssds_js_rd_repo_info(json_read, list);
-
-            guint len = g_slist_length(list->repoInfoList);
-
-            ssds_log(logDEBUG, "Repositories, count: %d: \n", len);
-            for(unsigned int i = 0; i < len; i++)
-            {
-              SsdsRepoInfo* info = (SsdsRepoInfo*)g_slist_nth_data(list->repoInfoList, i);
-              ssds_log(logDEBUG, "\t%d: %s\n", i, info->name);
-            }
-
-            SsdsRepoMetadataList* meta_list = ssds_repo_metadata_init();
-            ssds_locate_repo_metadata(/*json, */list, meta_list);
-
-            HySack sack;
-            #if VERSION_HAWKEY
-                sack = hy_sack_create(NULL, NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
-            #else
-                sack = hy_sack_create(NULL, NULL, NULL, HY_MAKE_CACHE_DIR);
-            #endif
-            
-            hy_sack_load_system_repo(sack, NULL, HY_BUILD_CACHE);
-            HySack* sack_p = &sack;
-            ssds_fill_sack(sack_p, meta_list);
-            
-						if(ssds_dep_query(pkgs, json_send, sack_p, ssds_js_rd_get_code(json_read), pkg_count) == -1)
-						{
-							ssds_js_cr_insert_code(json_send, ANSWER_NO_DEP);
-							ssds_js_cr_set_message(json_send, "Dependencies for requested package were not resolved. Package cannot be installed\n");
-						}
-						else
-							ssds_js_cr_insert_code(json_send, ANSWER_OK);
-//             ssds_dep_answer(json_read, json_send, sack_p);
-
-            ssds_js_cr_dump(json_send);
-            msg = ssds_js_cr_to_string(json_send);
-//             printf("%s\n\n", msg);
-            secure_write(socket, msg, strlen(msg));
-            *client_end = 1;
-            break;
+		break;
 
         
-        case GET_DEPENDENCY:
-        case GET_ERASE:
-           /* Checking repo files */
-           /* TODO here should be checking of cached repo files !!! */
-           ssds_log(logDEBUG, "Repo files checking.\n");
+		case GET_DEPENDENCY:
+		case GET_ERASE:
+			/* Checking repo files */
+			/* TODO here should be checking of cached repo files !!! */
+			ssds_log(logDEBUG, "Repo files checking.\n");
 
-           msg = ssds_js_cr_to_string(json_send);
-           secure_write(socket, msg, strlen(msg));
-           *client_end = 1;
-           break;
+			msg = ssds_js_cr_to_string(json_send);
+			secure_write(socket, msg, strlen(msg));
+			*client_end = 1;
+		break;
 
-       default: //client_end = 1;
-           break;
+		default: //client_end = 1;
+		break;
   }
 //
 processEnd:

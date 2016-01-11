@@ -33,7 +33,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#define USE_SSL 1	// 0 = do not use SSL, 1 = do use SSL
+#define USE_SSL 0	// 0 = do not use SSL, 1 = do use SSL
 
 #define MY_CERT "cert/public.pem"		// public cetrificate file
 #define MY_KEY "cert/private.pem"		// private key file
