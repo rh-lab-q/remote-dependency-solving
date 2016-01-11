@@ -102,16 +102,12 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
     goto processEnd;
   }
 
-  printf("buf is ok:\n%s\n, try to parse the json\n", buf);
-  
   if(!ssds_js_rd_parse(buf, json_read))//parse incoming message
   {
      ssds_log(logERROR, "False data recieved from %s. Client rejected.\n", client_ip);
      goto processEnd;
   }
   
-  printf("json parsing seems ok, try other stuff\n");
-
   ssds_log(logDEBUG, "%s\n\n", buf);
 	
   switch(ssds_js_rd_get_code(json_read))
@@ -305,7 +301,6 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
 		break;
 
 		default: //client_end = 1;
-			printf("default switch action\n");
 		break;
   }
 //
