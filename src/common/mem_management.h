@@ -23,6 +23,7 @@
 
 #include "includes.h"
 #include "log_handler.h"
+#include "errors.h"
 
 
 #ifdef __cplusplus
@@ -69,19 +70,19 @@ void ssds_gc_cleanup();
  * @param ptr       pointer that is searched
  * @return          1 if pointer is in garbage collector, 0 if its not
  */
-Ssds_gc_item * ssds_gc_search(Alloc_data data, int type);
+Ssds_gc_item * ssds_gc_search(Alloc_data * data, int type);
 
 /**
  * Removes pointer from garbage collector
  * @param ptr       pointer that is removed
  */
-void ssds_gc_remove(Alloc_data data, int type);
+void ssds_gc_remove(Alloc_data * data, int type);
 
 /**
  * Pushes pointer into garbage collector
  * @param ptr       pushed pointer
  */
-void ssds_gc_push(Alloc_data data, int type);
+void ssds_gc_push(Alloc_data * data, int type);
 
 /**
  * Realloc function that has the same interface as realloc but works
@@ -140,6 +141,18 @@ void ssds_gc_remove_ptr(void * ptr);
 void ssds_gc_remove_socket(int socket);
 
 /**
+ * Removes pointer from garbage collector and calls free on it.
+ * @param ptr	    freed pointer
+ */
+void ssds_free(void * ptr);
+
+/**
+ * Removes socket from garbage collector and closes it.
+ * @param socket    closed socket
+ */
+void ssds_close(int socket);
+
+/**
  * Creates a socket and pushes it into garbage collector.
  * @param domain    parameteor of socket
  * @param type      parameteor of socket
@@ -156,6 +169,12 @@ int ssds_socket(int domain, int type, int protocol);
  * @return              accepted socket
  */
 int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
+
+/**
+ * Returns pointer to GC, used for testing
+ * @return          	pointer to GC
+ */
+Ssds_gc * ssds_gc_get_header();
 
 
 #ifdef __cplusplus

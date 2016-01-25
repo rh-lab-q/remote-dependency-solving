@@ -1,9 +1,0 @@
-Version 0.3.0
-- define basic database structure (jridky)
-- client installs packages by librpm (jridky)
-- client and server use configuration file (SimonMatej)
-- first concept of caching algorithm (TBD)
-- testing suite for project (SimonMatej)
-- Proper return values in case of server failure (michalruprich)
-- Garbage collector test suite (wscherfel)
-

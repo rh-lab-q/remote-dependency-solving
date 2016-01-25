@@ -50,6 +50,8 @@ extern "C"{
 #include <sys/types.h>
 #include <sys/utsname.h>
 
+//Global variables
+#include "globvar.h"
 
 #ifdef __cplusplus
 }

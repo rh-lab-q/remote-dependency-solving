@@ -43,14 +43,21 @@ PKG_CHECK_MODULES(HAWKEY hawkey REQUIRED)
 if(NOT HAWKEY_FOUND)
 	message(FATAL_ERROR "Library hawkey not found.")
 else (NOT HAWKEY_FOUND)
-          string(REGEX MATCH "[0-9]?$" HKY_REGEX ${HAWKEY_VERSION})
-          
-          math(EXPR HKY_NUM "${HKY_REGEX}+0")
-          if(${HKY_NUM} GREATER 3)#hawkey version is higher than 0.5.3
-            set(HKY_22 1)
-          else(${HKY_NUM} GREATER 3)#hawkey version is lower or equal to 0.5.3
-            set(HKY_22 0)
-          endif(${HKY_NUM} GREATER 3)
+          string(REGEX MATCH "[0-9]?$" HKY_REGEX_VERSION ${HAWKEY_VERSION})
+#			message("Hawkey version " ${HAWKEY_VERSION})
+ 
+			if(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
+	            set(HKY_22 1)
+#				message("Hawkey version higher than 0.5.3")         
+			else(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
+				set(HKY_22 0)
+#				message("Hawkey version lower than 0.5.3")         
+#          math(EXPR HKY_NUM "${HKY_REGEX_VERSION}+0")
+#          if(${HKY_NUM} GREATER 3)#hawkey version is higher than 0.5.3
+
+#          else(${HKY_NUM} GREATER 3)#hawkey version is lower or equal to 0.5.3
+#            set(HKY_22 0)
+            endif(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
           
           add_definitions(-DVERSION_HAWKEY=${HKY_22})
 	include_directories(${HAWKEY_INCLUDE_DIRS})
@@ -73,25 +80,94 @@ configure_file(${PROJECT_SOURCE_DIR}/cmake/Config/version_conf.h.in ${PROJECT_SO
 include_directories(${PROJECT_SOURCE_DIR}/cmake/Config)
 
 if(CMAKE_COMPILER_IS_GNUCC) 
-	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0")
+	set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-O2 -g -Wall -Wextra -pedantic  -std=c11 -fmessage-length=0 -L/usr/include/librepo/ -lrepo -lz -lm -ldl -lpthread -lhawkey -lgobject-2.0 -lrpm -lrpmio -lssl -lcrypto -L/usr/lib")
 #original flags for boost lib:  -I/usr/local/include -L/usr/local/lib
   set(CMAKE_EXE_LINKER_FLAGS "-s")  ## Strip binary
 endif()
 
 file(GLOB SRCS *.c *.h)
 
+#COMMON
+set (ssds_common_srcs
+	src/common/util.c
+	src/common/json_read.c
+	src/common/json_create.c
+	src/common/repo_metadata.c
+	src/common/repo_handler.c
+	src/common/solving.c
+	src/common/log_handler.c
+	src/common/network_util.c
+	src/common/params.c
+	src/common/packages.c
+	src/common/mem_management.c
+	src/common/cfg_parsing.c
+	src/common/detect_missing_repos.c
+	src/common/network_security.c)
+set (ssds_common_headers
+	src/common/includes.h
+	src/common/json_handler.h
+	src/common/repo_handler.h
+	src/common/solving.h
+	src/common/log_handler.h
+	src/common/network_util.h
+	src/common/params.h
+	src/common/packages.h
+	src/common/mem_management.h
+	src/common/cfg_parsing.h
+	src/common/errors.h
+	src/common/detect_missing_repos.h
+	src/common/network_security.h)
+add_library(lib_ssds_common SHARED ${ssds_common_srcs} ${ssds_common_headers})
+target_link_libraries(lib_ssds_common
+	${LIBS}
+	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS})
+
+#SERVER
+set (ssds_server_srcs
+	src/server/server_main.c
+	src/server/server.c)
+set (ssds_server_headers
+	src/server/server.h)
+add_library(lib_ssds_server STATIC ${ssds_server_srcs} ${ssds_server_headers})
+target_link_libraries(lib_ssds_server
+	lib_ssds_common
+	${LIBS}
+	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS})
+
+#CLIENT
+set (ssds_client_srcs
+	src/client/client_main.c
+	src/client/client.c)
+set (ssds_client_headers
+	src/client/client.h)
+add_library(lib_ssds_client STATIC ${ssds_client_srcs} ${ssds_client_headers})
+target_link_libraries(lib_ssds_client
+	lib_ssds_common
+	${LIBS}
+	${GLIB2_LDFLAGS}
+	${JSON_LDFLAGS}
+	${HAWKEY_LDFLAGS}
+	${LIBREPO_LDFLAGS}
+	${CHECK_LDFLAGS})
+
+
+
 PROJECT(ssds-server)
-set(SERVSRC "src/server/server_main.c")
-add_executable(ssds-server ${SERVSRC}
-		../src/common/json_read.c
-		../src/common/json_create.c
-		../src/common/repo_metadata.c
-		../src/common/repo_handler.c
-		../src/common/solving.c
-		../src/common/log_handler.c
-		../src/common/network_util.c
-		../src/common/params.c
-		../src/common/mem_management.c)
+add_executable(ssds-server
+	${ssds_server_srcs}
+	${ssds_common_srcs})
+
+target_compile_definitions(ssds-server PUBLIC __CASE_SERVER)
+
+#add_library(lib_serv SHARED ${SERVSRC})
 
 target_link_libraries(
 	ssds-server
@@ -100,32 +176,24 @@ target_link_libraries(
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	${CHECK_LDFLAGS}
-)
+	${CHECK_LDFLAGS})
 
 PROJECT(ssds-client)
-set(CLISRC "src/client/client_main.c")
-add_executable(ssds-client ${CLISRC}
-		../src/common/json_read.c
-		../src/common/json_create.c
-		../src/common/repo_handler.c
-		../src/common/log_handler.c
-		../src/common/network_util.c
-		../src/common/util.c
-		../src/common/params.c
-		../src/common/mem_management.c)
-target_link_libraries(
-	ssds-client
+add_executable(ssds-client
+	${ssds_client_srcs}
+	${ssds_common_srcs})
+
+target_compile_definitions(ssds-client PUBLIC __CASE_CLIENT)
+
+target_link_libraries(ssds-client
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
 	${HAWKEY_LDFLAGS}
 	${LIBREPO_LDFLAGS}
-	${CHECK_LDFLAGS}
-)
+	${CHECK_LDFLAGS})
 
 file(MAKE_DIRECTORY /tmp/ssds/)
-file(MAKE_DIRECTORY /var/cache/ssds/packages/install/)
-file(MAKE_DIRECTORY /var/cache/ssds/packages/update/)
+file(MAKE_DIRECTORY /var/cache/ssds/packages/)
 enable_testing()
 add_subdirectory(tests)

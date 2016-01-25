@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <strings.h>
 #include <stdlib.h>
-#include "../common/network_util.h"
+
 
 #define MAX_INPUT_LEN 10
 #define BUFF_SIZE 50
@@ -34,13 +34,22 @@ int main()
   }
   
   printf("Connection successful\n");
+  FILE* fd = fopen("/var/cache/dnf/x86_64/21/@System.solv", "r");
   
-  write(socket_desc, message, strlen(message));
+  long int len = fseek(fd, 0, SEEK_END);
+  printf("length of file: %d\n", ftell(fd));
   
-  char* buf=sock_recv(socket_desc);
+  long int send_num = htonl(len);
   
-  printf("%s", buf);
   
-  free(buf);
+  write(socket_desc, &send_num, sizeof(send_num));
+//   write(socket_desc, message, strlen(message));
+  
+  
+  
+  
+//   printf("%s", buf);
+  
+//   free(buf);
   return 0;
 }

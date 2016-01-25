@@ -29,7 +29,7 @@ extern "C"{
 #include "repo_handler.h"
 #include "json_handler.h"
 #include "log_handler.h"
-//#include "mem_management.h"
+#include "mem_management.h"
 
 //GLIB
 #include "includes.h"
@@ -65,7 +65,7 @@ void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list);
  * @param answer              SsdsJsonCreate*
  * @param sack                HySack*
  */
-void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack);
+//void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack);
 
 /**
  * Solves dependency for one package. Needs to be called in loop for all packages.
@@ -74,8 +74,15 @@ void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* 
  * @param answer    SsdsJsonCreate*
  * @param sack      HySack*
  */
-void ssds_dep_query(const char* request, SsdsJsonCreate* answer, HySack* sack);
+int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, int operation, int pkg_count);
 
+
+/**
+ * Puts * into every string in array of package names (["vim", "emacs", NULL] becomes ["vim*", "emacs*", NULL])
+ * @param pkgs**	char**
+ * @param pkg_count	int
+ */
+void adjust_glob(char** pkgs, int pkg_count);
 
 #ifdef __cplusplus
 }

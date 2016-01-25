@@ -22,8 +22,12 @@
 #define _NETWORK_UTIL_H
 
 #include "log_handler.h"
-//#include "mem_management.h"
+#include "mem_management.h"
 #include "includes.h"
+#include "cfg_parsing.h"
+#include "errors.h"
+
+#include "network_security.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -46,6 +50,31 @@ extern "C"{
  */
 char* sock_recv(int sock_fd);
 
+/** 
+ * Function to recieve data of previously unknown length from socket. 
+ * There is a buffer that resizes according to the size of recieved data.
+ * @param sock_fd  File descriptor for socket that is recieving data
+ * @param buffer   buffer with recieved data - needs to be freed in the end
+ * @return         count of readed bytes
+ */
+ssize_t sock_solv_recv(int sock_fd, char **buffer);
+
+/** 
+ * Function for secure transfer data to client/server . 
+ * @param socket   communication socket
+ * @param *message transfered message
+ * @param length   length of message
+ */
+void secure_write(int socket, char* message, ssize_t length);
+
+/** 
+ * Function to connect client to server. 
+ * @param  *socket  		communication socket
+ * @param  *server_address	IP of server
+ * @param  comm_port  		communication port
+ * @return int         OK or error code
+ */
+int client_connect(int *socket, char *server_address, long int comm_port);
 
 #ifdef __cplusplus
 }

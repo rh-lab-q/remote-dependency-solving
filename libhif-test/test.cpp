@@ -42,7 +42,7 @@ int main(){
 
 	// prepare handle
 	system("ls");	
-	char *urls[] = {"http://why.lri.fr/", "https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64","https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",NULL};
+/*	char *urls[] = {"http://why.lri.fr/", "https://mirrors.fedoraproject.org/metalink?repo=fedora-21&arch=x86_64","https://mirrors.fedoraproject.org/metalink?repo=updates-released-f21&arch=x86_64",NULL};
 	char *name = "w/why-xemacs-el-2.34-13.fc21.noarch.rpm";
 	h = lr_handle_init();
 	lr_handle_setopt(h, NULL, LRO_URLS, urls);
@@ -52,7 +52,7 @@ int main(){
 
 	target = lr_packagetarget_new_v2(h, name, "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, pc, name, ec, NULL, &error);
 	packages = g_slist_append(packages, target);
-/*	target = lr_packagetarget_new(h, "l/libwmf-lite-0.2.8.4-43.fc21.x86_64.rpm", "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, NULL, NULL, &error);
+	target = lr_packagetarget_new(h, "l/libwmf-lite-0.2.8.4-43.fc21.x86_64.rpm", "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, NULL, NULL, &error);
         packages = g_slist_append(packages, target);
 target = lr_packagetarget_new(h, "l/libwmf-0.2.8.4-43.fc21.x86_64.rpm", "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, NULL, NULL, &error);
         packages = g_slist_append(packages, target);
@@ -62,43 +62,100 @@ target = lr_packagetarget_new(h, "t/tbb-4.3-1.20141204.fc21.x86_64.rpm", "./rpm/
         packages = g_slist_append(packages, target);
 target = lr_packagetarget_new(h, "a/atlas-3.10.1-18.fc21.x86_64.rpm", "./rpm/", LR_CHECKSUM_UNKNOWN, NULL, 0, NULL, TRUE, NULL, NULL, &error);
         packages = g_slist_append(packages, target);
-	// Download all packages	*/
+	// Download all packages	
 	ret = lr_download_packages(packages, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
 	if(!ret){
 		fprintf(stderr, "Error: %d: %s\n", error->code, error->message);
 		rc = EXIT_FAILURE;
 		g_error_free(error);
 	}	
- 
+ */
 	// Check statuses
 
 	// RPM init  
 	// TODO: need to init rpmdb connection
-	rpmts ts = rpmtsCreate();
+	Header hdr;
+        char *namen = "/var/cache/ssds/packages/install/gimp-2.8.14-3.fc21.x86_64.rpm";
+	rpmReadConfigFiles(NULL,NULL);
+        rpmts ts = rpmtsCreate();
 	rpmprobFilterFlags ignoreSet = 0;
 	rpmtsSetRootDir(ts, NULL);
-	for(GSList *elem = packages; elem; elem = g_slist_next(elem)){
-                LrPackageTarget *t = (LrPackageTarget *)elem->data;
-                printf("%s: %s\n", t->local_path, t->err ? t->err : "OK");
+//	for(GSList *elem = packages; elem; elem = g_slist_next(elem)){
+//                LrPackageTarget *t = (LrPackageTarget *)elem->data;
+//                printf("%s: %s\n", t->local_path, t->err ? t->err : "OK");
 		// installing package
-                if(!t->err){
-                        FD_t fd = (FD_t)fopen(t->local_path,"r");
-			Header hd = headerRead(fd, HEADER_MAGIC_YES);
+          //      if(!t->err){
+                        FD_t fd = Fopen(namen,"r.ufdio");
+                        printf("%d\n", fd);
+			char *msg = NULL;
+                        int rr = rpmReadPackageFile(ts,fd,namen,&hdr);
+//                        int rr = rpmReadHeader(ts,fd,&hdr,&msg);
+			switch (rr){
+			case RPMRC_OK: printf("OK\n");
+				       break;
+			case RPMRC_NOKEY: printf("NO KEY\n");
+					  break;
+			case RPMRC_NOTFOUND: printf("NOT FOUND\n");
+					     break;
+			case RPMRC_NOTTRUSTED: printf("NOT TRUSTED\n");
+					       break;
+			case RPMRC_FAIL: printf("FAIL\n");
+					 break;
+			default: printf("unknown error %d \n", rr);
+				 break;
+			}
+
 			int upgrade = 0;
 			//rpmRelocation rel = NULL;
-			int r = rpmtsAddInstallElement(ts, hd, (fnpyKey)name, 0,0);
-                }
-        }
-	
-	if(!rpmtsCheck(ts)){
+			int r = rpmtsAddInstallElement(ts, hdr, (fnpyKey) namen ,upgrade, NULL);
+                printf("add install element \n");
+		switch (r){
+                        case RPMRC_OK: printf("OK\n");
+                                       break;
+                        case RPMRC_NOKEY: printf("NO KEY\n");
+                                          break;
+                        case RPMRC_NOTFOUND: printf("NOT FOUND\n");
+                                             break;
+                        case RPMRC_NOTTRUSTED: printf("NOT TRUSTED\n");
+                                               break;
+                        case RPMRC_FAIL: printf("FAIL\n");
+                                         break;
+                        default: printf("unknown error %d \n", r);
+                                 break;
+                        }
+
+		//}
+        //}
+	//rpmtsi tsi = rpmtsiInit(ts);
 		if(rpmtsOrder(ts)){
 			printf("ERROR: some packages cannot be ordered\n");
 		}else{
-			int result = rpmtsRun(ts, NULL, ignoreSet);
-		}
-	}
-	// Clean up
+	int tsFlags = 0, notifyFlags = 0;
+//	notifyFlags |= INSTALL_LABEL | INSTALL_HASH;
+	rpmtsSetNotifyCallback(ts, rpmShowProgress, (void *)notifyFlags);
 
+	/* Set transaction flags and run the actual transaction */
+	rpmtsSetFlags(ts, (rpmtransFlags)(rpmtsFlags(ts) | tsFlags));
+			int result = rpmtsRun(ts, NULL, ignoreSet);
+			printf("rpmts run %s.\n", result==RPMRC_OK?"ok":"error");
+		switch (result){
+                        case RPMRC_OK: printf("OK\n");
+                                       break;
+                        case RPMRC_NOKEY: printf("NO KEY\n");
+                                          break;
+                        case RPMRC_NOTFOUND: printf("NOT FOUND\n");
+                                             break;
+                        case RPMRC_NOTTRUSTED: printf("NOT TRUSTED\n");
+                                               break;
+                        case RPMRC_FAIL: printf("FAIL\n");
+                                         break;
+                        default: printf("unknown error %d \n", result);
+                                 break;
+                        }
+
+		}
+	// Clean up
+	rpmtsClean(ts);
 	rpmtsFree(ts);
 	g_slist_free_full(packages, (GDestroyNotify) lr_packagetarget_free);
 	lr_handle_free(h);

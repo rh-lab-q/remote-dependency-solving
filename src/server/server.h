@@ -15,12 +15,18 @@ extern "C"{
 #include "../common/json_handler.h"
 #include "../common/solving.h"
 #include "../common/params.h"
-//#include "../common/mem_management.h"
+#include "../common/mem_management.h"
 #include "../../cmake/Config/version_conf.h"
+#include "../common/cfg_parsing.h"
+#include "../common/errors.h"
 
+int ssds_server_init(int *comm_desc, int *comm_addr_len);
+
+int ssds_server_accept_connection(int comm_desc, int comm_addr_len);
+
+int ssds_server_process(int comm_port, char *clietn_ip, int *client_end);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif
