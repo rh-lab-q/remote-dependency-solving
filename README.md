@@ -10,12 +10,13 @@ Dependencies
 Required packages needed for successfull compilation and build.
 
 - gcc
+- gcc-c++
 - cmake
 - libsolv
 - librepo-devel
 - hawkey-devel
-- glib2.0-devel
-- json-glib-1.0
+- glib2-devel
+- json-glib
 - json-glib-devel
 - check-devel
 
