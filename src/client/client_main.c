@@ -105,8 +105,8 @@ int main(int argc, char* argv[]){
 
   if(id == NULL)
   {     
-		status = ssds_get_new_id(socket, &id, arch, release);
-		if(status != OK) goto end;
+		//status = ssds_get_new_id(socket, &id, arch, release);
+		//if(status != OK) goto end;
 
 		status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
 		if(status != OK) goto end;
