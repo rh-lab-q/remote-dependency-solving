@@ -7,14 +7,14 @@ SET(CMAKE_COLOR_MAKEFILE ON)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
-PROJECT(ssds)
-SET(ssds_VERSION_MAJOR 0)
-SET(ssds_VERSION_MINOR 2)
-SET(ssds_VERSION_BUILD 0)
-SET(ssds_VERSION
-   	"${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
+PROJECT(rds)
+SET(rds_VERSION_MAJOR 0)
+SET(rds_VERSION_MINOR 2)
+SET(rds_VERSION_BUILD 0)
+SET(rds_VERSION
+   	"${rds_VERSION_MAJOR}.${rds_VERSION_MINOR}.${rds_VERSION_BUILD}")
 SET(PACKAGE_VERSION
-	"${ssds_VERSION_MAJOR}.${ssds_VERSION_MINOR}.${ssds_VERSION_BUILD}")
+	"${rds_VERSION_MAJOR}.${rds_VERSION_MINOR}.${rds_VERSION_BUILD}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/Modules/")
 
@@ -88,7 +88,7 @@ endif()
 file(GLOB SRCS *.c *.h)
 
 #COMMON
-set (ssds_common_srcs
+set (rds_common_srcs
 	src/common/util.c
 	src/common/json_read.c
 	src/common/json_create.c
@@ -103,7 +103,7 @@ set (ssds_common_srcs
 	src/common/cfg_parsing.c
 	src/common/detect_missing_repos.c
 	src/common/network_security.c)
-set (ssds_common_headers
+set (rds_common_headers
 	src/common/includes.h
 	src/common/json_handler.h
 	src/common/repo_handler.h
@@ -117,8 +117,8 @@ set (ssds_common_headers
 	src/common/errors.h
 	src/common/detect_missing_repos.h
 	src/common/network_security.h)
-add_library(lib_ssds_common SHARED ${ssds_common_srcs} ${ssds_common_headers})
-target_link_libraries(lib_ssds_common
+add_library(lib_rds_common SHARED ${rds_common_srcs} ${rds_common_headers})
+target_link_libraries(lib_rds_common
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
@@ -127,14 +127,14 @@ target_link_libraries(lib_ssds_common
 	${CHECK_LDFLAGS})
 
 #SERVER
-set (ssds_server_srcs
+set (rds_server_srcs
 	src/server/server_main.c
 	src/server/server.c)
-set (ssds_server_headers
+set (rds_server_headers
 	src/server/server.h)
-add_library(lib_ssds_server STATIC ${ssds_server_srcs} ${ssds_server_headers})
-target_link_libraries(lib_ssds_server
-	lib_ssds_common
+add_library(lib_rds_server STATIC ${rds_server_srcs} ${rds_server_headers})
+target_link_libraries(lib_rds_server
+	lib_rds_common
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
@@ -143,14 +143,14 @@ target_link_libraries(lib_ssds_server
 	${CHECK_LDFLAGS})
 
 #CLIENT
-set (ssds_client_srcs
+set (rds_client_srcs
 	src/client/client_main.c
 	src/client/client.c)
-set (ssds_client_headers
+set (rds_client_headers
 	src/client/client.h)
-add_library(lib_ssds_client STATIC ${ssds_client_srcs} ${ssds_client_headers})
-target_link_libraries(lib_ssds_client
-	lib_ssds_common
+add_library(lib_rds_client STATIC ${rds_client_srcs} ${rds_client_headers})
+target_link_libraries(lib_rds_client
+	lib_rds_common
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
@@ -160,17 +160,17 @@ target_link_libraries(lib_ssds_client
 
 
 
-PROJECT(ssds-server)
-add_executable(ssds-server
-	${ssds_server_srcs}
-	${ssds_common_srcs})
+PROJECT(rds-server)
+add_executable(rds-server
+	${rds_server_srcs}
+	${rds_common_srcs})
 
-target_compile_definitions(ssds-server PUBLIC __CASE_SERVER)
+target_compile_definitions(rds-server PUBLIC __CASE_SERVER)
 
 #add_library(lib_serv SHARED ${SERVSRC})
 
 target_link_libraries(
-	ssds-server
+	rds-server
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}
@@ -178,14 +178,14 @@ target_link_libraries(
 	${LIBREPO_LDFLAGS}
 	${CHECK_LDFLAGS})
 
-PROJECT(ssds-client)
-add_executable(ssds-client
-	${ssds_client_srcs}
-	${ssds_common_srcs})
+PROJECT(rds-client)
+add_executable(rds-client
+	${rds_client_srcs}
+	${rds_common_srcs})
 
-target_compile_definitions(ssds-client PUBLIC __CASE_CLIENT)
+target_compile_definitions(rds-client PUBLIC __CASE_CLIENT)
 
-target_link_libraries(ssds-client
+target_link_libraries(rds-client
 	${LIBS}
 	${GLIB2_LDFLAGS}
 	${JSON_LDFLAGS}

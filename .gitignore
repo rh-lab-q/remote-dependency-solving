@@ -2,5 +2,6 @@
 *Cache.txt
 *.o
 *ssds-client
+*rds-client
 build/librepo-*
 libhif-test/test

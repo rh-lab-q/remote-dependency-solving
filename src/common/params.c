@@ -143,7 +143,7 @@ void parse_params_srv(int argc, char* argv[])
 
 void print_help_cl()
 {
-  printf("Usage: ./ssds-client <commands> [<packages> ...]\n\n"
+  printf("Usage: ./rds-client <commands> [<packages> ...]\n\n"
          "List of Commands\n\n"
          "--install\t\tResolve dependencies and install packages\n"
          "--update\t\tResolve dependencies and update packages\n"
@@ -157,7 +157,7 @@ void print_help_cl()
 
 void print_help_srv()
 {
-  printf("Usage: ./ssds-server <commands>\n\n"
+  printf("Usage: ./rds-server <commands>\n\n"
          "List of Commands\n\n"
          "-h\tDisplays help\n"
          "-v\tVerbose - turned off by default\n"
