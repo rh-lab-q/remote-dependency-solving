@@ -30,7 +30,7 @@ Suite* params_suite(void)
 void no_parameters()
 {
   ParamOptsCl* params = init_params_cl();
-  char *argv_tst[1] = {"./ssds-client"};
+  char *argv_tst[1] = {"./rds-client"};
 
   int ret = parse_params_cl(1, argv_tst, params);
   fail_if(ret != 2);
@@ -42,7 +42,7 @@ void no_parameters()
 void install()
 {
   ParamOptsCl* params = init_params_cl();
-  char *argv_tst[3] = {"./ssds-client", "--install", "emacs"};
+  char *argv_tst[3] = {"./rds-client", "--install", "emacs"};
 
   int ret = parse_params_cl(3, argv_tst, params);
   //printf("ret is %d, command is %d\n", ret, params->command);
@@ -56,7 +56,7 @@ void install()
 void both_install_and_chkdep()
 {
   ParamOptsCl* params = init_params_cl();
-  char *argv_tst[5] = {"./ssds-client", "--install", "emacs", "--chkdep", "qwe"};
+  char *argv_tst[5] = {"./rds-client", "--install", "emacs", "--chkdep", "qwe"};
 
   int ret = parse_params_cl(5, argv_tst, params);
   //printf("ret is %d, command is %d, pkg_count is %d\n", ret, params->command, params->pkg_count);
@@ -69,7 +69,7 @@ void both_install_and_chkdep()
 void no_command_provided()
 {
   ParamOptsCl* params = init_params_cl();
-  char *argv_tst[3] = {"./ssds-client", "emacs", "qwe"};
+  char *argv_tst[3] = {"./rds-client", "emacs", "qwe"};
 
   int ret = parse_params_cl(3, argv_tst, params);
   //printf("ret is %d, command is %d, pkg_count is %d\n", ret, params->command, params->pkg_count);

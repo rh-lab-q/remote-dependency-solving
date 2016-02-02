@@ -124,7 +124,7 @@ int main(int argc, char* argv[]){
 			
   }else{
 		if( compare_files(pathToOriginalSolv, pathToBackupSolv) != OK ){
-			int ans = ssds_question("DNF install packages by themself. We need to make initial steps again. If you don't want to use SSDS call ssds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
+			int ans = ssds_question("DNF install packages by themself. We need to make initial steps again. If you don't want to use RDS call rds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
 
 			if(ans == NO)
 			{

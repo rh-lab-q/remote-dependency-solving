@@ -27,9 +27,9 @@
 
 
 #ifdef __CASE_CLIENT
-#define CFG_FILE "../etc/ssds-client.conf"
+#define CFG_FILE "../etc/rds-client.conf"
 #else
-#define CFG_FILE "../etc/ssds-server.conf"
+#define CFG_FILE "../etc/rds-server.conf"
 #endif
 
 int read_cfg(char **ret_client_id, char **address, long int *comm_port);

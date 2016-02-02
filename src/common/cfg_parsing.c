@@ -276,7 +276,7 @@ int write_to_cfg(char *name, char *value)
     char *tempcfg = (void*)ssds_malloc((position + 1) * sizeof(char));
     fread(tempcfg, sizeof(char), position, cfg_file);
     tempcfg[position] = '\0';
-    FILE *new_file = fopen("../etc/ssds-client.conf.tmp", "w");
+    FILE *new_file = fopen("../etc/rds-client.conf.tmp", "w");
     fwrite(tempcfg, sizeof(char), position, new_file);
     fwrite(value, sizeof(char), val_len, new_file);
 

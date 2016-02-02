@@ -32,7 +32,7 @@ There is new module in librepo, but it is not among updates yet so this is what 
   -install these packages at the same time like this:
    $sudo dnf update <pkg.rpm> <pkg.rpm> ... - put them all into the same command
 
-Now everything should be in order to build ssds:
+Now everything should be in order to build rds:
   -enter build/ and type:
 
 		$mkdir build
@@ -43,7 +43,7 @@ Now everything should be in order to build ssds:
     
     		$make
   
-  -two files are created - ssds-client and ssds-server
+  -two files are created - rds-client and rds-server
 	-to test type in build/ dir:
 
 		$ctest
@@ -58,5 +58,5 @@ Valgrind
 ========
 If you want to test the program with valgrind, there are lots of warnings and errors that are not caused by this program. Basically these errors are couased by various shared libraries and there is nothing we can do about them. To suppress all these warnings and errors the client program needs to be run with suppression file suppress-cl.supp. The server program has suppress-srv.supp. Both files are located in the build folder. Just run the program with valgrind like this:
 
-	$valgrind --suppressions=suppress-cl.supp ./ssds-client ...
-	$valgrind --suppressions=suppress-srv.supp ./ssds-server ...
+	$valgrind --suppressions=suppress-cl.supp ./rds-client ...
+	$valgrind --suppressions=suppress-srv.supp ./rds-server ...
