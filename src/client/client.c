@@ -459,7 +459,9 @@ int ssds_download(int answer, GSList *install, GSList *update, GSList *erase)
 		}
 	}
 
-	g_error_free(error);
+	if(error != NULL){
+		g_error_free(error);
+	}
 	g_slist_free_full(install_list, (GDestroyNotify) lr_packagetarget_free);
 	g_slist_free_full(update_list, (GDestroyNotify) lr_packagetarget_free);
 	
@@ -520,16 +522,15 @@ int ssds_rpm_process(GSList *install, GSList *update, GSList *erase)
     if(g_slist_length(erase) > 1)
     {
     	ssds_log(logMESSAGE, "Erasing packages.\n");
-        for(GSList *elem = erase; elem; elem = g_slist_next(elem))
+        for(guint i = 1; i < g_slist_length(erase); i++)
         {
-			SsdsJsonPkg *pkg = (SsdsJsonPkg*)elem;
-			printf("erase %s\n", pkg->pkg_name);
-        	/*rc = ssds_add_to_erase(ts, (char *)elem);
+	    SsdsJsonPkg *pkg = (SsdsJsonPkg*)g_slist_nth_data(erase,i);
+            rc = ssds_add_to_erase(ts, pkg->pkg_name);
             if(rc != OK){
-				ssds_log(logERROR, "Unable to erase requested package.\n");
+		ssds_log(logERROR, "Unable to erase requested package.\n");
                 rc = ERASE_ERROR;
-				goto rpmEnd;
-            } */
+		goto rpmEnd;
+            } 
         }
     }
     

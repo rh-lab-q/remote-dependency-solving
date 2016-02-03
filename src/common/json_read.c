@@ -233,26 +233,42 @@ GSList* ssds_js_rd_parse_answer(const char* name, SsdsJsonRead* json)
     JsonObject* obj = json_array_get_object_element(array, i);
 		
 		char* pkg_name = (char*)json_object_get_string_member(obj, "pkg_name");
-    one_pkg->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
-    strcpy(one_pkg->pkg_name, pkg_name);
+    if(pkg_name != NULL){
+        one_pkg->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
+        strncpy(one_pkg->pkg_name, pkg_name,strlen(pkg_name)+1);
+    }else{
+        one_pkg->pkg_name = NULL;
+    }
     
     //name of package location on repository
     char* pkg_loc = (char*)json_object_get_string_member(obj, "pkg_loc");
-    one_pkg->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
-    strcpy(one_pkg->pkg_loc, pkg_loc);
+    if(pkg_loc != NULL){
+        one_pkg->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
+        strncpy(one_pkg->pkg_loc, pkg_loc,strlen(pkg_loc)+1);
+    }else{
+        one_pkg->pkg_loc = NULL;
+    }
     
     //baseurl or null
     if(json_object_get_null_member(obj, "base_url"))
     {
       char* meta = (char*)json_object_get_string_member(obj, "metalink");
-      one_pkg->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
-      strcpy(one_pkg->metalink, meta);
+      if(meta != NULL){
+          one_pkg->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
+          strncpy(one_pkg->metalink, meta, strlen(meta)+1);
+      }else{
+          one_pkg->metalink = NULL;
+      }
     }
     else
     {
       char* base = (char*)json_object_get_string_member(obj, "base_url");
-      one_pkg->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
-      strcpy(one_pkg->base_url, base);
+      if(base != NULL){
+          one_pkg->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
+          strncpy(one_pkg->base_url, base, strlen(base)+1);
+      }else{
+         one_pkg->base_url = NULL;
+      }
     }
     
     ret = g_slist_append(ret, one_pkg);
