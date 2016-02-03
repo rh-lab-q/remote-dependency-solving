@@ -78,7 +78,8 @@ void ssds_resolve_dependency_file_path(char * ret_val, char** arch, char** relea
 
     ssds_log(logDEBUG, "Getting path string.\n");
     //composing path to @System.solv file
-    snprintf(ret_val, 100, "/var/cache/dnf/@System.solv");
+		snprintf(ret_val, 100, "/var/cache/dnf/%s/%s/@System.solv",machine->machine,fedora_release);
+    //snprintf(ret_val, 100, "/var/cache/dnf/@System.solv");
     ssds_log(logDEBUG, "Getting arch string.\n");
     *arch = machine->machine;
     *release = fedora_release;

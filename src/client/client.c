@@ -257,6 +257,7 @@ int ssds_answer_process(int socket, int action)
 	int rc = -1;
 	
 	ssds_log(logDEBUG, "Checking answer.\n");
+	printf("from server:\n%s\n",buf);
 	
 	if(buf == NULL)
 	{
