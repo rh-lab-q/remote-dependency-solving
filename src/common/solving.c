@@ -99,7 +99,7 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 		for(int i = 0; i < hy_packagelist_count(plist); i++)
 		{
 			pkg = hy_packagelist_get(plist, i);
-			printf("pkg v query: %s\n", hy_package_get_name(pkg));
+// 			printf("pkg v query: %s\n", hy_package_get_name(pkg));
 			switch(operation)
 			{
 				case GET_INSTALL:
@@ -121,7 +121,7 @@ int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, i
 			}
 		}
 	}
-	printf("pred insert\n");
+	/*printf*/("pred insert\n");
   ssds_js_cr_pkgs_insert(answer, &goal);
 }
 

@@ -219,7 +219,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
 		case GET_UPDATE:
 		case GET_UPDATE_ALL:
 		case GET_ERASE:
-			ssds_js_rd_get_count(json_read, "pokus");
+// 			ssds_js_rd_get_count(json_read, "pokus");
 			/* Checking repo files */
 			/* TODO here should be checking of cached repo files !!! */
 			ssds_log(logDEBUG, "Repo files checking.\n");
@@ -302,7 +302,7 @@ int ssds_server_process(int socket, char *client_ip, int *client_end)
 
 		default: //client_end = 1;
 		break;
-  }
+  }//switch
 //
 processEnd:
   ssds_free(json_read);
