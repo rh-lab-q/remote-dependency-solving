@@ -22,30 +22,31 @@
 
 
 int main(int argc, char* argv[]) {
-  /*******************************************************************/
-  /* Setting up garbage collector and setting callback functions */
-  /*******************************************************************/
-  rds_gc_init();
-  signal(SIGINT, rds_signal_handler);
-  signal(SIGBUS, rds_signal_handler);
-  signal(SIGSEGV, rds_signal_handler);
-  signal(SIGTERM, rds_signal_handler);
+    /*******************************************************************/
+    /* Setting up garbage collector and setting callback functions */
+    /*******************************************************************/
+    rds_gc_init();
+    signal(SIGINT, rds_signal_handler);
+    signal(SIGBUS, rds_signal_handler);
+    signal(SIGSEGV, rds_signal_handler);
+    signal(SIGTERM, rds_signal_handler);
 
-  int status = OK, comm_desc, comm_addr_len;
-  
-  parse_params_srv(argc, argv);
+    int status = OK, comm_desc, comm_addr_len;
 
-  rds_log(logSSDS, "Server started.\n");
-  rds_log(logDEBUG, "Params parsed.\n");
+    parse_params_srv(argc, argv);
 
-  status = server_init(&comm_desc, &comm_addr_len);
-  if(status != OK) goto end;
- 
-  while(1){
-	status = server_accept_connection(comm_desc, comm_addr_len);
-	if(status == EXIT) goto end;
-  }
-end:
-  rds_gc_cleanup();
-  return status;
+    rds_log(logSSDS, "Server started.\n");
+    rds_log(logDEBUG, "Params parsed.\n");
+
+    status = server_init(&comm_desc, &comm_addr_len);
+    if(status != OK) goto end;
+
+    while(1) {
+        status = server_accept_connection(comm_desc, comm_addr_len);
+        if(status == EXIT) goto end;
+    }
+    
+    end:
+        rds_gc_cleanup();
+        return status;
 }

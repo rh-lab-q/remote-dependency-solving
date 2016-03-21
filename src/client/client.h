@@ -31,11 +31,11 @@ extern "C"{
 #include "../common/params.h"
 
 enum{
-	YES,
-	NO,
-	DOWNLOAD,
-	YES_NO,
-	YES_NO_DOWNLOAD,
+    YES,
+    NO,
+    DOWNLOAD,
+    YES_NO,
+    YES_NO_DOWNLOAD,
 };
 
 /**
