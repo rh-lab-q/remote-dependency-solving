@@ -1,4 +1,4 @@
-set (SSDS_TEST_FILES
+set (RDS_TEST_FILES
 	test_main.c
 	test_dummy.c
 	test_template.c
@@ -8,7 +8,7 @@ set (SSDS_TEST_FILES
 	test_missing_repos.c
 	)
 
-add_executable(test_main ${SSDS_TEST_FILES})
+add_executable(test_main ${RDS_TEST_FILES})
 
 find_package(Check REQUIRED)
 #set(LIBS ${LIBS} ${CHECK_LIBRARIES})
@@ -17,9 +17,9 @@ find_package(Check REQUIRED)
 include_directories(. ../src ${CHECK_INCLUDE_DIRS})
 
 target_link_libraries(test_main
-	lib_ssds_client
-	lib_ssds_server
-	lib_ssds_common
+        lib_rds_client
+        lib_rds_server
+        lib_rds_common
 	${CHECK_LDFLAGS})
 
 add_test(test_main ${CMAKE_CURRENT_BINARY_DIR}/../tests/test_main)
