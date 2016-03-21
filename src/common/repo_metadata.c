@@ -19,6 +19,7 @@
  */
 
 #include "repo_handler.h"
+#include "log_handler.h"
 
 
 RepoMetadataList* repo_metadata_init()

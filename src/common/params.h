@@ -21,15 +21,18 @@
 #ifndef _PARAMS_H
 #define _PARAMS_H
 
-#include "includes.h"
-#include "log_handler.h"
-#include "mem_management.h"
-#include "errors.h"
+
+//GLIB
+#include <glib.h>
+#include <glib-2.0/glib.h>
+#include <json-glib/json-glib.h>
+#include <json-glib/json-types.h>
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
+#include "log_handler.h"
 /**
  * Integer option for command in ParamOptsCl
  */

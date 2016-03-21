@@ -29,7 +29,6 @@
 
 //SSDS
 #include "json_handler.h"
-#include "log_handler.h"
 
 //SOLVING
 #include <hawkey/types.h>
@@ -39,7 +38,6 @@
 #include <hawkey/goal.h>
 #include <hawkey/repo.h>
 
-#include "mem_management.h"
 
 #ifdef __cplusplus
 extern "C"{

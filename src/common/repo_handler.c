@@ -19,6 +19,7 @@
  */
 
 #include "repo_handler.h"
+#include "log_handler.h"
 
 LocalRepoInfo* repo_parse_init()
 { //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch

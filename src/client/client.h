@@ -28,25 +28,7 @@
 extern "C"{
 #endif
 
-#include "../common/includes.h"
-#include <librepo/librepo.h>
-#include <rpm/rpmlib.h>
-#include <rpm/rpmts.h>
-#include <rpm/rpmcli.h>
-#include <rpm/rpmps.h>
-
-//SSDS
-#include "../common/log_handler.h"
-#include "../common/network_util.h"
 #include "../common/params.h"
-#include "../common/json_handler.h"
-#include "../common/repo_handler.h"
-#include "../common/util.h"
-#include "../common/mem_management.h"
-#include "../../cmake/Config/version_conf.h"
-#include "../common/errors.h"
-#include "../common/detect_missing_repos.h"
-#include "../common/packages.h"
 
 enum{
 	YES,

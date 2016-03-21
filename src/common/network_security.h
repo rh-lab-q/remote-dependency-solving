@@ -21,12 +21,6 @@
 #ifndef _NETWORK_SECURITY_H
 #define _NETWORK_SECURITY_H
 
-#include "log_handler.h"
-#include "mem_management.h"
-#include "includes.h"
-#include "cfg_parsing.h"
-#include "errors.h"
-
 #include <openssl/crypto.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>

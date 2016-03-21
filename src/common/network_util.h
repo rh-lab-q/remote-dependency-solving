@@ -21,14 +21,6 @@
 #ifndef _NETWORK_UTIL_H
 #define _NETWORK_UTIL_H
 
-#include "log_handler.h"
-#include "mem_management.h"
-#include "includes.h"
-#include "cfg_parsing.h"
-#include "errors.h"
-
-#include "network_security.h"
-
 #ifdef __cplusplus
 extern "C"{
 #endif

@@ -17,8 +17,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <stdarg.h>
 
 #include "log_handler.h"
+#include "errors.h"
+#include "globvar.h"
 
 const char* log_lvl_msg[7] = {"INFO", "MESSAGE", "WARNING", "ERROR", "DEBUG", "SSDS", "QUESTION"};
 int __verbose = 0;

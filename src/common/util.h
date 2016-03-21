@@ -21,14 +21,11 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+#include <librepo/librepo.h>
+
 #ifdef __cplusplus
 extern "C"{
 #endif
-
-#include "includes.h"
-#include "log_handler.h"
-#include <librepo/librepo.h>
-#include "mem_management.h"
 
 /**
  * Resolves path for @System.solv file depending on system version

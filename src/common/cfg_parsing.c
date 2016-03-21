@@ -1,5 +1,8 @@
+#include <stdio.h>
 
 #include "cfg_parsing.h"
+#include "mem_management.h"
+#include "log_handler.h"
 
 
 int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)

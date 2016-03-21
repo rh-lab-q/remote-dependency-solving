@@ -28,10 +28,6 @@
 extern "C"{
 #endif
 
-#include "includes.h"
-#include "log_handler.h"
-#include "errors.h"
-
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmcli.h>

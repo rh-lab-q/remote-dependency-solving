@@ -26,6 +26,11 @@
 extern "C"{
 #endif
 
+#include <glib.h>
+#include <glib-2.0/glib.h>
+#include <json-glib/json-glib.h>
+#include <json-glib/json-types.h>
+	
 //SOLVING
 #include <hawkey/types.h>
 #include <hawkey/sack.h>
@@ -35,9 +40,6 @@ extern "C"{
 #include <hawkey/repo.h>
 #include <hawkey/package.h>
 
-#include "includes.h" 
-
-#include "mem_management.h"
 
 /** Type of url from .repo file located in /etc/yum.repos.d/ */
 typedef enum {

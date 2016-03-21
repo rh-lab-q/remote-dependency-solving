@@ -17,7 +17,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
 
+#include "log_handler.h"
+#include "errors.h"
 #include "network_util.h"
 
 char* sock_recv(int sock_fd)

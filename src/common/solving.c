@@ -19,6 +19,7 @@
  */
 
 #include "solving.h"
+#include "log_handler.h"
 
 // HySack* solve_init()
 // {

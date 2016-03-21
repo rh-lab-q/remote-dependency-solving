@@ -21,7 +21,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <rpm/rpmlib.h>
+#include <rpm/rpmts.h>
+#include <rpm/rpmcli.h>
+#include <rpm/rpmps.h>
+
 #include "client.h"
+#include "../common/network_util.h"
+#include "../common/repo_handler.h"
+#include "../common/log_handler.h"
+#include "../common/json_handler.h"
+#include "../common/util.h"
+#include "../common/packages.h"
+#include "../common/errors.h"
+#include "../common/mem_management.h"
+
 
 int get_new_id(int socket, char **id, char *arch, char *release)
 {

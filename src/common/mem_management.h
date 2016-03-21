@@ -21,10 +21,7 @@
 #ifndef _MEM_MANAGEMENT_H
 #define _MEM_MANAGEMENT_H
 
-#include "includes.h"
-#include "log_handler.h"
-#include "errors.h"
-
+#include <sys/socket.h>
 
 #ifdef __cplusplus
 extern "C"{

@@ -19,6 +19,11 @@
  */
 
 #include "params.h"
+#include "includes.h"
+#include "mem_management.h"
+#include "errors.h"
+
+
 
 int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 {
@@ -103,7 +108,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 
 ParamOptsCl* init_params_cl()
 {
-  ParamOptsCl* new = (ParamOptsCl*)rds_malloc(sizeof(ParamOptsCl));
+  ParamOptsCl* new = (ParamOptsCl*)malloc(sizeof(ParamOptsCl));
   new->pkg_count = 0;
   new->command = -1;
   new->pkgs = NULL;
@@ -114,7 +119,7 @@ ParamOptsCl* init_params_cl()
 void free_params_cl(ParamOptsCl* params)
 {
   g_slist_free_full(params->pkgs, (GDestroyNotify) free); //only *char in the list so free will suffice
-  rds_free(params);
+  free(params);
 }
 
 

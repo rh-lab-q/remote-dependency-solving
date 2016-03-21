@@ -19,6 +19,7 @@
  */
 
 #include "network_security.h"
+#include "log_handler.h"
 
 
 /*

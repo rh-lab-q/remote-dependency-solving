@@ -20,7 +20,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "globvar.h"
+#include "errors.h"
 #include "packages.h"
+#include "log_handler.h"
 
 int add_to_transaction(rpmts ts, char *pkg, int action)
 {

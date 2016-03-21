@@ -1,4 +1,11 @@
+#include <stdlib.h>
+#include <signal.h>
+
 #include "client.h"
+#include "../common/repo_handler.h"
+#include "../common/errors.h"
+#include "../common/mem_management.h"
+
 
 // #define VERSION_HAWKEY @HKY_22@
 //for debugging
@@ -21,8 +28,17 @@
  *  install/update/erase them - done
  */
 
-int main(int argc, char* argv[]){
+/******************* This is an interesting concept if we want to call a function after the program exits **************/
+// void end() __attribute__((destructor));
+// 
+// void end()
+// {
+// 	printf("In the end() function\n");
+// }
 
+int main(int argc, char* argv[]){
+	
+	//char* buffer __attribute__ ((__cleanup__(free_buffer))) = malloc(20);
   /*******************************************************************/
   /* Check root rights                                               */
   /*******************************************************************/
@@ -46,7 +62,7 @@ int main(int argc, char* argv[]){
   signal(SIGBUS, rds_signal_handler);
   signal(SIGSEGV, rds_signal_handler);
   signal(SIGTERM, rds_signal_handler);
-
+	
   /*******************************************************************/
   /* Parsing parameters 					     */
   /*******************************************************************/
@@ -60,6 +76,8 @@ int main(int argc, char* argv[]){
     status = PARAMS_ERROR;
     goto end;
   }
+  
+  return 1;
   
   rds_log(logDEBUG, "Client params initialized.\n");
   rds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  

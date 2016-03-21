@@ -21,10 +21,6 @@
 //#ifndef _CFG_PARSING_H
 //#define _CFG_PARSING_H
 
-#include "includes.h"
-#include "log_handler.h"
-#include "mem_management.h"
-
 
 #ifdef __CASE_CLIENT
 #define CFG_FILE "../etc/rds-client.conf"
