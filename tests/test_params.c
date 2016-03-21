@@ -4,7 +4,7 @@
 
 START_TEST(test_params)
 {
-  ssds_gc_init();
+  rds_gc_init();
 
   /*CLIENT FUNCTIONS TESTING*/
   /*test 1*/no_parameters();
@@ -14,7 +14,7 @@ START_TEST(test_params)
            // while it should be both commands [line 88]
   /*test 4*/no_command_provided();
   
-  ssds_gc_cleanup();
+  rds_gc_cleanup();
 }
 END_TEST
 

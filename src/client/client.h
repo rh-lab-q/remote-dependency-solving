@@ -64,7 +64,7 @@ enum{
  * @param release   char* version of installed system
  * @return          Returns OK if the recieved json is valid, otherwise error code.
  */
-int ssds_get_new_id(int socket, char **id, char *arch, char *release);
+int get_new_id(int socket, char **id, char *arch, char *release);
 
 /**
  * Send file to server.
@@ -73,7 +73,7 @@ int ssds_get_new_id(int socket, char **id, char *arch, char *release);
  * @param path      char* path to file
  * @return          Returns OK if the recieved json is valid, otherwise error code.
  */
-int ssds_send_file(int socket, int type, char *path);
+int send_file(int socket, int type, char *path);
 
 /**
  * Compare two files
@@ -100,15 +100,15 @@ int copy_file(char *source, char *destination);
  * @param action    int type of requested operation
  * @return          Returns OK if the recieved json is valid, otherwise error code.
  */
-int ssds_send_repo(ParamOptsCl* params, char *arch, char *release, int socket, int action);
+int send_repo(ParamOptsCl* params, char *arch, char *release, int socket, int action);
 
 /**
- * Parse answer from server of ssds_send_repo request.
+ * Parse answer from server of send_repo request.
  * @param socket    int socket handler
  * @param message   char** message fom delivered answer.
  * @return          Returns ANSWER_OK if and NULL in message, otherwise error code with message.
  */
-int ssds_check_repo(int socket, char **message);
+int check_repo(int socket, char **message);
 
 /**
  * Parses dependency solv answer and download and install/update/erase requested packages.
@@ -116,7 +116,7 @@ int ssds_check_repo(int socket, char **message);
  * @param action    int type of requested action
  * @return          Returns OK if the recieved json is valid, otherwise error code.
  */
-int ssds_answer_process(int socket, int action);
+int answer_process(int socket, int action);
 
 /**
  * Download requested packages.
@@ -126,7 +126,7 @@ int ssds_answer_process(int socket, int action);
  * @param erase		list of packages to erase  
  * @return          Returns OK, otherwise error code.
  */
-int ssds_download(int answer, GSList *install, GSList *update, GSList *erase);
+int download(int answer, GSList *install, GSList *update, GSList *erase);
 
 /**
  * Install/update/erase requested packages.
@@ -135,7 +135,7 @@ int ssds_download(int answer, GSList *install, GSList *update, GSList *erase);
  * @param erase		list of packages to erase  
  * @return          Returns OK, otherwise error code.
  */
-int ssds_rpm_process(GSList *install, GSList *update, GSList *erase);
+int rpm_process(GSList *install, GSList *update, GSList *erase);
 
 /**
  * Asking user for his wish.
@@ -143,7 +143,7 @@ int ssds_rpm_process(GSList *install, GSList *update, GSList *erase);
  * @param possibilities int type (number) of offered possibilities
  * @return              Returns chosen possibility.
  */
-int ssds_question(char* question, int possibilities);
+int question(char* question, int possibilities);
 
 #ifdef __cplusplus
 }

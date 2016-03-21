@@ -21,26 +21,26 @@
 #include "repo_handler.h"
 
 
-SsdsRepoMetadataList* ssds_repo_metadata_init()
+RepoMetadataList* repo_metadata_init()
 {
-  SsdsRepoMetadataList* new = (SsdsRepoMetadataList*)ssds_malloc(sizeof(SsdsRepoMetadataList));
+  RepoMetadataList* new = (RepoMetadataList*)malloc(sizeof(RepoMetadataList));
   new->files_locations = NULL;
   return new;
 }
 
 
-int ssds_locate_repo_metadata(/*SsdsJsonRead* json, */SsdsRepoInfoList* info_list, SsdsRepoMetadataList* meta_list)
+int locate_repo_metadata(/*JsonRead* json, */RepoInfoList* info_list, RepoMetadataList* meta_list)
 {
   guint len = g_slist_length(info_list->repoInfoList);
   for(guint i = 0; i < len; i++){
-//     ssds_log(logDEBUG, "ssds_locate_repo_metadata inside for before getting repo from list\n");
-    SsdsRepoInfo* repo = (SsdsRepoInfo*)g_slist_nth_data(info_list->repoInfoList, i);
+//     rds_log(logDEBUG, "locate_repo_metadata inside for before getting repo from list\n");
+    RepoInfo* repo = (RepoInfo*)g_slist_nth_data(info_list->repoInfoList, i);
     
     if(!local_repo_metadata(repo, meta_list))
     {
-//       ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if\n");
+//       rds_log(logDEBUG, "locate_repo_metadata inside if\n");
       download_repo_metadata_by_url(repo, meta_list);
-      ssds_log(logDEBUG, "ssds_locate_repo_metadata inside if after download\n");
+      rds_log(logDEBUG, "locate_repo_metadata inside if after download\n");
     }
     
   }
@@ -50,16 +50,16 @@ int ssds_locate_repo_metadata(/*SsdsJsonRead* json, */SsdsRepoInfoList* info_lis
 }
 
 
-int local_repo_metadata(SsdsRepoInfo* repos, SsdsRepoMetadataList* list)
+int local_repo_metadata(RepoInfo* repos, RepoMetadataList* list)
 {
   char* local_path=full_path_to_metadata(repos->name);
   GError *tmp_err = NULL;
   LrHandle *h = lr_handle_init();
   LrResult *r = lr_result_init();
   
-  ssds_log(logDEBUG, "%s\n", local_path);
+  rds_log(logDEBUG, "%s\n", local_path);
   
-  char** handle_urls = (char**)ssds_malloc(2*sizeof(char*));
+  char** handle_urls = (char**)malloc(2*sizeof(char*));
   handle_urls[0] = local_path;
   handle_urls[1] = NULL;
   lr_handle_setopt(h, NULL, LRO_URLS, handle_urls);//look for repo locally
@@ -70,11 +70,11 @@ int local_repo_metadata(SsdsRepoInfo* repos, SsdsRepoMetadataList* list)
   
   if(ret)
   {
-//     ssds_log(logINFO,"Local metadata for %s found at %s. Using local copy.\n", repo->name, local_path);
+//     rds_log(logINFO,"Local metadata for %s found at %s. Using local copy.\n", repo->name, local_path);
     LrYumRepo* local_repo = lr_yum_repo_init();
     lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &local_repo);
     
-    SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)ssds_malloc(sizeof(SsdsMetadataFilesLoc));
+    MetadataFilesLoc* loc = (MetadataFilesLoc*)malloc(sizeof(MetadataFilesLoc));
     loc->repomd = local_path;
     loc->filelists = strdup(lr_yum_repo_path(local_repo,"filelists"));
     loc->primary = strdup(lr_yum_repo_path(local_repo,"primary"));
@@ -85,7 +85,7 @@ int local_repo_metadata(SsdsRepoInfo* repos, SsdsRepoMetadataList* list)
     return 1;
   }
     
-//   ssds_log(logINFO, "Local metadata for %s repo were not found at %s. Metadata will be downloaded.\n", repo->name, local_path);
+//   rds_log(logINFO, "Local metadata for %s repo were not found at %s. Metadata will be downloaded.\n", repo->name, local_path);
   return 0;
 }
 
@@ -94,7 +94,7 @@ char* full_path_to_metadata(char* repo_name)
 {
   const char* dest = "/tmp/ssds/";
   int length = strlen(dest) + strlen(repo_name);
-  char* full_path = (char*)ssds_malloc((length+1)*sizeof(char));
+  char* full_path = (char*)malloc((length+1)*sizeof(char));
   
   strncpy(full_path, dest, strlen(dest)+1);
   strncat(full_path, repo_name, strlen(repo_name));
@@ -113,7 +113,7 @@ int metadata_progress(G_GNUC_UNUSED void *data, double total, double now){
 	return 0;
 }
 
-void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* list)
+void download_repo_metadata_by_url(RepoInfo* repo, RepoMetadataList* list)
 {
   LrHandleOption type;
   GError *tmp_err = NULL;
@@ -157,15 +157,15 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
   
   
   if (ret) {
-    ssds_log(logMESSAGE, "Metadata for %s - download successfull (Destination dir: %s).\n", repo->name, destdir);
+    rds_log(logMESSAGE, "Metadata for %s - download successfull (Destination dir: %s).\n", repo->name, destdir);
     
     LrYumRepo* lrRepo = lr_yum_repo_init();
     lr_result_getinfo(r, &tmp_err, LRR_YUM_REPO, &lrRepo);
     //std::cout << lr_yum_repo_path(repo, "filelists") << std::endl;
     
-//     ssds_log(logDEBUG, "Lr_result contains all the info now\n");
+//     rds_log(logDEBUG, "Lr_result contains all the info now\n");
     
-    SsdsMetadataFilesLoc* loc = (SsdsMetadataFilesLoc*)ssds_malloc(sizeof(SsdsMetadataFilesLoc));
+    MetadataFilesLoc* loc = (MetadataFilesLoc*)malloc(sizeof(MetadataFilesLoc));
     
     loc->repomd = destdir;
     
@@ -175,19 +175,19 @@ void download_repo_metadata_by_url(SsdsRepoInfo* repo, SsdsRepoMetadataList* lis
 //     
 //     printf("download_repo_metadata_by_url:\nrepomd: %s\nfilelists: %s\nprimary: %s\n", loc->repomd, loc->filelists, loc->primary);
     
-//     ssds_log(logDEBUG, "Locations of downloaded files are ready\n");
+//     rds_log(logDEBUG, "Locations of downloaded files are ready\n");
     
     list->files_locations = g_slist_append(list->files_locations, loc);
-//     ssds_log(logDEBUG, "Locations of files are in the list\n");
+//     rds_log(logDEBUG, "Locations of files are in the list\n");
     lr_yum_repo_free(lrRepo);
-//     ssds_log(logDEBUG, "download_repo_metadata_by_url after repo free\n");
+//     rds_log(logDEBUG, "download_repo_metadata_by_url after repo free\n");
   } else {
     fprintf(stderr, "Error encountered: %s.\n", tmp_err->message);
     g_error_free(tmp_err);
   }
   
-//   ssds_log(logDEBUG, "download_repo_metadata_by_url beffore free\n");
+//   rds_log(logDEBUG, "download_repo_metadata_by_url beffore free\n");
 //  lr_result_free(r);
 //  lr_handle_free(h);
-//   ssds_log(logDEBUG, "download_repo_metadata_by_url after free\n");
+//   rds_log(logDEBUG, "download_repo_metadata_by_url after free\n");
 }

@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
   uid_t uid = geteuid();
   if(uid != 0)
   {
-    ssds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
+    rds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
     return ROOT_ERROR;
   }
   
@@ -41,17 +41,17 @@ int main(int argc, char* argv[]){
   /*******************************************************************/
   /* Setting up garbage collector and setting callback functions     */
   /*******************************************************************/
-  ssds_gc_init();
-  signal(SIGINT, ssds_signal_handler);
-  signal(SIGBUS, ssds_signal_handler);
-  signal(SIGSEGV, ssds_signal_handler);
-  signal(SIGTERM, ssds_signal_handler);
+  rds_gc_init();
+  signal(SIGINT, rds_signal_handler);
+  signal(SIGBUS, rds_signal_handler);
+  signal(SIGSEGV, rds_signal_handler);
+  signal(SIGTERM, rds_signal_handler);
 
   /*******************************************************************/
   /* Parsing parameters 					     */
   /*******************************************************************/
   
-  ssds_log(logSSDS, "Client startup.\n");
+  rds_log(logSSDS, "Client startup.\n");
 
   ParamOptsCl* params = init_params_cl();
   
@@ -61,9 +61,9 @@ int main(int argc, char* argv[]){
     goto end;
   }
   
-  ssds_log(logDEBUG, "Client params initialized.\n");
-  ssds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
-  ssds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
+  rds_log(logDEBUG, "Client params initialized.\n");
+  rds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
+  rds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
  
 	if((params->pkg_count == 0) && (params->command == PAR_UPDATE))
 		params->command = PAR_UPDATE_ALL;
@@ -84,12 +84,12 @@ int main(int argc, char* argv[]){
        *pathToBackupYum = "/var/cache/ssds/yum.conf";
               
   char *arch = NULL, *release = NULL, *message = NULL;
-  ssds_resolve_dependency_file_path(pathToOriginalSolv, &arch, &release);
+  resolve_dependency_file_path(pathToOriginalSolv, &arch, &release);
 
   /********************************************************************/
   /* Networking part - connecting to server                           */
   /********************************************************************/
-  ssds_log(logDEBUG, "Network part.\n");
+  rds_log(logDEBUG, "Network part.\n");
 
   int socket;
 
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]){
 
   if(status != OK) goto end;
  
-  ssds_log(logDEBUG, "Communication socket: %d.\n", socket);
+  rds_log(logDEBUG, "Communication socket: %d.\n", socket);
 
   /********************************************************************/
   /* Checking client ID                                               */
@@ -105,53 +105,53 @@ int main(int argc, char* argv[]){
 
   if(id == NULL)
   {     
-		status = ssds_get_new_id(socket, &id, arch, release);
+		status = get_new_id(socket, &id, arch, release);
 		if(status != OK) goto end;
 
-		status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
+		status = send_file(socket, SEND_SOLV, pathToOriginalSolv);
 		if(status != OK) goto end;
 		if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
 		{
-			ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
+			rds_log(logWARNING, "Unable to make @System.solv backup.\n");
 		}
 
-		status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
+		status = send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
 		if(status != OK) goto end;
 		if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
 		{
-			ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
+			rds_log(logWARNING, "Unable to make yum.conf backup.\n");
 		}
 			
   }else{
 		if( compare_files(pathToOriginalSolv, pathToBackupSolv) != OK ){
-			int ans = ssds_question("DNF install packages by themself. We need to make initial steps again. If you don't want to use RDS call rds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
+			int ans = question("DNF install packages by themself. We need to make initial steps again. If you don't want to use RDS call rds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
 
 			if(ans == NO)
 			{
-				ssds_log(logMESSAGE,"Action interupted by user.\n");
+				rds_log(logMESSAGE,"Action interupted by user.\n");
 				goto end;
 			}
 
-			status = ssds_send_file(socket, SEND_SOLV, pathToOriginalSolv);
+			status = send_file(socket, SEND_SOLV, pathToOriginalSolv);
 			if(status != OK) goto end;
 			if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
 			{
-				ssds_log(logWARNING, "Unable to make @System.solv backup.\n");
+				rds_log(logWARNING, "Unable to make @System.solv backup.\n");
 			}
 		}
 
 		if( compare_files(pathToOriginalYum, pathToBackupYum) != OK ){
-			int ans = ssds_question("New yum configuration will be sent to server. Do yout agree?", YES_NO);
+			int ans = question("New yum configuration will be sent to server. Do yout agree?", YES_NO);
 			if(ans == NO){
-				ssds_log(logMESSAGE,"Action interupted by user.\n");
+				rds_log(logMESSAGE,"Action interupted by user.\n");
 				goto end;
 			}
 
-			status = ssds_send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
+			status = send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
 			if(status != OK) goto end;
 			if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
 			{
-				ssds_log(logWARNING, "Unable to make yum.conf backup.\n");
+				rds_log(logWARNING, "Unable to make yum.conf backup.\n");
 			}
 		}       
   }
@@ -162,74 +162,74 @@ int main(int argc, char* argv[]){
   {
 
 	case PAR_INSTALL: 
-		ssds_log(logMESSAGE, "Installation of packages was selected.\n");
+		rds_log(logMESSAGE, "Installation of packages was selected.\n");
 
-		status = ssds_send_repo(params, arch, release, socket, GET_INSTALL);
+		status = send_repo(params, arch, release, socket, GET_INSTALL);
 		if(status != OK) break; 
 
-		if(ssds_check_repo(socket, &message) != ANSWER_OK)
+		if(check_repo(socket, &message) != ANSWER_OK)
 		{
-			ssds_log(logWARNING,"%s\n", message);
+			rds_log(logWARNING,"%s\n", message);
 		}
 
 
-		status = ssds_answer_process(socket, GET_INSTALL);
+		status = answer_process(socket, GET_INSTALL);
 	break;
 
 	case PAR_UPDATE: 
-		ssds_log(logMESSAGE, "Update of packages was selected.\n");
-		ssds_log(logERROR, "Update option has not been implemented yet.\n");
+		rds_log(logMESSAGE, "Update of packages was selected.\n");
+		rds_log(logERROR, "Update option has not been implemented yet.\n");
 
-		status = ssds_send_repo(params, arch, release, socket, GET_UPDATE);
+		status = send_repo(params, arch, release, socket, GET_UPDATE);
 		if(status != OK) break;
 
-		if(ssds_check_repo(socket, &message) != ANSWER_OK)
+		if(check_repo(socket, &message) != ANSWER_OK)
 		{
-			ssds_log(logWARNING,"%s\n", message);
+			rds_log(logWARNING,"%s\n", message);
 		}
 
-		status = ssds_answer_process(socket, GET_UPDATE);
+		status = answer_process(socket, GET_UPDATE);
 
 	break;
 
 	case PAR_ERASE: 
-		ssds_log(logMESSAGE, "Erase of packages was selected.\n");
+		rds_log(logMESSAGE, "Erase of packages was selected.\n");
 
-		status = ssds_send_repo(params, arch, release, socket, GET_ERASE);
+		status = send_repo(params, arch, release, socket, GET_ERASE);
 		if(status != OK) break;
 
-		if(ssds_check_repo(socket, &message) != ANSWER_OK)
+		if(check_repo(socket, &message) != ANSWER_OK)
 		{
-			ssds_log(logWARNING,"%s\n", message);
+			rds_log(logWARNING,"%s\n", message);
 		}
 
-		status = ssds_answer_process(socket, GET_ERASE);
+		status = answer_process(socket, GET_ERASE);
 
 		break;
 
 	case PAR_CHK_DEP: 
-		ssds_log(logMESSAGE, "Dependency check of packages was selected.\n");
-		ssds_log(logERROR, "Dependency check option has not been implemented yet.\n");
+		rds_log(logMESSAGE, "Dependency check of packages was selected.\n");
+		rds_log(logERROR, "Dependency check option has not been implemented yet.\n");
 		break;
 		
 	case PAR_UPDATE_ALL:
-		ssds_log(logMESSAGE, "Update all packages was initiated.\n");
-		status = ssds_send_repo(params, arch, release, socket, GET_UPDATE_ALL);
+		rds_log(logMESSAGE, "Update all packages was initiated.\n");
+		status = send_repo(params, arch, release, socket, GET_UPDATE_ALL);
 		if(status != OK) break;
 
-    if(ssds_check_repo(socket, &message) != ANSWER_OK)
+    if(check_repo(socket, &message) != ANSWER_OK)
 		{
-			ssds_log(logWARNING,"%s\n", message);
+			rds_log(logWARNING,"%s\n", message);
 		}
 
-		status = ssds_answer_process(socket, GET_UPDATE);
+		status = answer_process(socket, GET_UPDATE);
 		break;
   } 
   
 end:
-  ssds_log(logSSDS, "End of client.\n\n");
+  rds_log(logSSDS, "End of client.\n\n");
     
-  ssds_gc_cleanup();
+  rds_gc_cleanup();
 
   return status;
 }

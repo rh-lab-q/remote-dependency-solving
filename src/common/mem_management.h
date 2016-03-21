@@ -48,41 +48,41 @@ typedef struct mem_item
 	int type;
 	struct mem_item * next;
 	struct mem_item * prev;
-}Ssds_gc_item;
+}Rds_gc_item;
 
 typedef struct s_gc
 {
-	Ssds_gc_item * top;
-}Ssds_gc;
+	Rds_gc_item * top;
+}Rds_gc;
 
 /**
  * Function called when termination signals are recieved.
  */
-void ssds_signal_handler(int signum);
+void rds_signal_handler(int signum);
 
 /**
  * Deletes everything in the garbage collector including garbage collector.
  */
-void ssds_gc_cleanup();
+void rds_gc_cleanup();
 
 /**
  * Searches for a pointer in the garbage collector
  * @param ptr       pointer that is searched
  * @return          1 if pointer is in garbage collector, 0 if its not
  */
-Ssds_gc_item * ssds_gc_search(Alloc_data * data, int type);
+Rds_gc_item * rds_gc_search(Alloc_data * data, int type);
 
 /**
  * Removes pointer from garbage collector
  * @param ptr       pointer that is removed
  */
-void ssds_gc_remove(Alloc_data * data, int type);
+void rds_gc_remove(Alloc_data * data, int type);
 
 /**
  * Pushes pointer into garbage collector
  * @param ptr       pushed pointer
  */
-void ssds_gc_push(Alloc_data * data, int type);
+void rds_gc_push(Alloc_data * data, int type);
 
 /**
  * Realloc function that has the same interface as realloc but works
@@ -91,7 +91,7 @@ void ssds_gc_push(Alloc_data * data, int type);
  * @param size      new size of pointer
  * @return          new reallocated pointer
  */
-void * ssds_realloc(void * old_ptr, int size);
+void * rds_realloc(void * old_ptr, int size);
 
 /**
  * Malloc function that has the same interface as realloc but works
@@ -99,7 +99,7 @@ void * ssds_realloc(void * old_ptr, int size);
  * @param size      number of bytes to be allocated
  * @return          allocated pointer
  */
-void * ssds_malloc(int size);
+void * rds_malloc(int size);
 
 /**
  * Malloc function that has the same interface as realloc but works
@@ -108,49 +108,49 @@ void * ssds_malloc(int size);
  * @param size      size of chunks
  * @return          allocated pointer
  */
-void * ssds_calloc(int n_items, int size);
+void * rds_calloc(int n_items, int size);
 
 /**
  * Initialization function for garbage collector. Must be called before
  * user allocates something.
  */
-void ssds_gc_init();
+void rds_gc_init();
 
 /**
  * Pushes pointer to garbage collector.
  * @param ptr       pushed pointer
  */
-void ssds_gc_push_ptr(void * ptr);
+void rds_gc_push_ptr(void * ptr);
 
 /**
  * @Pushes socket to garbage collector.
  * @param socket    pushed socket
  */
-void ssds_gc_push_socket(int socket);
+void rds_gc_push_socket(int socket);
 
 /**
  * Removes pointer from garbage collector.
  * @param ptr       removed pointer
  */
-void ssds_gc_remove_ptr(void * ptr);
+void rds_gc_remove_ptr(void * ptr);
 
 /**
  * Removes socket from garbage collector.
  * @param socket    removed socket
  */
-void ssds_gc_remove_socket(int socket);
+void rds_gc_remove_socket(int socket);
 
 /**
  * Removes pointer from garbage collector and calls free on it.
  * @param ptr	    freed pointer
  */
-void ssds_free(void * ptr);
+void rds_free(void * ptr);
 
 /**
  * Removes socket from garbage collector and closes it.
  * @param socket    closed socket
  */
-void ssds_close(int socket);
+void rds_close(int socket);
 
 /**
  * Creates a socket and pushes it into garbage collector.
@@ -159,7 +159,7 @@ void ssds_close(int socket);
  * @param protocol  parameteor of socket
  * @return          new socket
  */
-int ssds_socket(int domain, int type, int protocol);
+int rds_socket(int domain, int type, int protocol);
 
 /**
  * Accepts a socket and pushes it into garbage collector
@@ -168,13 +168,13 @@ int ssds_socket(int domain, int type, int protocol);
  * @param address_len   parameter of accept
  * @return              accepted socket
  */
-int ssds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
+int rds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
 
 /**
  * Returns pointer to GC, used for testing
  * @return          	pointer to GC
  */
-Ssds_gc * ssds_gc_get_header();
+Rds_gc * rds_gc_get_header();
 
 
 #ifdef __cplusplus

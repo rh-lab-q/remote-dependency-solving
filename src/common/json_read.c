@@ -20,14 +20,14 @@
 
 #include "json_handler.h"
 
-SsdsJsonRead* ssds_js_rd_init()
+JsonRead* js_rd_init()
 {
-  SsdsJsonRead* new = (SsdsJsonRead*)ssds_malloc(sizeof(SsdsJsonRead));
+  JsonRead* new = (JsonRead*)rds_malloc(sizeof(JsonRead));
   new->parser = json_parser_new();
   return new;
 }
 
-gboolean ssds_js_rd_parse(char* buffer, SsdsJsonRead* json)
+gboolean js_rd_parse(char* buffer, JsonRead* json)
 {
   GError *error = NULL;
     
@@ -43,7 +43,7 @@ gboolean ssds_js_rd_parse(char* buffer, SsdsJsonRead* json)
   return ret;
 }
 
-int ssds_rd_get_code(SsdsJsonRead* json)
+int js_get_code(JsonRead* json)
 {
   int ret=-1;
   JsonObject* obj=json_node_get_object(json->rootNode);
@@ -53,7 +53,7 @@ int ssds_rd_get_code(SsdsJsonRead* json)
   return ret;
 }
 
-int ssds_js_rd_get_read_bytes(SsdsJsonRead* json)
+int js_rd_get_read_bytes(JsonRead* json)
 {
   int ret=-1;
   JsonObject* obj = json->dataObj;
@@ -63,7 +63,7 @@ int ssds_js_rd_get_read_bytes(SsdsJsonRead* json)
   return ret;
 }
 
-char* ssds_js_rd_get_message(SsdsJsonRead* json)
+char* js_rd_get_message(JsonRead* json)
 {
   char *msg = NULL;
   JsonObject* obj = json->dataObj;
@@ -73,7 +73,7 @@ char* ssds_js_rd_get_message(SsdsJsonRead* json)
   return msg;
 }
 
-GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path)
+GList* js_rd_find(JsonRead* json, char* x_path)
 {
   GList* ret = NULL;
   JsonPath* new_path = json_path_new();
@@ -91,7 +91,7 @@ GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path)
 // =================================================================================
 // original json ˇˇˇ
 
-int ssds_js_rd_get_code(SsdsJsonRead* json)
+int js_rd_get_code(JsonRead* json)
 {
   int ret = -1;
   JsonObject* obj = json_node_get_object(json->rootNode);
@@ -101,11 +101,11 @@ int ssds_js_rd_get_code(SsdsJsonRead* json)
   return ret;
 }
 
-void ssds_js_rd_get_packages(char** pkgs, SsdsJsonRead* json)
+void js_rd_get_packages(char** pkgs, JsonRead* json)
 {
   JsonArray* array = json_object_get_array_member(json->dataObj, "req_pkgs");
   guint len = json_array_get_length(array);
-  //pkgs->packages = (char**)ssds_malloc(len*sizeof(char*));
+  //pkgs->packages = (char**)rds_malloc(len*sizeof(char*));
   
   guint i;
   for(i = 0; i < len; i++)
@@ -119,7 +119,7 @@ void ssds_js_rd_get_packages(char** pkgs, SsdsJsonRead* json)
 }
 
 
-void ssds_js_rd_repo_info(SsdsJsonRead* json, SsdsRepoInfoList* list)
+void js_rd_repo_info(JsonRead* json, RepoInfoList* list)
 {
   JsonArray*array = json_object_get_array_member(json->dataObj, "repolist");
   guint len = json_array_get_length(array);
@@ -127,24 +127,24 @@ void ssds_js_rd_repo_info(SsdsJsonRead* json, SsdsRepoInfoList* list)
   guint i;
   for(i = 0; i < len; i++)
   {
-    SsdsRepoInfo* repo = ssds_js_rd_repoinfo_init();
+    RepoInfo* repo = js_rd_repoinfo_init();
     
     JsonObject* obj = json_array_get_object_element(array, i);
     repo->type = (int)json_object_get_int_member(obj, "type");
     
     char* currName = (char*)json_object_get_string_member(obj, "name");
-    repo->name = (char*)ssds_malloc((strlen(currName)+1)*sizeof(char));
+    repo->name = (char*)rds_malloc((strlen(currName)+1)*sizeof(char));
     strcpy(repo->name, currName);
     
     JsonArray* url_arr = json_object_get_array_member(obj, (gchar*)"repo_url");
     int arr_len = json_array_get_length(url_arr);
-    repo->urls = (char**)ssds_malloc(arr_len*(sizeof(char*)));
+    repo->urls = (char**)rds_malloc(arr_len*(sizeof(char*)));
     
     int j;
     for(j = 0; j < arr_len; j++)
     {
       char* word = (char*)json_array_get_string_element(url_arr, j);
-      repo->urls[j] = (char*)ssds_malloc((strlen(word)+1)*sizeof(char));
+      repo->urls[j] = (char*)rds_malloc((strlen(word)+1)*sizeof(char));
       strcpy(repo->urls[j], word);
       repo->count++;
     }
@@ -154,18 +154,18 @@ void ssds_js_rd_repo_info(SsdsJsonRead* json, SsdsRepoInfoList* list)
 }
 
 
-SsdsPkgInfo* ssds_js_rd_pkginfo_init()
+PkgInfo* js_rd_pkginfo_init()
 {
-  SsdsPkgInfo* new = (SsdsPkgInfo*)ssds_malloc(sizeof(SsdsPkgInfo));
+  PkgInfo* new = (PkgInfo*)rds_malloc(sizeof(PkgInfo));
   new->packages = NULL;
   new->length = 0;
   return new;
 }
 
 
-SsdsRepoInfo* ssds_js_rd_repoinfo_init()
+RepoInfo* js_rd_repoinfo_init()
 {
-  SsdsRepoInfo* new = (SsdsRepoInfo*)ssds_malloc(sizeof(SsdsRepoInfo));
+  RepoInfo* new = (RepoInfo*)rds_malloc(sizeof(RepoInfo));
   new->count = 0;
   new->type = 0;
   new->name = NULL;
@@ -173,9 +173,9 @@ SsdsRepoInfo* ssds_js_rd_repoinfo_init()
   return new;
 }
 
-SsdsRepoInfoList* ssds_js_rd_list_init()
+RepoInfoList* js_rd_list_init()
 {
-  SsdsRepoInfoList* new = (SsdsRepoInfoList*)ssds_malloc(sizeof(SsdsRepoInfoList));
+  RepoInfoList* new = (RepoInfoList*)rds_malloc(sizeof(RepoInfoList));
   new->repoInfoList = NULL;
   return new;
 }
@@ -183,17 +183,17 @@ SsdsRepoInfoList* ssds_js_rd_list_init()
 /**********************/
 /* mainly client part */
 /**********************/
-SsdsJsonAnswer* ssds_js_rd_answer_init()
+JsonAnswer* js_rd_answer_init()
 {
-  SsdsJsonAnswer* new = (SsdsJsonAnswer*)ssds_malloc(sizeof(SsdsJsonAnswer));
+  JsonAnswer* new = (JsonAnswer*)rds_malloc(sizeof(JsonAnswer));
   new->name = NULL;
   new->pkgList = NULL;
   return new;
 }
 
-SsdsJsonPkg* ssds_js_rd_pkg_init()
+JsonPkg* js_rd_pkg_init()
 {
-  SsdsJsonPkg* new = (SsdsJsonPkg*)ssds_malloc(sizeof(SsdsJsonPkg));
+  JsonPkg* new = (JsonPkg*)rds_malloc(sizeof(JsonPkg));
   new->pkg_name = NULL;
   new->pkg_loc = NULL;
   new->base_url = NULL;
@@ -201,7 +201,7 @@ SsdsJsonPkg* ssds_js_rd_pkg_init()
   return new;
 }
 
-int ssds_js_rd_get_count(SsdsJsonRead* json, char* name)
+int js_rd_get_count(JsonRead* json, char* name)
 {
   const char* default_path="$.data..";
   int length=strlen(default_path)+strlen(name);
@@ -221,37 +221,37 @@ int ssds_js_rd_get_count(SsdsJsonRead* json, char* name)
   return ret;
 }
 
-GSList* ssds_js_rd_parse_answer(const char* name, SsdsJsonRead* json)
+GSList* js_rd_parse_answer(const char* name, JsonRead* json)
 {
   JsonArray* array = json_object_get_array_member(json->dataObj, name);
-	int count = ssds_js_rd_get_count(json, name);
+	int count = js_rd_get_count(json, name);
 	GSList* ret = g_slist_alloc();
 	
 	for(int i=0; i<count; i++)
 	{
-		SsdsJsonPkg* one_pkg = ssds_js_rd_pkg_init();
+		JsonPkg* one_pkg = js_rd_pkg_init();
     JsonObject* obj = json_array_get_object_element(array, i);
 		
 		char* pkg_name = (char*)json_object_get_string_member(obj, "pkg_name");
-    one_pkg->pkg_name = (char*)ssds_malloc((strlen(pkg_name)+1)*sizeof(char));
+    one_pkg->pkg_name = (char*)rds_malloc((strlen(pkg_name)+1)*sizeof(char));
     strcpy(one_pkg->pkg_name, pkg_name);
     
     //name of package location on repository
     char* pkg_loc = (char*)json_object_get_string_member(obj, "pkg_loc");
-    one_pkg->pkg_loc = (char*)ssds_malloc((strlen(pkg_loc)+1)*sizeof(char));
+    one_pkg->pkg_loc = (char*)rds_malloc((strlen(pkg_loc)+1)*sizeof(char));
     strcpy(one_pkg->pkg_loc, pkg_loc);
     
     //baseurl or null
     if(json_object_get_null_member(obj, "base_url"))
     {
       char* meta = (char*)json_object_get_string_member(obj, "metalink");
-      one_pkg->metalink = (char*)ssds_malloc((strlen(meta)+1)*sizeof(char));
+      one_pkg->metalink = (char*)rds_malloc((strlen(meta)+1)*sizeof(char));
       strcpy(one_pkg->metalink, meta);
     }
     else
     {
       char* base = (char*)json_object_get_string_member(obj, "base_url");
-      one_pkg->base_url = (char*)ssds_malloc((strlen(base)+1)*sizeof(char));
+      one_pkg->base_url = (char*)rds_malloc((strlen(base)+1)*sizeof(char));
       strcpy(one_pkg->base_url, base);
     }
     

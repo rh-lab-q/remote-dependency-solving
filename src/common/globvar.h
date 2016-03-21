@@ -55,9 +55,9 @@ extern "C"{
 	JS_ARR_ERASE,
 	JS_ARR_OBSOLETE,
 	JS_ARR_UNNEEDED
-	}SsdsJsArrayName;
+	}RdsJsArrayName;
 
-	static const char* const SsdsJsArrayStr[] = {"install", "upgrade", "erase", "obsolete", "unneeded"};
+	static const char* const JsArrayStr[] = {"install", "upgrade", "erase", "obsolete", "unneeded"};
 
 
 #ifdef __cplusplus

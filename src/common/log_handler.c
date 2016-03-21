@@ -24,7 +24,7 @@ const char* log_lvl_msg[7] = {"INFO", "MESSAGE", "WARNING", "ERROR", "DEBUG", "S
 int __verbose = 0;
 int __debug = 0;
 
-void ssds_log(int log_level, const char *message, ...)
+void rds_log(int log_level, const char *message, ...)
 {
   FILE *flog = fopen(LOG_FILE, "a");
   time_t current_time = time(NULL);

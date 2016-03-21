@@ -20,66 +20,66 @@
 
 #include "util.h"
 
-void ssds_resolve_dependency_file_path(char * ret_val, char** arch, char** release)
+void resolve_dependency_file_path(char * ret_val, char** arch, char** release)
 {
     *release = NULL;
-    struct utsname *machine = (struct utsname *)ssds_malloc(sizeof(struct utsname));
+    struct utsname *machine = (struct utsname *)malloc(sizeof(struct utsname));
 
-    ssds_log(logDEBUG, "Getted info about machine.\n");
+    rds_log(logDEBUG, "Getted info about machine.\n");
 
     if(machine == NULL){
-	ssds_log(logERROR, "Not enough memory on heap.\n");
+	rds_log(logERROR, "Not enough memory on heap.\n");
         return;
     }
 
-    ssds_log(logDEBUG, "Getting info about release and arch.\n");
+    rds_log(logDEBUG, "Getting info about release and arch.\n");
 
     if(uname(machine) < 0){
-	ssds_log(logERROR, "Unable to found system type and computer architecture.\n");
-	ssds_free(machine);
+	rds_log(logERROR, "Unable to found system type and computer architecture.\n");
+	free(machine);
         return;
     }
 
-    ssds_log(logDEBUG, "Getting last dot in release string.\n");
+    rds_log(logDEBUG, "Getting last dot in release string.\n");
     char *end = strrchr(machine->release, '.');
 
     if(end == NULL){
-	ssds_log(logERROR, "Internal error - unable to find dot in release string.\n");
-	ssds_free(machine);
+	rds_log(logERROR, "Internal error - unable to find dot in release string.\n");
+	free(machine);
 	return;
     }
 
     char *i = end-1;
-    ssds_log(logDEBUG, "Search release number.\n");
+    rds_log(logDEBUG, "Search release number.\n");
 
     while(i > machine->release && isdigit(i[0]))
     {
 	i--;
     }
-    ssds_log(logDEBUG, "Getting release string length.\n");
+    rds_log(logDEBUG, "Getting release string length.\n");
 
     int length = end - i;
-    ssds_log(logDEBUG, "Allocating memory for release string.\n");
-    char *fedora_release = (char *)ssds_malloc(length*sizeof(char));
+    rds_log(logDEBUG, "Allocating memory for release string.\n");
+    char *fedora_release = (char *)malloc(length*sizeof(char));
 
     if(fedora_release == NULL){
-	ssds_log(logERROR, "Not enough memory on heap.\n");
-	ssds_free(machine);
+	rds_log(logERROR, "Not enough memory on heap.\n");
+	free(machine);
 	return;
     }
    
-    ssds_log(logDEBUG, "Memory allocated.\n");
+    rds_log(logDEBUG, "Memory allocated.\n");
 
     i++; length--;
 
-    ssds_log(logDEBUG, "Copying release number into new string.\n");
+    rds_log(logDEBUG, "Copying release number into new string.\n");
     strncpy(fedora_release, i, length); //22 or 21 or any other
     fedora_release[length] = '\0';
 
-    ssds_log(logDEBUG, "Getting path string.\n");
+    rds_log(logDEBUG, "Getting path string.\n");
     //composing path to @System.solv file
     snprintf(ret_val, 100, "/var/cache/dnf/@System.solv");
-    ssds_log(logDEBUG, "Getting arch string.\n");
+    rds_log(logDEBUG, "Getting arch string.\n");
     *arch = machine->machine;
     *release = fedora_release;
 }

@@ -42,19 +42,19 @@ enum LogClass{
   logQUESTION	    /**< QUESTION is for messages, which will wait for user interaction */
 };        
   
-/** Contains severence level message for ssds_log function */
+/** Contains severence level message for rds_log function */
 extern const char* log_lvl_msg[7];
 
 /**
  * Used on global scope to indicate if verbose option is on. 
- * If __verbose == 0 - ssds_log prints only WARNING and ERROR to stderr.
+ * If __verbose == 0 - rds_log prints only WARNING and ERROR to stderr.
  * Set to 0 by default.
  */
 extern int __verbose;
 
 /** 
  * Used on global scope to indicate if debug option is on. 
- * If __debug==0 - ssds_log doesn't print anything with logDEBUG.
+ * If __debug==0 - rds_log doesn't print anything with logDEBUG.
  * Set to 0 by default.
  */
 extern int __debug;
@@ -69,7 +69,7 @@ extern int __debug;
  * @param log_level int
  * @param message   char*
  */
-void ssds_log(int log_level, const char *message, ...);
+void rds_log(int log_level, const char *message, ...);
 
 
 /**

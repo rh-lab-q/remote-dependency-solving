@@ -37,7 +37,7 @@ typedef enum {
   SSDS_BASEURL = 1, /**< #baseurl in .repo file */
   SSDS_MIRRORLIST,  /**< #mirrorlist in .repo file */
   SSDS_METALINK     /**< #metalink in .repo file*/
-} SsdsJsonUrlType;
+} RdsJsonUrlType;
 
 /**********************************************************************************************
  * Json create - this part describes functions used when creating json structure from scratch *
@@ -46,9 +46,9 @@ typedef enum {
 /**
  * Structure used for creating message in json to be sent over the network 
  */
-typedef struct SsdsJsonCreate SsdsJsonCreate;
+typedef struct RdsJsonCreate RdsJsonCreate;
 
-struct SsdsJsonCreate{
+struct RdsJsonCreate{
    JsonGenerator * generator; /**< Holds structure for generatig json from scraps */
    JsonNode* rootNode;        /**< Points to root of json */
    JsonNode* codeNode;        /**< Points to node holding control code */
@@ -69,73 +69,73 @@ typedef enum {
   JS_BOOL,
   JS_ARRAY,
   JS_OBJ
-}SsdsJsInsType;
+}RdsJsInsType;
 
 /**
- * Returns new SsdsJsonCreate structure - this structure is needed during the whole process of json creation
- * @return          newly allocated SsdsJsonCreate structure
+ * Returns new RdsJsonCreate structure - this structure is needed during the whole process of json creation
+ * @return          newly allocated RdsJsonCreate structure
  */
-SsdsJsonCreate* ssds_js_cr_init(int code);
+RdsJsonCreate* rds_js_cr_init(int code);
 
 /**
- * Adds a new element into currArray from SsdsJsonCreate structure
- * Array that is created last is set to be currArray. For inserting elements to defferent array use ssds_js_cr_switch_array
- * @param json      SsdsJsonCreate structure holding the json structure in memory
- * @param type      SsdsJsInsType - integer identifying type of data inserted as a new element
+ * Adds a new element into currArray from RdsJsonCreate structure
+ * Array that is created last is set to be currArray. For inserting elements to defferent array use rds_js_cr_switch_array
+ * @param json      RdsJsonCreate structure holding the json structure in memory
+ * @param type      RdsJsInsType - integer identifying type of data inserted as a new element
  * @param data      data to be inserted - string, int, or bool - for object and array use NULL
  */
-void ssds_js_cr_add_array_member(SsdsJsonCreate* json, int type, void* data);
+void rds_js_cr_add_array_member(RdsJsonCreate* json, int type, void* data);
 
 /**
- * Adds a new element into currObj from SsdsJsonCreate structure. 
- * Works the same way as ssds_js_cr_add_array_member.
- * @param json      SsdsJsonCreate structure holding the json structure in memory
- * @param type      SsdsJsInsType - integer identifying type of data inserted as a new element
+ * Adds a new element into currObj from RdsJsonCreate structure. 
+ * Works the same way as rds_js_cr_add_array_member.
+ * @param json      RdsJsonCreate structure holding the json structure in memory
+ * @param type      RdsJsInsType - integer identifying type of data inserted as a new element
  * @param data      data to be inserted - string, int, or bool - for object and array use NULL
  * @param name      string to be used as a name for new element
  */
-void ssds_js_cr_add_obj_member(SsdsJsonCreate* json, int type, void* data, const char* name);
+void rds_js_cr_add_obj_member(RdsJsonCreate* json, int type, void* data, const char* name);
 
 /**
  * Adds new element into top level data object. It can be array, object, string, bool or int.
- * @param json      SsdsJsonCreate structure holding the json structure in memory
- * @param type      SsdsJsInsType - integer identifying type of data inserted as a new element
+ * @param json      RdsJsonCreate structure holding the json structure in memory
+ * @param type      RdsJsInsType - integer identifying type of data inserted as a new element
  * @param data      data to be inserted - string, int, or bool - for object and array use NULL
  * @param name      string to be used as a name for new element
  */
-void ssds_js_cr_new_data(SsdsJsonCreate* json, int type, const char* name, void* data);
+void rds_js_cr_new_data(RdsJsonCreate* json, int type, const char* name, void* data);
 
 /**
  * Finds an array anywhere in the json structure and sets json->currArray as the currently active array.
- * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param json      RdsJsonCreate structure holding the json structure in memory
  * @param name      String used as the array identifier
  * @return          TRUE if array with given name is found and set, otherwise FALSE
  */
-gboolean ssds_js_cr_switch_array(SsdsJsonCreate* json, const char* name);
+gboolean rds_js_cr_switch_array(RdsJsonCreate* json, const char* name);
 
 /**
  * Sets array one level above the current array as the current array.
- * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param json      RdsJsonCreate structure holding the json structure in memory
  */
-void ssds_js_cr_upper_array(SsdsJsonCreate* json);
+void rds_js_cr_upper_array(RdsJsonCreate* json);
 
 /**
  * Sets object one level above current object as current object
- * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param json      RdsJsonCreate structure holding the json structure in memory
  */
-void ssds_js_cr_upper_obj(SsdsJsonCreate* json);
+void rds_js_cr_upper_obj(RdsJsonCreate* json);
 
 /**
- * Converts data in memory represented by SsdsJsonCreate to string.
- * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * Converts data in memory represented by RdsJsonCreate to string.
+ * @param json      RdsJsonCreate structure holding the json structure in memory
  */
-char* ssds_js_cr_to_string(SsdsJsonCreate* json);
+char* rds_js_cr_to_string(RdsJsonCreate* json);
 
 /**
  * Function used for debugging - use it to dump the created json to stdout.
- * @param json      SsdsJsonCreate structure holding the json structure in memory
+ * @param json      RdsJsonCreate structure holding the json structure in memory
  */
-void ssds_js_cr_dump(SsdsJsonCreate* json);
+void rds_js_cr_dump(RdsJsonCreate* json);
 
 /**********************************************************************************************
  * Json read - this part describes functions used when parsing recieved json structure        *
@@ -143,10 +143,10 @@ void ssds_js_cr_dump(SsdsJsonCreate* json);
 /** 
  * Structure used for parsing message recieved through socket and converting it to json structure 
  */
-typedef struct SsdsJsonRead SsdsJsonRead;
+typedef struct RdsJsonRead RdsJsonRead;
 
-struct SsdsJsonRead{
-  JsonParser* parser;         /** < parser holds SsdsJsonRead structure */
+struct RdsJsonRead{
+  JsonParser* parser;         /** < parser holds RdsJsonRead structure */
   JsonNode* rootNode;         /** < root of json - used to find objects */
   JsonNode* currNode;         /** < currently used node */
   JsonNode* dataNode;         /** < data node - often used */
@@ -155,31 +155,31 @@ struct SsdsJsonRead{
 };
 
 /**
- * Returns new SsdsJsonRead structure - this structure is needed during the whole process of json parsing
- * @return          newly allocated SsdsJsonCreate structure
+ * Returns new RdsJsonRead structure - this structure is needed during the whole process of json parsing
+ * @return          newly allocated RdsJsonCreate structure
  */
-SsdsJsonRead* ssds_json_rd_init();
+RdsJsonRead* rds_json_rd_init();
 
 /**
- * Parses string representing json structure into SsdsJsonRead structure.
+ * Parses string representing json structure into RdsJsonRead structure.
  * @param buffer    Json structure in a string
- * @param json      SsdsJsonRead structure holding parsed json in memory
+ * @param json      RdsJsonRead structure holding parsed json in memory
  * @return          Returns TRUE if the recieved json is valid, FALSE otherwise - TODO
  */
-gboolean ssds_rd_parse(char* buffer, SsdsJsonRead* json);
+gboolean rds_rd_parse(char* buffer, RdsJsonRead* json);
 
 /**
  * Extracts status code from json.
- * @param json      SsdsJsonRead structure holding parsed json in memory
+ * @param json      RdsJsonRead structure holding parsed json in memory
  * @return          status code from recieved json
  */
-int ssds_rd_get_code(SsdsJsonRead* json);
+int rds_rd_get_code(RdsJsonRead* json);
 
 /**
  * Finds all elements from recieved json. x_path is a string describing path to the elements. 
  * All elements found are placed in a GList.
- * @param json      SsdsJsonRead structure holding parsed json in memory
+ * @param json      RdsJsonRead structure holding parsed json in memory
  * @param x_path    JsonPath format as a string - TODO
  * @return          GList of all elements found - this needs to be freed afterwards
  */
-GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path);
+GList* rds_js_rd_find(RdsJsonRead* json, char* x_path);

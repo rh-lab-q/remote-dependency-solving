@@ -22,20 +22,20 @@
 
 char* sock_recv(int sock_fd)
 {
-  char* reply = (char*)ssds_malloc(MAX_INPUT_LEN*sizeof(char));
+  char* reply = (char*)rds_malloc(MAX_INPUT_LEN*sizeof(char));
   memset(reply, 0, MAX_INPUT_LEN);
-  ssize_t ret = ssds_read(sock_fd, reply , MAX_INPUT_LEN);
+  ssize_t ret = rds_read(sock_fd, reply , MAX_INPUT_LEN);
   
   if(ret == -1)
   {
-    ssds_log(logERROR, "Unable to read data from socket\n");
-    ssds_free(reply);
+    rds_log(logERROR, "Unable to read data from socket\n");
+    rds_free(reply);
     return NULL;
   }
   
   if(ret == MAX_INPUT_LEN)
   {
-    char* buffer = (char*)ssds_malloc(BUFF_SIZE*sizeof(char));
+    char* buffer = (char*)rds_malloc(BUFF_SIZE*sizeof(char));
     memset(buffer, 0, BUFF_SIZE);
     
     int read_count = 0;
@@ -48,15 +48,15 @@ char* sock_recv(int sock_fd)
       memset(reply, 0, MAX_INPUT_LEN);      
       
       if(read_count*MAX_INPUT_LEN >= buff_size*BUFF_SIZE)
-        buffer = ssds_realloc(buffer, ++buff_size*BUFF_SIZE);
+        buffer = rds_realloc(buffer, ++buff_size*BUFF_SIZE);
       
-      ret = ssds_read(sock_fd, reply , MAX_INPUT_LEN);
+      ret = rds_read(sock_fd, reply , MAX_INPUT_LEN);
       memcpy(buffer+read_count*MAX_INPUT_LEN, reply, MAX_INPUT_LEN);
       
       
     }while(!(ret < MAX_INPUT_LEN));
     
-    ssds_free(reply);
+    rds_free(reply);
     return buffer;
   }
   //no buffer is needed for very short messages
@@ -65,20 +65,20 @@ char* sock_recv(int sock_fd)
 
 ssize_t sock_solv_recv(int sock_fd, char **buffer)
 {
-  *buffer = (char*)ssds_malloc(MAX_INPUT_LEN*sizeof(char));
+  *buffer = (char*)rds_malloc(MAX_INPUT_LEN*sizeof(char));
   memset(*buffer, 0, MAX_INPUT_LEN);
-  ssize_t retVal = ssds_read(sock_fd, *buffer , MAX_INPUT_LEN);
+  ssize_t retVal = rds_read(sock_fd, *buffer , MAX_INPUT_LEN);
 
   if(retVal == -1)
   {
-    ssds_log(logERROR, "Unable to read data from socket\n");
-    ssds_free(*buffer);
+    rds_log(logERROR, "Unable to read data from socket\n");
+    rds_free(*buffer);
     return retVal;
   }
 
   if(retVal == MAX_INPUT_LEN)
   {
-    char* buff = (char*)ssds_malloc(BUFF_SIZE*sizeof(char));
+    char* buff = (char*)rds_malloc(BUFF_SIZE*sizeof(char));
     memset(buff, 0, BUFF_SIZE);
 
     int read_count = 0;
@@ -92,15 +92,15 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer)
       memset(*buffer, 0, MAX_INPUT_LEN);
 
       if(read_count*MAX_INPUT_LEN >= buff_size*BUFF_SIZE)
-        buff = ssds_realloc(buff, ++buff_size*BUFF_SIZE);
+        buff = rds_realloc(buff, ++buff_size*BUFF_SIZE);
 
-      ret = ssds_read(sock_fd, *buffer , MAX_INPUT_LEN);
+      ret = rds_read(sock_fd, *buffer , MAX_INPUT_LEN);
       retVal += ret;
       memcpy(buff+read_count*MAX_INPUT_LEN, *buffer, MAX_INPUT_LEN);
 
     }while(!(ret < MAX_INPUT_LEN));
 
-    ssds_free(*buffer);
+    rds_free(*buffer);
     *buffer = buff;
   }
   //no buffer is needed for very short messages
@@ -111,7 +111,7 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer)
 void secure_write(int socket, char* message, ssize_t length)
 {
 
-	ssds_write(socket, message, length);
+	rds_write(socket, message, length);
 }
 
 int client_connect(int *socket, char *server_address, long int port)
@@ -119,44 +119,44 @@ int client_connect(int *socket, char *server_address, long int port)
 
   int connection_try = 1;
 
-  *socket = ssds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
-  ssds_log(logDEBUG, "Set up socket descriptor.\n");
+  *socket = rds_socket(AF_INET, SOCK_STREAM, 0);//AF_INET = IPv4, SOCK_STREAM = TCP, 0 = IP
+  rds_log(logDEBUG, "Set up socket descriptor.\n");
 
-  ssds_log(logDEBUG, "Setting up connection to server.\n");
+  rds_log(logDEBUG, "Setting up connection to server.\n");
   struct sockaddr_in server_comm;
 
   server_comm.sin_addr.s_addr = inet_addr(server_address);
-  ssds_log(logDEBUG, "Set server address.\n");
+  rds_log(logDEBUG, "Set server address.\n");
 
   server_comm.sin_family = AF_INET;
-  ssds_log(logDEBUG, "Set comunication protocol.\n");
+  rds_log(logDEBUG, "Set comunication protocol.\n");
 
   server_comm.sin_port = htons(port);
-  ssds_log(logDEBUG, "Set server port.\n");
+  rds_log(logDEBUG, "Set server port.\n");
 
-  ssds_log(logDEBUG, "Socket control.\n");
+  rds_log(logDEBUG, "Socket control.\n");
   if(*socket == -1)
   {
-    ssds_log(logERROR, "Client encountered an error when creating socket for communication.\n");
+    rds_log(logERROR, "Client encountered an error when creating socket for communication.\n");
     return SOCKET_ERROR;
   }
 
-  ssds_log(logDEBUG, "Socket control - OK.\n");
+  rds_log(logDEBUG, "Socket control - OK.\n");
 
-  ssds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
+  rds_log(logMESSAGE, "Trying to connect to server...(1 of 3)\n");
   while((connect(*socket, (struct sockaddr *)&server_comm, sizeof(server_comm)) < 0) && (connection_try < 3))
   {
-     ssds_log(logMESSAGE, "Unable to connect to comm. socket on server. Another attempt will be executed in 5 seconds.\n");
+     rds_log(logMESSAGE, "Unable to connect to comm. socket on server. Another attempt will be executed in 5 seconds.\n");
      sleep(5);
-     ssds_log(logMESSAGE, "Trying to connect to server...(%d of 3)\n", ++connection_try);
+     rds_log(logMESSAGE, "Trying to connect to server...(%d of 3)\n", ++connection_try);
   }
 
   if(connection_try == 3){
-    ssds_log(logERROR, "Unable to connect comm. socket on server. Please, check out your network connection and try it again later.\n");
+    rds_log(logERROR, "Unable to connect comm. socket on server. Please, check out your network connection and try it again later.\n");
     return NETWORKING_ERROR;
   }
 
-  ssds_log(logMESSAGE, "Connection to server is established.\n");
+  rds_log(logMESSAGE, "Connection to server is established.\n");
 
   return OK;
 }

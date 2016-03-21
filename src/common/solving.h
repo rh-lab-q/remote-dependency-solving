@@ -48,33 +48,33 @@ extern "C"{
 #include <librepo/handle.h>
 
 
-// HySack* ssds_solve_init();
+// HySack* solve_init();
   
 /**
  * Fills sack object with information from all repositories provided by client
  * @param sack      HySack*
- * @param list      SsdsRepoMetadataList*
+ * @param list      RepoMetadataList*
  */
-void ssds_fill_sack(HySack* sack, SsdsRepoMetadataList* list);
+void fill_sack(HySack* sack, RepoMetadataList* list);
 
 /**
  * Function connects input with output and dependency solving. 
  * Takes information from client and passes them for dependency solving to
- * ssds_dep_query. Ssds_dep_query adds each result to SsdsJsonCreate.
- * @param client_data         SsdsJsonRead*
- * @param answer              SsdsJsonCreate*
+ * dep_query. _dep_query adds each result to JsonCreate.
+ * @param client_data         JsonRead*
+ * @param answer              JsonCreate*
  * @param sack                HySack*
  */
-//void ssds_dep_answer(SsdsJsonRead *client_data, SsdsJsonCreate* answer, HySack* sack);
+//void dep_answer(JsonRead *client_data, JsonCreate* answer, HySack* sack);
 
 /**
  * Solves dependency for one package. Needs to be called in loop for all packages.
- * Used by ssds_dep_answer.
+ * Used by dep_answer.
  * @param request   const char*
- * @param answer    SsdsJsonCreate*
+ * @param answer    JsonCreate*
  * @param sack      HySack*
  */
-int ssds_dep_query(const char** request, SsdsJsonCreate* answer, HySack* sack, int operation, int pkg_count);
+int dep_query(const char** request, JsonCreate* answer, HySack* sack, int operation, int pkg_count);
 
 
 /**

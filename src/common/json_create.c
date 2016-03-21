@@ -21,9 +21,9 @@
 #include "json_handler.h"
 
 
-SsdsJsonCreate* ssds_js_cr_init(int code)
+JsonCreate* js_cr_init(int code)
 {
-  SsdsJsonCreate* new = (SsdsJsonCreate*)malloc(sizeof(SsdsJsonCreate));
+  JsonCreate* new = (JsonCreate*)malloc(sizeof(JsonCreate));
   
   new->generator = json_generator_new();
   new->rootNode = json_node_new(JSON_NODE_OBJECT);
@@ -49,7 +49,7 @@ SsdsJsonCreate* ssds_js_cr_init(int code)
   return new;
 }
 
-void ssds_js_cr_add_array_member(SsdsJsonCreate* json, int type, void* data)
+void js_cr_add_array_member(JsonCreate* json, int type, void* data)
 {
   switch(type)
   {
@@ -96,7 +96,7 @@ void ssds_js_cr_add_array_member(SsdsJsonCreate* json, int type, void* data)
 }
 
 
-void ssds_js_cr_add_obj_member(SsdsJsonCreate* json, int type, void* data, const char* name)
+void js_cr_add_obj_member(JsonCreate* json, int type, void* data, const char* name)
 {
   switch(type)
   {
@@ -150,7 +150,7 @@ void ssds_js_cr_add_obj_member(SsdsJsonCreate* json, int type, void* data, const
   }
 }
 
-void ssds_js_cr_new_data(SsdsJsonCreate* json, int type, const char* name, void* data)
+void js_cr_new_data(JsonCreate* json, int type, const char* name, void* data)
 {
   switch(type)
   {
@@ -199,7 +199,7 @@ void ssds_js_cr_new_data(SsdsJsonCreate* json, int type, const char* name, void*
   }
 }
 
-gboolean ssds_js_cr_switch_array(SsdsJsonCreate* json, const char* name)
+gboolean js_cr_switch_array(JsonCreate* json, const char* name)
 {
   //create full path in jsonpath format from name of array provided
   const char* default_path="$.data..";
@@ -228,7 +228,7 @@ gboolean ssds_js_cr_switch_array(SsdsJsonCreate* json, const char* name)
   return TRUE;
 }
 
-void ssds_js_cr_upper_array(SsdsJsonCreate* json)
+void js_cr_upper_array(JsonCreate* json)
 {
   do
   {
@@ -238,7 +238,7 @@ void ssds_js_cr_upper_array(SsdsJsonCreate* json)
   json->currArray = json_node_get_array(json->currNode);
 }
 
-void ssds_js_cr_upper_obj(SsdsJsonCreate* json)
+void js_cr_upper_obj(JsonCreate* json)
 {
   do
   {
@@ -248,7 +248,7 @@ void ssds_js_cr_upper_obj(SsdsJsonCreate* json)
   json->currObj = json_node_get_object(json->currNode);
 }
 
-char* ssds_js_cr_to_string(SsdsJsonCreate* json)
+char* js_cr_to_string(JsonCreate* json)
 {
   gsize len;
   char* data;
@@ -256,7 +256,7 @@ char* ssds_js_cr_to_string(SsdsJsonCreate* json)
   return data;
 }
 
-void ssds_js_cr_dump(SsdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
+void js_cr_dump(JsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
 {
   gchar *data;
   json_generator_set_pretty(json->generator, 1);
@@ -268,12 +268,12 @@ void ssds_js_cr_dump(SsdsJsonCreate* json)//this will always dump error when som
 // original json ˇˇˇ
 
 
-void ssds_js_cr_insert_code(SsdsJsonCreate* json, int code)
+void js_cr_insert_code(JsonCreate* json, int code)
 {
   json_node_set_int(json->codeNode, (gint64)code);
 }
 
-void ssds_js_cr_gen_id(SsdsJsonCreate* json, char* arch, char* release)
+void js_cr_gen_id(JsonCreate* json, char* arch, char* release)
 {
   JsonNode* json_arch = json_node_new(JSON_NODE_VALUE);
   json_node_set_string(json_arch, (gchar*)arch);
@@ -284,21 +284,21 @@ void ssds_js_cr_gen_id(SsdsJsonCreate* json, char* arch, char* release)
   json_object_set_member(json->dataObj, (gchar*)"release", json_rel);
 }
 
-void ssds_js_cr_set_read_bytes(SsdsJsonCreate* json, int bytes_read)
+void js_cr_set_read_bytes(JsonCreate* json, int bytes_read)
 {
   JsonNode* json_bytes = json_node_new(JSON_NODE_VALUE);
   json_node_set_int(json_bytes, (gint64)bytes_read);
   json_object_set_member(json->dataObj, (gchar*)"read", json_bytes);
 }
  
-void ssds_js_cr_set_message(SsdsJsonCreate* json, char *msg)
+void js_cr_set_message(JsonCreate* json, char *msg)
 {
   JsonNode* json_msg = json_node_new(JSON_NODE_VALUE);
   json_node_set_string(json_msg, (gchar*)msg);
   json_object_set_member(json->dataObj, (gchar*)"message", json_msg);
 }
                                                  
-void ssds_js_cr_add_package(SsdsJsonCreate* json,char* package)
+void js_cr_add_package(JsonCreate* json,char* package)
 {
   //adding package for the first time
   if(!json_object_has_member(json->dataObj,(const gchar*)"req_pkgs"))
@@ -323,7 +323,7 @@ void ssds_js_cr_add_package(SsdsJsonCreate* json,char* package)
 }
 
 
-void ssds_js_cr_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, int url_count)
+void js_cr_add_repo(JsonCreate* json,char** url, char* name, int type, int url_count)
 {
   if(!json_object_has_member(json->dataObj,(const gchar*)"repolist"))
   {
@@ -375,7 +375,7 @@ void ssds_js_cr_add_repo(SsdsJsonCreate* json,char** url, char* name, int type, 
 }
 
 
-void ssds_js_cr_pkgs_init(SsdsJsonCreate* json)
+void js_cr_pkgs_init(JsonCreate* json)
 {
   if(!json_object_has_member(json->dataObj,(const gchar*)"install_pkgs"))
   {
@@ -390,15 +390,15 @@ void ssds_js_cr_pkgs_init(SsdsJsonCreate* json)
 }
 
 
-void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
+void js_cr_pkgs_insert(JsonCreate* json,HyGoal* goal)
 {
 	int count;
 	for(int i=0; i<=JS_ARR_OBSOLETE; i++)
 	{
-		if(!json_object_has_member(json->dataObj,(const gchar*)SsdsJsArrayStr[i]))
-			ssds_js_cr_new_data(json, JS_ARRAY, SsdsJsArrayStr[i], NULL);
+		if(!json_object_has_member(json->dataObj,(const gchar*)JsArrayStr[i]))
+			js_cr_new_data(json, JS_ARRAY, JsArrayStr[i], NULL);
 		else
-			json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)SsdsJsArrayStr[i]);
+			json->currArray = json_object_get_array_member(json->dataObj, (const gchar*)JsArrayStr[i]);
 		
 		HyPackageList goal_pkgs = hy_packagelist_create();
 		HyPackage pkg;
@@ -439,27 +439,27 @@ void ssds_js_cr_pkgs_insert(SsdsJsonCreate* json,HyGoal* goal)
 			{
 				pkg = hy_packagelist_get(goal_pkgs, i);
 				
-				ssds_js_cr_add_array_member(json, JS_OBJ, NULL);
-				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
-				ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
+				js_cr_add_array_member(json, JS_OBJ, NULL);
+				js_cr_add_obj_member(json, JS_STRING, hy_package_get_name(pkg), (gchar*)"pkg_name");
+				js_cr_add_obj_member(json, JS_STRING, hy_package_get_location(pkg), (gchar*)"pkg_loc");
 				
 				if(hy_package_get_baseurl(pkg) == NULL)
 				{
-					ssds_js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
-					ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+					js_cr_add_obj_member(json, JS_STRING, NULL, (gchar*)"base_url");
+					js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
 				}
 				else
 				{
-					ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
-					ssds_js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
+					js_cr_add_obj_member(json, JS_STRING, hy_package_get_baseurl(pkg), (gchar*)"base_url");
+					js_cr_add_obj_member(json, JS_STRING, hy_package_get_reponame(pkg), (gchar*)"metalink");
 				}
 			}
 		}
 	}
-	ssds_log(logINFO, "Total packages to install: %d\n", count);
+	rds_log(logINFO, "Total packages to install: %d\n", count);
 }
 
-int ssds_strcmp(gconstpointer a, gconstpointer b){
+int rds_strcmp(gconstpointer a, gconstpointer b){
 
    char *s_a = (char *)a;
    char *s_b = (char *)b;

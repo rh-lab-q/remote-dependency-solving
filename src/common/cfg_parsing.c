@@ -14,16 +14,16 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
   cfg_file = fopen(CFG_FILE, "r");
   if (cfg_file == NULL)
   {
-    ssds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
+    rds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
 
-    *ret_address = (char*)ssds_malloc(10*sizeof(char));
+    *ret_address = (char*)rds_malloc(10*sizeof(char));
     strncpy(*ret_address, "127.0.0.1\0", 10);
 
     *ret_comm_port = 2345;
     return 1;
   }
  
-  ssds_log(logDEBUG, "CFG file opened.\n");
+  rds_log(logDEBUG, "CFG file opened.\n");
 
   char fmstate = 'e';
   char act_c;
@@ -84,7 +84,7 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
         {
           comm_port = file_read_value(cfg_file, 5);
           *ret_comm_port = strtol(comm_port, NULL, 10);
-          ssds_free(comm_port);
+          rds_free(comm_port);
           comm_port_parsed = 1;
           fmstate = 'e';
         }
@@ -111,7 +111,7 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
 
   if (address_parsed == 0)
   {
-    *ret_address = (char*)ssds_malloc(10*sizeof(char));
+    *ret_address = (char*)rds_malloc(10*sizeof(char));
     strncpy(*ret_address, "127.0.0.1\0", 10);
   }
   if (client_id_parsed == 0)
@@ -123,7 +123,7 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
     *ret_comm_port = 2345;
   }
 
-  ssds_log(logDEBUG, "server: %s, comm port: %ld\n", *ret_address, *ret_comm_port);
+  rds_log(logDEBUG, "server: %s, comm port: %ld\n", *ret_address, *ret_comm_port);
 
   return 0;
 }
@@ -139,13 +139,13 @@ int read_srv_cfg(long int* ret_comm_port)
   cfg_file = fopen(CFG_FILE, "r");
   if (cfg_file == NULL)
   {
-    ssds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
+    rds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
 
     *ret_comm_port = 2345;
     return 1;
   }
 
-  ssds_log(logDEBUG, "CFG file opened.\n");
+  rds_log(logDEBUG, "CFG file opened.\n");
 
   char fmstate = 'e';
   char act_c;
@@ -176,7 +176,7 @@ int read_srv_cfg(long int* ret_comm_port)
         {
           comm_port = file_read_value(cfg_file, 5);
           *ret_comm_port = strtol(comm_port, NULL, 10);
-          ssds_free(comm_port);
+          rds_free(comm_port);
           comm_port_parsed = 1;
           fmstate = 'e';
         }
@@ -195,7 +195,7 @@ int read_srv_cfg(long int* ret_comm_port)
     *ret_comm_port = 2345;
   }
 
-  ssds_log(logDEBUG, "comm port: %ld\n", *ret_comm_port);
+  rds_log(logDEBUG, "comm port: %ld\n", *ret_comm_port);
 
   return 0;
 }
@@ -206,11 +206,11 @@ int write_to_cfg(char *name, char *value)
   cfg_file = fopen(CFG_FILE, "r+");
   if (cfg_file == NULL)
   {
-    ssds_log(logDEBUG, "Conf file not found.\n");
+    rds_log(logDEBUG, "Conf file not found.\n");
     return 1;
   }
 
-  ssds_log(logDEBUG, "CFG file opened for write.\n");
+  rds_log(logDEBUG, "CFG file opened for write.\n");
 
   char fmstate = 'e';
   char *act_val;
@@ -273,7 +273,7 @@ int write_to_cfg(char *name, char *value)
   {
     //clone file with changed value
     fseek(cfg_file, 0, SEEK_SET);
-    char *tempcfg = (void*)ssds_malloc((position + 1) * sizeof(char));
+    char *tempcfg = (void*)rds_malloc((position + 1) * sizeof(char));
     fread(tempcfg, sizeof(char), position, cfg_file);
     tempcfg[position] = '\0';
     FILE *new_file = fopen("../etc/rds-client.conf.tmp", "w");
@@ -297,17 +297,17 @@ int write_to_cfg(char *name, char *value)
     
     if (remove(CFG_FILE) != 0)
     {
-      ssds_log(logERROR, "cannot delete old conf. file\n");
+      rds_log(logERROR, "cannot delete old conf. file\n");
       return 1;
     }
 
     if (rename("../etc/ssds-client.conf.tmp", CFG_FILE) != 0)
     {
-      ssds_log(logERROR, "cannot rename new conf. file\n");
+      rds_log(logERROR, "cannot rename new conf. file\n");
       return 1;
     }
 
-    ssds_log(logDEBUG, "there is already [%s] in config file, updating its value\n", name);
+    rds_log(logDEBUG, "there is already [%s] in config file, updating its value\n", name);
     return 0;
   }
   else
@@ -318,7 +318,7 @@ int write_to_cfg(char *name, char *value)
     fwrite(value, sizeof(char), val_len, cfg_file);
     fwrite("\n", sizeof(char), 1, cfg_file);
   
-    ssds_log(logDEBUG, "[%s = %s] written to configuration file\n", name, value);
+    rds_log(logDEBUG, "[%s = %s] written to configuration file\n", name, value);
   
     fclose(cfg_file);
   }
@@ -334,7 +334,7 @@ char* file_read_value(FILE* file, int max_length)
   char act_char;
   int value_lenght = 0;
   int allocated_lenght = 5;
-  value = (char*)ssds_malloc(6*sizeof(char)); //5 + 1
+  value = (char*)rds_malloc(6*sizeof(char)); //5 + 1
 
   act_char = fgetc(file);
   while ((act_char != '\n') && (act_char != EOF))
@@ -342,7 +342,7 @@ char* file_read_value(FILE* file, int max_length)
     if (value_lenght == allocated_lenght)
     {
       allocated_lenght += 5;
-      value = (char*)ssds_realloc(value, (allocated_lenght + 1)*sizeof(char));
+      value = (char*)rds_realloc(value, (allocated_lenght + 1)*sizeof(char));
     }
     value[value_lenght++] = act_char;
     act_char = fgetc(file);
@@ -350,12 +350,12 @@ char* file_read_value(FILE* file, int max_length)
   value[value_lenght] = '\0';
   if ((value_lenght >= max_length) & (max_length != 0))
   {
-    ssds_log(logDEBUG, "[%s] shortened to:\n", value);
+    rds_log(logDEBUG, "[%s] shortened to:\n", value);
     value[max_length - 1] = '\0';
-    value = (char*)ssds_realloc(value, (max_length)*sizeof(char));
-    ssds_log(logDEBUG, "\t[%s] (max-length = %d)\n", value, max_length);
+    value = (char*)rds_realloc(value, (max_length)*sizeof(char));
+    rds_log(logDEBUG, "\t[%s] (max-length = %d)\n", value, max_length);
   }
-  //ssds_log(logDEBUG, "***read \"%s\" of lenght %d\n", value, value_lenght);
+  //rds_log(logDEBUG, "***read \"%s\" of lenght %d\n", value, value_lenght);
   return value;
 }
 

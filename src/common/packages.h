@@ -42,8 +42,8 @@ static const char *DOWNLOAD_TARGET = "/var/cache/ssds/packages/";
  
 // Types of supported operation
 enum{
-        SSDS_INSTALL = 0,
-        SSDS_UPDATE
+        RDS_INSTALL = 0,
+        RDS_UPDATE
 };
 
 /**
@@ -53,7 +53,7 @@ enum{
  * @param action    int type of operation
  * @return          RPM transaction set return value
  */
-int ssds_add_to_transaction (rpmts ts, char *pkg, int action);
+int add_to_transaction (rpmts ts, char *pkg, int action);
 
 /**
  * Add package to RPM transaction for erase. 
@@ -61,7 +61,7 @@ int ssds_add_to_transaction (rpmts ts, char *pkg, int action);
  * @param pkg       char* name of package to erase
  * @return          RPM transaction set return value
  */
-int ssds_add_to_erase (rpmts ts, char *pkg);
+int add_to_erase (rpmts ts, char *pkg);
 
 #ifdef __cplusplus
 }

@@ -21,38 +21,38 @@ Suite* gc_suite(void)
 
 void mem_test()
 {
-  Ssds_gc * gc = ssds_gc_get_header();
+  Rds_gc * gc = rds_gc_get_header();
   fail_if(gc != NULL);
 
-  ssds_gc_init();
+  rds_gc_init();
 
-  gc = ssds_gc_get_header();
+  gc = rds_gc_get_header();
   fail_if(gc == NULL);
 
-  void * a = ssds_malloc(500);
-  void * b = ssds_realloc(a,800);
+  void * a = rds_malloc(500);
+  void * b = rds_realloc(a,800);
 
-  ssds_gc_cleanup();
-  gc = ssds_gc_get_header();
+  rds_gc_cleanup();
+  gc = rds_gc_get_header();
   fail_if(gc != NULL);
 }
 
 void socket_test()
 {
-  Ssds_gc * gc = ssds_gc_get_header();
+  Rds_gc * gc = rds_gc_get_header();
   fail_if(gc != NULL);
 
-  ssds_gc_init();
+  rds_gc_init();
   int socket;
 
-  socket = ssds_socket(AF_INET, SOCK_STREAM, 0);
+  socket = rds_socket(AF_INET, SOCK_STREAM, 0);
   fail_if(socket < 0);
 
-  gc = ssds_gc_get_header();
+  gc = rds_gc_get_header();
   fail_if(gc == NULL);
 
-  ssds_gc_cleanup();
+  rds_gc_cleanup();
 
-  gc = ssds_gc_get_header();
+  gc = rds_gc_get_header();
   fail_if(gc != NULL);
 }

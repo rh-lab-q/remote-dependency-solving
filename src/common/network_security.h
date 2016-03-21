@@ -72,7 +72,7 @@ extern "C"{
  * @param  count  	maximum number of bytes to read
  * @return ssize_t	bytes read
  */
-ssize_t ssds_read(int fd, void *buf, size_t count);
+ssize_t rds_read(int fd, void *buf, size_t count);
 
 /**
  * Function which uses either standard write(), or crypted write
@@ -81,7 +81,7 @@ ssize_t ssds_read(int fd, void *buf, size_t count);
  * @param  count  	maximum number of bytes to send
  * @return ssize_t	bytes sent
  */
-ssize_t ssds_write(int fd, const void *buf, size_t count);
+ssize_t rds_write(int fd, const void *buf, size_t count);
 
 /**
  * Shutdowns current ssl connection

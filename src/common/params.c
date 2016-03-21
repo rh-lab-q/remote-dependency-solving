@@ -24,7 +24,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 {
   if(argc==1)
   {
-    ssds_log(logERROR, "No command provided. The program will terminate now.\n");
+    rds_log(logERROR, "No command provided. The program will terminate now.\n");
     return 2;
   }
   
@@ -79,14 +79,14 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 
   if(seen > 1)
   {
-    ssds_log(logMESSAGE, "Choose either install, update, erase or chkdep. The program will terminate now.\n");
-    ssds_log(logERROR, "Wrong parameter combination. Terminating.\n");
+    rds_log(logMESSAGE, "Choose either install, update, erase or chkdep. The program will terminate now.\n");
+    rds_log(logERROR, "Wrong parameter combination. Terminating.\n");
     return -1;
   }
   
   if(seen == 0)
   {
-    ssds_log(logERROR, "No command provided. The program will terminate now.\n");
+    rds_log(logERROR, "No command provided. The program will terminate now.\n");
     return 3;
   }
 
@@ -103,7 +103,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params)
 
 ParamOptsCl* init_params_cl()
 {
-  ParamOptsCl* new = (ParamOptsCl*)ssds_malloc(sizeof(ParamOptsCl));
+  ParamOptsCl* new = (ParamOptsCl*)rds_malloc(sizeof(ParamOptsCl));
   new->pkg_count = 0;
   new->command = -1;
   new->pkgs = NULL;
@@ -114,7 +114,7 @@ ParamOptsCl* init_params_cl()
 void free_params_cl(ParamOptsCl* params)
 {
   g_slist_free_full(params->pkgs, (GDestroyNotify) free); //only *char in the list so free will suffice
-  ssds_free(params);
+  rds_free(params);
 }
 
 

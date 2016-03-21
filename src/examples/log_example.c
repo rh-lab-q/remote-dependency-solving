@@ -15,9 +15,9 @@
 void main()
 {
   printf("%s\n", log_lvl_msg[0]);
-  ssds_log("Pokusna zprava", logINFO);
-  ssds_log("Pokusny error", logERROR);
+  rds_log("Pokusna zprava", logINFO);
+  rds_log("Pokusny error", logERROR);
   
   set_verbose();
-  ssds_log("Pokusna zprava", logINFO);
+  rds_log("Pokusna zprava", logINFO);
 }

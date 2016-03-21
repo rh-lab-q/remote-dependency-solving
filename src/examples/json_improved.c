@@ -20,9 +20,9 @@
 
 #include "json_improved.h"
 
-SsdsJsonCreate* ssds_js_cr_init(int code)
+RdsJsonCreate* rds_js_cr_init(int code)
 {
-  SsdsJsonCreate* new = (SsdsJsonCreate*)malloc(sizeof(SsdsJsonCreate));
+  RdsJsonCreate* new = (RdsJsonCreate*)malloc(sizeof(RdsJsonCreate));
   
   new->generator = json_generator_new();
   new->rootNode = json_node_new(JSON_NODE_OBJECT);
@@ -48,7 +48,7 @@ SsdsJsonCreate* ssds_js_cr_init(int code)
   return new;
 }
 
-void ssds_js_cr_add_array_member(SsdsJsonCreate* json, int type, void* data)
+void rds_js_cr_add_array_member(RdsJsonCreate* json, int type, void* data)
 {
   switch(type)
   {
@@ -95,7 +95,7 @@ void ssds_js_cr_add_array_member(SsdsJsonCreate* json, int type, void* data)
 }
 
 
-void ssds_js_cr_add_obj_member(SsdsJsonCreate* json, int type, void* data, const char* name)
+void rds_js_cr_add_obj_member(RdsJsonCreate* json, int type, void* data, const char* name)
 {
   switch(type)
   {
@@ -149,7 +149,7 @@ void ssds_js_cr_add_obj_member(SsdsJsonCreate* json, int type, void* data, const
   }
 }
 
-void ssds_js_cr_new_data(SsdsJsonCreate* json, int type, const char* name, void* data)
+void rds_js_cr_new_data(RdsJsonCreate* json, int type, const char* name, void* data)
 {
   switch(type)
   {
@@ -198,7 +198,7 @@ void ssds_js_cr_new_data(SsdsJsonCreate* json, int type, const char* name, void*
   }
 }
 
-gboolean ssds_js_cr_switch_array(SsdsJsonCreate* json, const char* name)
+gboolean rds_js_cr_switch_array(RdsJsonCreate* json, const char* name)
 {
   //create full path in jsonpath format from name of array provided
   const char* default_path="$.data..";
@@ -227,7 +227,7 @@ gboolean ssds_js_cr_switch_array(SsdsJsonCreate* json, const char* name)
   return TRUE;
 }
 
-void ssds_js_cr_upper_array(SsdsJsonCreate* json)
+void rds_js_cr_upper_array(RdsJsonCreate* json)
 {
   do
   {
@@ -237,7 +237,7 @@ void ssds_js_cr_upper_array(SsdsJsonCreate* json)
   json->currArray = json_node_get_array(json->currNode);
 }
 
-void ssds_js_cr_upper_obj(SsdsJsonCreate* json)
+void rds_js_cr_upper_obj(RdsJsonCreate* json)
 {
   do
   {
@@ -247,7 +247,7 @@ void ssds_js_cr_upper_obj(SsdsJsonCreate* json)
   json->currObj = json_node_get_object(json->currNode);
 }
 
-char* ssds_js_cr_to_string(SsdsJsonCreate* json)
+char* rds_js_cr_to_string(RdsJsonCreate* json)
 {
   gsize len;
   char* data;
@@ -255,7 +255,7 @@ char* ssds_js_cr_to_string(SsdsJsonCreate* json)
   return data;
 }
 
-void ssds_js_cr_dump(SsdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
+void rds_js_cr_dump(RdsJsonCreate* json)//this will always dump error when some array or object is empty - just ignore it
 {
   gchar *data;
   json_generator_set_pretty(json->generator, 1);
@@ -266,15 +266,15 @@ void ssds_js_cr_dump(SsdsJsonCreate* json)//this will always dump error when som
 /*****************************************
  * This part is for json parsing         *
  * ***************************************/
-SsdsJsonRead* ssds_json_rd_init()
+RdsJsonRead* rds_json_rd_init()
 {
-  SsdsJsonRead* new = (SsdsJsonRead*)malloc(sizeof(SsdsJsonRead));
+  RdsJsonRead* new = (RdsJsonRead*)malloc(sizeof(RdsJsonRead));
   new->parser=json_parser_new();
   return new;
 }
 
 
-gboolean ssds_rd_parse(char* buffer, SsdsJsonRead* json)
+gboolean rds_rd_parse(char* buffer, RdsJsonRead* json)
 {
   GError *error = NULL;
     
@@ -290,7 +290,7 @@ gboolean ssds_rd_parse(char* buffer, SsdsJsonRead* json)
   return ret;
 }
 
-int ssds_rd_get_code(SsdsJsonRead* json)
+int rds_rd_get_code(RdsJsonRead* json)
 {
   int ret=-1;
   JsonObject* obj=json_node_get_object(json->rootNode);
@@ -300,7 +300,7 @@ int ssds_rd_get_code(SsdsJsonRead* json)
   return ret;
 }
 
-GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path)
+GList* rds_js_rd_find(RdsJsonRead* json, char* x_path)
 {
   GList* ret = NULL;
   JsonPath* new_path = json_path_new();
@@ -317,36 +317,36 @@ GList* ssds_js_rd_find(SsdsJsonRead* json, char* x_path)
 
 int main()
 {
-  SsdsJsonCreate* json_cr = ssds_js_cr_init(123);
-  ssds_js_cr_new_data(json_cr, JS_ARRAY, "install_pkgs", NULL);
-  ssds_js_cr_add_array_member(json_cr, JS_OBJ, NULL);
-  ssds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "install");
-  ssds_js_cr_add_array_member(json_cr, JS_OBJ, NULL);
+  RdsJsonCreate* json_cr = rds_js_cr_init(123);
+  rds_js_cr_new_data(json_cr, JS_ARRAY, "install_pkgs", NULL);
+  rds_js_cr_add_array_member(json_cr, JS_OBJ, NULL);
+  rds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "install");
+  rds_js_cr_add_array_member(json_cr, JS_OBJ, NULL);
   
-  ssds_js_cr_add_obj_member(json_cr, JS_STRING, "pokusny text", "pkg_name");
+  rds_js_cr_add_obj_member(json_cr, JS_STRING, "pokusny text", "pkg_name");
   
   gboolean attempt = TRUE;
-  ssds_js_cr_add_obj_member(json_cr, JS_BOOL, &attempt, "allowed");
+  rds_js_cr_add_obj_member(json_cr, JS_BOOL, &attempt, "allowed");
   int attempt2 = 64;
-  ssds_js_cr_add_obj_member(json_cr, JS_INT, &attempt2, "some_value");
+  rds_js_cr_add_obj_member(json_cr, JS_INT, &attempt2, "some_value");
   
-  ssds_js_cr_upper_obj(json_cr);
-  ssds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "erase");
+  rds_js_cr_upper_obj(json_cr);
+  rds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "erase");
   
-  ssds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "upgrade");
-  ssds_js_cr_add_array_member(json_cr, JS_STRING, "hokus_pokus");
-  ssds_js_cr_switch_array(json_cr, "erase");
-  ssds_js_cr_add_array_member(json_cr, JS_STRING, "hokus_pokus");
+  rds_js_cr_add_obj_member(json_cr, JS_ARRAY, NULL, "upgrade");
+  rds_js_cr_add_array_member(json_cr, JS_STRING, "hokus_pokus");
+  rds_js_cr_switch_array(json_cr, "erase");
+  rds_js_cr_add_array_member(json_cr, JS_STRING, "hokus_pokus");
   
-  ssds_js_cr_dump(json_cr);
+  rds_js_cr_dump(json_cr);
   
   
   //x path example
-  char* result = ssds_js_cr_to_string(json_cr);
-  SsdsJsonRead* json_rd = ssds_json_rd_init();
-  ssds_rd_parse(result, json_rd);
+  char* result = rds_js_cr_to_string(json_cr);
+  RdsJsonRead* json_rd = rds_json_rd_init();
+  rds_rd_parse(result, json_rd);
   
-  GList* list = ssds_js_rd_find(json_rd, "$.data.install_pkgs..pkg_name");
+  GList* list = rds_js_rd_find(json_rd, "$.data.install_pkgs..pkg_name");
   if(list==NULL)
     printf("list is empty\n");
   else{
