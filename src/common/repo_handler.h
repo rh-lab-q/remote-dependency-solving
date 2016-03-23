@@ -52,8 +52,8 @@ extern "C"{
  */
 typedef struct LocalRepoInfo LocalRepoInfo;
 
-struct LocalRepoInfo{
-  LrYumRepoConfs* repoHandler; /**< List of repo structures */
+struct LocalRepoInfo {
+    LrYumRepoConfs* repoHandler; /**< List of repo structures */
 };
 
 /**
@@ -94,15 +94,15 @@ typedef struct RepoMetadataList RepoMetadataList;
  */
 typedef struct MetadataFilesLoc MetadataFilesLoc;
 
-struct RepoMetadataList{
-  GSList *files_locations; /**< GSList of MetadataFilesLoc */
+struct RepoMetadataList {
+    GSList *files_locations; /**< GSList of MetadataFilesLoc */
 };
 
-struct MetadataFilesLoc{
-  char* repomd;     /**< path to repomod.xml file */
-  char* filelists;  /**< path to filelists.xml */
-  char* primary;    /**< path to primary.xml */
-  char* repo_name;  /**< name of repo for later use */
+struct MetadataFilesLoc {
+    char* repomd;     /**< path to repomod.xml file */
+    char* filelists;  /**< path to filelists.xml */
+    char* primary;    /**< path to primary.xml */
+    char* repo_name;  /**< name of repo for later use */
 };
 
 /**

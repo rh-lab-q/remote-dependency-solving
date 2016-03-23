@@ -32,101 +32,103 @@ int __debug = 0;
 
 void rds_log(int log_level, const char *message, ...)
 {
-  FILE *flog = fopen(LOG_FILE, "a");
-  time_t current_time = time(NULL);
-  struct tm *ts = localtime(&current_time);
-  
-  if(flog == NULL)
-  {
-    fprintf(stderr, "[%d/%d/%d %02d:%02d:%02d SSDS ERROR]: Unable to open log file.\n",
-            ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, 
-            ts->tm_hour, ts->tm_min, ts->tm_sec);
-    exit(EXIT_FAILURE);
-  }
-  
-  if(log_level != logDEBUG)
-    fprintf(flog, "[%d/%d/%d %02d:%02d:%02d %s]: ", 
-            ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
-            ts->tm_hour, ts->tm_min, ts->tm_sec,
-            log_lvl_msg[log_level]);//beginning of every message
-  
-  va_list args;
-  va_start(args, message);
-  
-  switch(log_level){
-    case logSSDS:
-      fprintf(stdout, "\033[92m[%d/%d/%d %02d:%02d:%02d SSDS]\033[0m: ",
-                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
-                ts->tm_hour, ts->tm_min, ts->tm_sec);
-      vfprintf(stdout, message, args);
-      break;
+    FILE *flog;
+    time_t current_time;
+    struct tm *ts;
 
-    case logQUESTION:
-      fprintf(stdout, "\033[1;92m[QUESTION]\033[0m: ");
-      vfprintf(stdout, message, args);
-      break;
+    flog = fopen(LOG_FILE, "a");
+    current_time = time(NULL);
+    ts = localtime(&current_time);
+    
+    if(flog == NULL) {
+        fprintf(stderr, "[%d/%d/%d %02d:%02d:%02d SSDS ERROR]: Unable to open log file.\n",
+        ts->tm_mday, ts->tm_mon+1, ts->tm_year-100, 
+        ts->tm_hour, ts->tm_min, ts->tm_sec);
+        exit(EXIT_FAILURE);
+    }
 
-    case logINFO:
-      if(__verbose == 1)
-      {
-        fprintf(stdout, "\033[96m[%d/%d/%d %02d:%02d:%02d INFO]\033[0m: ",
-                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
-                ts->tm_hour, ts->tm_min, ts->tm_sec);
-        vfprintf(stdout, message, args);
-      }
-      break;
+    if(log_level != logDEBUG)
+        fprintf(flog, "[%d/%d/%d %02d:%02d:%02d %s]: ", 
+        ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
+        ts->tm_hour, ts->tm_min, ts->tm_sec,
+        log_lvl_msg[log_level]);//beginning of every message
 
-    case logMESSAGE:
-      fprintf(stdout, "\033[94m[MESSAGE]\033[0m: ");
-      vfprintf(stdout, message, args);
-      break;
-
-    case logWARNING:
-      fprintf(stderr, "\033[93m[%02d:%02d:%02d WARNING]\033[0m: ",
-              ts->tm_hour, ts->tm_min, ts->tm_sec);
-      vfprintf(stderr, message, args);
-      break;
-
-    case logERROR:
-      fprintf(stderr, "\033[91m[%02d:%02d:%02d ERROR]\033[0m: ",
-              ts->tm_hour, ts->tm_min, ts->tm_sec);
-      vfprintf(stderr, message, args);
-      break;
-    case logDEBUG:
-      if(__debug == 1)
-      {
-        fprintf(stderr, "\033[95m[%02d:%02d:%02d DEBUG]\033[0m: ",
-                ts->tm_hour, ts->tm_min, ts->tm_sec);
-        vfprintf(stderr, message, args);
-      }
-      break;
-  }
-  
-  if(log_level != logDEBUG)
-  {
+    va_list args;
     va_start(args, message);
-    vfprintf(flog, message, args);
-  }
-  fclose(flog);
-  va_end(args);
+
+    switch(log_level){
+        case logSSDS:
+            fprintf(stdout, "\033[92m[%d/%d/%d %02d:%02d:%02d SSDS]\033[0m: ",
+            ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
+            ts->tm_hour, ts->tm_min, ts->tm_sec);
+            vfprintf(stdout, message, args);
+        break;
+
+        case logQUESTION:
+            fprintf(stdout, "\033[1;92m[QUESTION]\033[0m: ");
+            vfprintf(stdout, message, args);
+        break;
+
+        case logINFO:
+            if(__verbose == 1) {
+                fprintf(stdout, "\033[96m[%d/%d/%d %02d:%02d:%02d INFO]\033[0m: ",
+                ts->tm_mday, ts->tm_mon+1, ts->tm_year-100,
+                ts->tm_hour, ts->tm_min, ts->tm_sec);
+                vfprintf(stdout, message, args);
+            }
+        break;
+
+        case logMESSAGE:
+            fprintf(stdout, "\033[94m[MESSAGE]\033[0m: ");
+            vfprintf(stdout, message, args);
+        break;
+
+        case logWARNING:
+            fprintf(stderr, "\033[93m[%02d:%02d:%02d WARNING]\033[0m: ",
+            ts->tm_hour, ts->tm_min, ts->tm_sec);
+            vfprintf(stderr, message, args);
+        break;
+
+        case logERROR:
+            fprintf(stderr, "\033[91m[%02d:%02d:%02d ERROR]\033[0m: ",
+            ts->tm_hour, ts->tm_min, ts->tm_sec);
+            vfprintf(stderr, message, args);
+        break;
+        
+        case logDEBUG:
+            if(__debug == 1) {
+                fprintf(stderr, "\033[95m[%02d:%02d:%02d DEBUG]\033[0m: ",
+                ts->tm_hour, ts->tm_min, ts->tm_sec);
+                vfprintf(stderr, message, args);
+            }
+        break;
+    }
+
+    if(log_level != logDEBUG) {
+        va_start(args, message);
+        vfprintf(flog, message, args);
+    }
+    
+    fclose(flog);
+    va_end(args);
 }
 
 void set_verbose()
 {
-  __verbose = 1;
+    __verbose = 1;
 }
 
 void unset_verbose()
 {
-  __verbose = 0;
+    __verbose = 0;
 }
 
 void set_debug()
 {
-  __debug = 1;
+    __debug = 1;
 }
 
 void unset_debug()
 {
-  __debug = 0;
+    __debug = 0;
 }

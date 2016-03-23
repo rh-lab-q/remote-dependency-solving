@@ -23,52 +23,51 @@
 #include "log_handler.h"
 
 
-void resolve_dependency_file_path(char * ret_val, char** arch, char** release)
-{
+void resolve_dependency_file_path(char * ret_val, char** arch, char** release) {
     *release = NULL;
-    struct utsname *machine = (struct utsname *)malloc(sizeof(struct utsname));
+    struct utsname *machine;
 
-    rds_log(logDEBUG, "Getted info about machine.\n");
-
+    rds_log(logDEBUG, "Got info about machine.\n");
+    
+    machine = (struct utsname *)malloc(sizeof(struct utsname));
     if(machine == NULL){
-	rds_log(logERROR, "Not enough memory on heap.\n");
+        rds_log(logERROR, "Not enough memory on heap.\n");
         return;
     }
 
     rds_log(logDEBUG, "Getting info about release and arch.\n");
 
     if(uname(machine) < 0){
-	rds_log(logERROR, "Unable to found system type and computer architecture.\n");
-	free(machine);
+        rds_log(logERROR, "Unable to found system type and computer architecture.\n");
+        free(machine);
         return;
     }
 
     rds_log(logDEBUG, "Getting last dot in release string.\n");
     char *end = strrchr(machine->release, '.');
 
-    if(end == NULL){
-	rds_log(logERROR, "Internal error - unable to find dot in release string.\n");
-	free(machine);
-	return;
+    if(end == NULL) {
+        rds_log(logERROR, "Internal error - unable to find dot in release string.\n");
+        free(machine);
+        return;
     }
 
     char *i = end-1;
     rds_log(logDEBUG, "Search release number.\n");
 
     while(i > machine->release && isdigit(i[0]))
-    {
-	i--;
-    }
+        i--;
+    
     rds_log(logDEBUG, "Getting release string length.\n");
 
     int length = end - i;
     rds_log(logDEBUG, "Allocating memory for release string.\n");
     char *fedora_release = (char *)malloc(length*sizeof(char));
 
-    if(fedora_release == NULL){
-	rds_log(logERROR, "Not enough memory on heap.\n");
-	free(machine);
-	return;
+    if(fedora_release == NULL) {
+        rds_log(logERROR, "Not enough memory on heap.\n");
+        free(machine);
+        return;
     }
    
     rds_log(logDEBUG, "Memory allocated.\n");
@@ -88,19 +87,19 @@ void resolve_dependency_file_path(char * ret_val, char** arch, char** release)
 }
 
 int progress_callback(void *data, double total, double downloaded){
-        if(total > 0){
-                printf("\r%.40s\t%.0f%%",(char *)data, (downloaded/total)*100);
-                fflush(stdout);
-        }
-        return 0;
+    if(total > 0) {
+        printf("\r%.40s\t%.0f%%",(char *)data, (downloaded/total)*100);
+        fflush(stdout);
+    }
+    return 0;
 }
 
 int end_callback(void *data, LrTransferStatus status, const char *msg){
-        if(status == LR_TRANSFER_SUCCESSFUL){
-                printf("\r%.40s\t%s\n",(char *)data,"100% - Downloaded.");
-        }else{
-                printf("\r%.40s\t%s\n",(char *)data,msg);
-        }
-        return status;
+    if(status == LR_TRANSFER_SUCCESSFUL)
+        printf("\r%.40s\t%s\n",(char *)data,"100% - Downloaded.");
+    else
+        printf("\r%.40s\t%s\n",(char *)data,msg);
+    
+    return status;
 }
 

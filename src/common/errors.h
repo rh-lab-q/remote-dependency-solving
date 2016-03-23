@@ -23,23 +23,23 @@
 
 enum ERRORS
 {
-	OK = 0,
-	SOCKET_ERROR,
-	NETWORKING_ERROR,
-	INTERNAL_ERROR,
-	FILE_ERROR,
-	PARAMS_ERROR,
-	REPO_ERROR,
-	JSON_ERROR,
-	DOWNLOAD_ERROR,
-	MEMORY_ERROR,
-	ROOT_ERROR,
-	RPM_ORDER_ERROR,
-	INSTALL_ERROR,
-        UPDATE_ERROR,
-        ERASE_ERROR,
-        ACTION_ERROR,
-	EXIT
+    OK = 0,
+    SOCKET_ERROR,     //1
+    NETWORKING_ERROR, //2
+    INTERNAL_ERROR,   //3
+    FILE_ERROR,       //5
+    PARAMS_ERROR,     //6
+    REPO_ERROR,       //7
+    JSON_ERROR,       //8
+    DOWNLOAD_ERROR,   //9
+    MEMORY_ERROR,     //10
+    ROOT_ERROR,       //11
+    RPM_ORDER_ERROR,  //12
+    INSTALL_ERROR,    //13
+    UPDATE_ERROR,     //14
+    ERASE_ERROR,      //15
+    ACTION_ERROR,     //16
+    EXIT              //17
 };
 
 #endif

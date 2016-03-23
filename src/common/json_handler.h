@@ -43,9 +43,9 @@ extern "C"{
 
 /** Type of url from .repo file located in /etc/yum.repos.d/ */
 typedef enum {
-  BASEURL = 1, /**< #baseurl in .repo file */
-  MIRRORLIST,  /**< #mirrorlist in .repo file */
-  METALINK     /**< #metalink in .repo file*/
+    BASEURL = 1, /**< #baseurl in .repo file */
+    MIRRORLIST,  /**< #mirrorlist in .repo file */
+    METALINK     /**< #metalink in .repo file*/
 } JsonUrlType;
 
 /*******************************************************************/
@@ -55,16 +55,16 @@ typedef enum {
 /** Structure used for creating message in json to be sent over the network */
 typedef struct JsonCreate JsonCreate;
 
-struct JsonCreate{
-   JsonGenerator * generator; /**< Holds structure for generatig json from scraps */
-   JsonNode* rootNode;        /**< Points to root of json */
-   JsonNode* codeNode;        /**< Points to node holding control code */
-   JsonNode* dataNode;        /**< Points to node holding data part of json */
-   JsonNode* currNode;        /**< Currently used node */
-   JsonObject* rootObj;       /**< Root object - used for adding new objects */
-   JsonObject* dataObj;       /**< Data object - used for adding objects under data */
-   JsonObject* currObj;       /**< Currently used object */
-   JsonArray* currArray;      /**< Currently used array */
+struct JsonCreate {
+    JsonGenerator * generator; /**< Holds structure for generatig json from scraps */
+    JsonNode* rootNode;        /**< Points to root of json */
+    JsonNode* codeNode;        /**< Points to node holding control code */
+    JsonNode* dataNode;        /**< Points to node holding data part of json */
+    JsonNode* currNode;        /**< Currently used node */
+    JsonObject* rootObj;       /**< Root object - used for adding new objects */
+    JsonObject* dataObj;       /**< Data object - used for adding objects under data */
+    JsonObject* currObj;       /**< Currently used object */
+    JsonArray* currArray;      /**< Currently used array */
 };
 
 
@@ -72,11 +72,11 @@ struct JsonCreate{
  * Type of data that is inserted into objects or arrays
  */
 typedef enum {
-  JS_STRING = 0,
-  JS_INT,
-  JS_BOOL,
-  JS_ARRAY,
-  JS_OBJ
+    JS_STRING = 0,
+    JS_INT,
+    JS_BOOL,
+    JS_ARRAY,
+    JS_OBJ
 }JsInsType;
 
 
@@ -266,41 +266,41 @@ typedef struct JsonAnswer JsonAnswer;
  */
 typedef struct JsonPkg JsonPkg;
 
-struct PkgInfo{
-  char** packages;  /**< names of packages requested by user */
-  int length;       /**< number of packages */
+struct PkgInfo {
+    char** packages;  /**< names of packages requested by user */
+    int length;       /**< number of packages */
 };
 
-struct RepoInfo{
-  char** urls;      /**< array of char pointers in case url is baseurl - there can be more than one baseurl for one repo */
-  char* name;       /**< name of repo */
-  int count;        /**< number of addresses in urls */
-  int type;         /**< JsonUrlType */
+struct RepoInfo {
+    char** urls;      /**< array of char pointers in case url is baseurl - there can be more than one baseurl for one repo */
+    char* name;       /**< name of repo */
+    int count;        /**< number of addresses in urls */
+    int type;         /**< JsonUrlType */
 };
 
-struct RepoInfoList{
-  GSList* repoInfoList; /** < GSList of RepoInfo */
+struct RepoInfoList {
+    GSList* repoInfoList; /** < GSList of RepoInfo */
 };
 
-struct JsonRead{
-  JsonParser* parser;         /** < parser holds JsonRead structure */
-  JsonNode* rootNode;         /** < root of json - used to find objects */
-  JsonNode* currNode;         /** < currently used node */
-  JsonNode* dataNode;         /** < data node - often used */
-  JsonObject* currObj;        /** < currently used object */
-  JsonObject* dataObj;        /** < data object - often used for adding new objects */
+struct JsonRead {
+    JsonParser* parser;         /** < parser holds JsonRead structure */
+    JsonNode* rootNode;         /** < root of json - used to find objects */
+    JsonNode* currNode;         /** < currently used node */
+    JsonNode* dataNode;         /** < data node - often used */
+    JsonObject* currObj;        /** < currently used object */
+    JsonObject* dataObj;        /** < data object - often used for adding new objects */
 };
 
-struct JsonAnswer{
-  char* name;       /** < name of app that was requested for install */
-  GSList* pkgList;  /** < holds list of JsonPkg */
+struct JsonAnswer {
+    char* name;       /** < name of app that was requested for install */
+    GSList* pkgList;  /** < holds list of JsonPkg */
 };
 
-struct JsonPkg{
-  char* pkg_name;   /** < name of requested package */
-  char* pkg_loc;    /** < location of package on repository */
-  char* base_url;   /** < base_url for package download or null */
-  char* metalink;   /** < metalink or null */
+struct JsonPkg {
+    char* pkg_name;   /** < name of requested package */
+    char* pkg_loc;    /** < location of package on repository */
+    char* base_url;   /** < base_url for package download or null */
+    char* metalink;   /** < metalink or null */
 };
 /**
  * Returns new JsonRead structure - this structure is needed during the whole process of json parsing

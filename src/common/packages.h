@@ -38,8 +38,8 @@ static const char *DOWNLOAD_TARGET = "/var/cache/ssds/packages/";
  
 // Types of supported operation
 enum{
-        RDS_INSTALL = 0,
-        RDS_UPDATE
+    RDS_INSTALL = 0,
+    RDS_UPDATE
 };
 
 /**

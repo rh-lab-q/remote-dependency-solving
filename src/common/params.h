@@ -36,13 +36,13 @@ extern "C"{
 /**
  * Integer option for command in ParamOptsCl
  */
-enum ParamsOptions{ 
-  PAR_NO_OPT = 0,   /**< 0 No option was provided */
-  PAR_INSTALL,      /**< 1 Install option chosen */
-  PAR_CHK_DEP,      /**< 2 Only check if dependencies are fulfilled */
-  PAR_UPDATE,       /**< 3 Update option choosen */
-  PAR_ERASE,        /**< 4 Erase option choosen */
-  PAR_UPDATE_ALL		/**< 5 Update all packages */
+enum ParamsOptions { 
+    PAR_NO_OPT = 0,   /**< 0 No option was provided */
+    PAR_INSTALL,      /**< 1 Install option chosen */
+    PAR_CHK_DEP,      /**< 2 Only check if dependencies are fulfilled */
+    PAR_UPDATE,       /**< 3 Update option choosen */
+    PAR_ERASE,        /**< 4 Erase option choosen */
+    PAR_UPDATE_ALL		/**< 5 Update all packages */
 }ParOpt;
  
 /********************************/
@@ -53,10 +53,10 @@ enum ParamsOptions{
  * Structure hold information parsed from parameters provided by user */
 typedef struct ParamOptsCl ParamOptsCl;
 
-struct ParamOptsCl{
-  int command;      /**< ParOpt number of command */
-  int pkg_count;    /**< Number of packages required by user */
-  GSList* pkgs;     /**< Names of packages from command line */
+struct ParamOptsCl {
+    int command;      /**< ParOpt number of command */
+    int pkg_count;    /**< Number of packages required by user */
+    GSList* pkgs;     /**< Names of packages from command line */
 };
 
 /**
