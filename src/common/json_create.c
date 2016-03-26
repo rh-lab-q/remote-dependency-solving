@@ -44,7 +44,7 @@ JsonCreate* js_cr_init(int code) {
     new->codeNode = addCode;
 
     //create data object
-    addCode = json_node_new(JSON_NODE_OBJECT);
+    add = json_node_new(JSON_NODE_OBJECT); //TODO - test
     new->dataNode = add;
     json_object_set_member(new->rootObj, (gchar*)"data", add);
     new->dataObj = json_object_new();
@@ -272,6 +272,8 @@ void js_cr_dump(JsonCreate* json)//this will always dump error when some array o
     json_generator_set_pretty(json->generator, 1);
     data = json_generator_to_data (json->generator, NULL);
     printf("%s\n", (char*)data);
+    
+    free(data);
 }
 
 // =============================================================================================
@@ -473,6 +475,12 @@ void js_cr_pkgs_insert(JsonCreate* json,HyGoal* goal)
         }
     }
     rds_log(logINFO, "Total packages to install: %d\n", count);
+}
+
+void js_cr_dispose(JsonCreate* json)
+{
+    json_node_free(json->rootNode);
+    g_object_unref(json->generator);
 }
 
 int rds_strcmp(gconstpointer a, gconstpointer b) {

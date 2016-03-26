@@ -133,6 +133,8 @@ set (rds_server_srcs
 set (rds_server_headers
 	src/server/server.h)
 add_library(lib_rds_server STATIC ${rds_server_srcs} ${rds_server_headers})
+# message(${GLIB2_LDFLAGS})
+# message(${JSON_LDFLAGS})
 target_link_libraries(lib_rds_server
 	lib_rds_common
 	${LIBS}

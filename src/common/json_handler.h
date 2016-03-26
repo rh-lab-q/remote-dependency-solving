@@ -178,6 +178,12 @@ char* js_cr_to_string(JsonCreate* json);
  */
 void js_cr_dump(JsonCreate* json);
 
+/**
+ * Used at the end for proper disposal of the json structure
+ * @param json      JsonCreate*
+ */
+void js_cr_dispose(JsonCreate* json);
+
 
 /**
  * These functions can be used for more flexible creation of JSON structures

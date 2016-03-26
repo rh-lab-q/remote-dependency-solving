@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
     }
     else {
         if(compare_files(pathToOriginalSolv, pathToBackupSolv) != OK) {
-            int ans = question("DNF install packages by themself. We need to make initial steps again. If you don't want to use RDS call rds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
+            int ans = question("DNF install packages by themselves. We need to make initial steps again. If you don't want to use RDS call rds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
 
             if(ans == NO) {
                 rds_log(logMESSAGE,"Action interupted by user.\n");
@@ -227,7 +227,6 @@ int main(int argc, char* argv[]) {
 
     end:
         rds_log(logSSDS, "End of client.\n\n");
-
         rds_gc_cleanup();
 
     return status;
