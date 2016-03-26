@@ -126,13 +126,11 @@ int client_connect(int *socket, char *server_address, long int port) {
     struct sockaddr_in server_comm;
 
     server_comm.sin_addr.s_addr = inet_addr(server_address);
-    rds_log(logDEBUG, "Set server address.\n");
-
+//     rds_log(logDEBUG, "Set server address.\n");
     server_comm.sin_family = AF_INET;
-    rds_log(logDEBUG, "Set comunication protocol.\n");
-
+//     rds_log(logDEBUG, "Set comunication protocol.\n");
     server_comm.sin_port = htons(port);
-    rds_log(logDEBUG, "Set server port.\n");
+//     rds_log(logDEBUG, "Set server port.\n");
 
     rds_log(logDEBUG, "Socket control.\n");
     if(*socket == -1) {

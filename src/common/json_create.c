@@ -261,7 +261,7 @@ char* js_cr_to_string(JsonCreate* json)
     gsize len;
     char* data;
     
-    data = (char*)json_generator_to_data (json->generator, &len);
+    data = (char*)json_generator_to_data(json->generator, &len);
     return data;
 }
 

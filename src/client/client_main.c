@@ -38,14 +38,15 @@
 // }
 
 int main(int argc, char* argv[]) {
+    printf("Client start\n");
     /*******************************************************************/
     /* Check root rights                                               */
     /*******************************************************************/
-    uid_t uid = geteuid();
-    if(uid != 0) {
-        rds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
-        return ROOT_ERROR;
-    }
+//     uid_t uid = geteuid();
+//     if(uid != 0) {
+//         rds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
+//         return ROOT_ERROR;
+//     }
 
     /*******************************************************************/
     /* Client return code variable                                     */
@@ -69,11 +70,12 @@ int main(int argc, char* argv[]) {
 
     ParamOptsCl* params = init_params_cl();
 
+    
     if(parse_params_cl(argc, argv, params) != 0) {
         status = PARAMS_ERROR;
         goto end;
     }
-
+    
     rds_log(logDEBUG, "Client params initialized.\n");
     rds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
     rds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
@@ -110,13 +112,13 @@ int main(int argc, char* argv[]) {
 
     if(status != OK) goto end;
 
-    rds_log(logDEBUG, "Communication socket: %d.\n", socket);
+//     rds_log(logDEBUG, "Communication socket: %d.\n", socket);
 
     /********************************************************************/
     /* Checking client ID                                               */
     /********************************************************************/
 
-    if(id == NULL) {     
+    if(id == NULL) {  //TODO - create request-response communication with server   
         status = get_new_id(socket, &id, arch, release);
         if(status != OK) goto end;
 
@@ -227,6 +229,7 @@ int main(int argc, char* argv[]) {
 
     end:
         rds_log(logSSDS, "End of client.\n\n");
+        free_params_cl(params);
         rds_gc_cleanup();
 
     return status;

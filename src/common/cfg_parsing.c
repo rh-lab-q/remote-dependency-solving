@@ -24,7 +24,7 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
         return 1;
     }
 
-    rds_log(logDEBUG, "CFG file opened.\n");
+    rds_log(logDEBUG, "Parsing the config file.\n");
 
     char fmstate = 'e';
     char act_c;

@@ -20,7 +20,7 @@
 
 #include "repo_handler.h"
 #include "log_handler.h"
-
+//TODO - function for repoInfo disposal
 LocalRepoInfo* repo_parse_init() { //this part uses librepo library to parse .repo files - repoconf module was created by TMlcoch
     LocalRepoInfo* new;
     

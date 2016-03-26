@@ -46,7 +46,7 @@ int get_new_id(int socket, char **id, char *arch, char *release) {
     js_cr_gen_id(json_gen, arch, release);    // generate message for server
     rds_log(logDEBUG, "Generated JSON for server with params: arch=%s, release=%s.\n", arch, release);
 
-    rds_log(logDEBUG, "Generating message string.\n");
+//     rds_log(logDEBUG, "Generating message string.\n");
     message = js_cr_to_string(json_gen);
     rds_log(logDEBUG, "Message string generated: \t%s\n", message);
 
@@ -56,7 +56,7 @@ int get_new_id(int socket, char **id, char *arch, char *release) {
 
     *id = NULL;
     //TODO: read answer from server
-    rds_free(json_gen);
+    js_cr_dispose(json_gen);
 
     return OK;
 }
@@ -99,7 +99,7 @@ int send_file(int socket, int type, char *path) {
         secure_write(socket, buffer, bytes_read);
         rds_log(logDEBUG, "Data sent.\n");
     }
-    rds_free(json_msg);
+    js_cr_dispose(json_msg);
 
     char *buff = sock_recv(socket);
 
@@ -116,7 +116,7 @@ int send_file(int socket, int type, char *path) {
     else {
         rc = OK;
     }
-    rds_free(buff);
+    free(buff);
 
     return rc; 
 }
@@ -229,6 +229,8 @@ int send_repo(ParamOptsCl* params, char *arch, char *release, int socket, int ac
     secure_write(socket, repo_output, strlen(repo_output));
     rds_log(logDEBUG, "Message sent.\n");
 
+    free(repo_output);
+    js_cr_dispose(json_gen);
     return OK;
 }
 

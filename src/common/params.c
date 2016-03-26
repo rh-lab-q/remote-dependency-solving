@@ -46,7 +46,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params) {
     extern int optind;
     opterr = 0;
 
-    while(1) {
+    for(;;) {
         c = getopt_long(argc, argv, "vhd", long_options, &opt_index);
         switch(c) {
             case 0:
@@ -109,7 +109,7 @@ ParamOptsCl* init_params_cl() {
 
 
 void free_params_cl(ParamOptsCl* params) {
-    g_slist_free_full(params->pkgs, (GDestroyNotify) free); //only *char in the list so free will suffice
+    g_slist_free(params->pkgs); //only *char in the list so free will suffice
     free(params);
 }
 

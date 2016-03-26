@@ -88,6 +88,7 @@ JsonCreate* js_cr_init(int code);
 
 /**
  * Converts data in memory represented by JsonCreate to string.
+ * New memory is allocated and returned - it needs to be explicitly freed afterwards.
  * @param json      JsonCreate structure holding the json structure in memory
  */
 char* js_cr_to_string(JsonCreate* json);
