@@ -99,11 +99,11 @@ set (rds_common_srcs
 	src/common/network_util.c
 	src/common/params.c
 	src/common/packages.c
-	src/common/mem_management.c
 	src/common/cfg_parsing.c
 	src/common/detect_missing_repos.c
 	src/common/network_security.c)
 set (rds_common_headers
+	src/common/util.h
 	src/common/includes.h
 	src/common/json_handler.h
 	src/common/repo_handler.h
@@ -112,7 +112,6 @@ set (rds_common_headers
 	src/common/network_util.h
 	src/common/params.h
 	src/common/packages.h
-	src/common/mem_management.h
 	src/common/cfg_parsing.h
 	src/common/errors.h
 	src/common/detect_missing_repos.h

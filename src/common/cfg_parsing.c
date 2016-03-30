@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "cfg_parsing.h"
-#include "mem_management.h"
+#include "util.h"
 #include "log_handler.h"
 
 
@@ -83,7 +83,7 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
                 if (fmstate == 'p') {
                     comm_port = file_read_value(cfg_file, 5);
                     *ret_comm_port = strtol(comm_port, NULL, 10);
-                    rds_free(comm_port);
+                    free(comm_port);
                     comm_port_parsed = 1;
                     fmstate = 'e';
                 }
@@ -168,7 +168,7 @@ int read_srv_cfg(long int* ret_comm_port)
                 if (fmstate == 'p') {
                     comm_port = file_read_value(cfg_file, 5);
                     *ret_comm_port = strtol(comm_port, NULL, 10);
-                    rds_free(comm_port);
+                    free(comm_port);
                     comm_port_parsed = 1;
                     fmstate = 'e';
                 }

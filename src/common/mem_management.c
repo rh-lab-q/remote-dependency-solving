@@ -22,7 +22,7 @@
 #include <sys/socket.h>
 #include <stdio.h>
 
-#include "mem_management.h"
+#include "util.h"
 #include "log_handler.h"
 #include "errors.h"
 

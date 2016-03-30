@@ -103,3 +103,26 @@ int end_callback(void *data, LrTransferStatus status, const char *msg){
     return status;
 }
 
+void * rds_malloc(size_t len){
+    void *m = malloc(len);
+    if (!m) lr_out_of_memory();
+    return m;
+}
+
+void* rds_realloc(void* ptr, size_t len){
+    void *m = realloc(ptr, len);
+    if (!m && len) lr_out_of_memory();
+    return m;
+}
+
+void rds_out_of_memory(){
+    fprintf(stderr, "Remote Dependency Solving out of memory\n");
+    abort();
+    exit(1);
+}
+
+void rds_signal_handler(int signum) {
+    rds_log(logERROR, "End with signal number %d.\n", signum);
+    exit(signum);
+}
+

@@ -24,7 +24,7 @@
 #include "log_handler.h"
 #include "errors.h"
 #include "network_util.h"
-#include "mem_management.h"
+#include "util.h"
 
 char* sock_recv(int sock_fd) {
     char* reply;
@@ -36,7 +36,7 @@ char* sock_recv(int sock_fd) {
     ret = rds_read(sock_fd, reply , MAX_INPUT_LEN);
     if(ret == -1) {
         rds_log(logERROR, "Unable to read data from socket\n");
-        rds_free(reply);
+        free(reply);
         return NULL;
     }
 
@@ -61,7 +61,7 @@ char* sock_recv(int sock_fd) {
             memcpy(buffer+read_count*MAX_INPUT_LEN, reply, MAX_INPUT_LEN);
         }while(!(ret < MAX_INPUT_LEN));
 
-        rds_free(reply);
+        free(reply);
         return buffer;
     }
     //no buffer is needed for very short messages
@@ -77,7 +77,7 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer) {
 
     if(retVal == -1) {
         rds_log(logERROR, "Unable to read data from socket\n");
-        rds_free(*buffer);
+        free(*buffer);
         return retVal;
     }
 
@@ -104,7 +104,7 @@ ssize_t sock_solv_recv(int sock_fd, char **buffer) {
             memcpy(buff+read_count*MAX_INPUT_LEN, *buffer, MAX_INPUT_LEN);
         }while(!(ret < MAX_INPUT_LEN));
 
-        rds_free(*buffer);
+        free(*buffer);
         *buffer = buff;
     }
     //no buffer is needed for very short messages
@@ -155,4 +155,26 @@ int client_connect(int *socket, char *server_address, long int port) {
     rds_log(logMESSAGE, "Connection to server is established.\n");
 
     return OK;
+}
+
+int rds_socket(int domain, int type, int protocol) {
+    int new_socket;
+    
+    new_socket = socket(domain, type, protocol);
+    if(new_socket < 0) {
+        rds_log(logERROR, "Failed to open socket.\n");
+        return -1;
+    }
+    return new_socket;
+}
+
+int rds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len) {
+    int new_socket;
+    
+    new_socket = accept(socket, address, address_len);
+    if(new_socket < 0) {
+        rds_log(logERROR, "Failed to accept socket.\n");
+        return -1;
+    }
+    return new_socket;
 }

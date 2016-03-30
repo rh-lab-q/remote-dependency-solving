@@ -25,7 +25,6 @@ int main(int argc, char* argv[]) {
     /*******************************************************************/
     /* Setting up garbage collector and setting callback functions */
     /*******************************************************************/
-    rds_gc_init();
     signal(SIGINT, rds_signal_handler);
     signal(SIGBUS, rds_signal_handler);
     signal(SIGSEGV, rds_signal_handler);
@@ -47,6 +46,5 @@ int main(int argc, char* argv[]) {
     }
     
     end:
-        rds_gc_cleanup();
         return status;
 }

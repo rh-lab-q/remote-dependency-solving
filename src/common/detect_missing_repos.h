@@ -24,7 +24,7 @@
 #include <dirent.h>
 #include "../common/includes.h"
 #include "../common/log_handler.h"
-#include "../common/mem_management.h"
+#include "../common/util.h"
 #include "../common/cfg_parsing.h"
 
 #define REPO_LIST_FILE "../required_repos_list.txt"

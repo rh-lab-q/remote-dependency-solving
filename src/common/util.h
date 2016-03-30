@@ -54,6 +54,32 @@ int progress_callback(void *data, double total, double downloaded);
  */
 int end_callback(void *data, LrTransferStatus status, const char *msg);
 
+/**
+ * Malloc with allocation control. If the malloc fails, the program calls abort.
+ * @param len   Number of bytes to be allocated
+ * @return      New pointer to the allocated memory
+ */
+void * rds_malloc();
+
+/**
+ * Realloc with allocation control. If the malloc fails, the program calls abort.
+ * @param ptr   Pointer to memory segment for reallocation.
+ * @param len   Number of bytes to be allocated.
+ * @return      New pointer to the allocated memory.
+ */
+void * rds_realloc(void* ptr, size_t len);
+
+/**
+ * Prints error and aborts
+ */
+void rds_out_of_memory();
+
+/**
+ * Function called when termination signals are recieved.
+ * @param signum    int
+ */
+void rds_signal_handler(int signum);
+
 
 #ifdef __cplusplus
 }

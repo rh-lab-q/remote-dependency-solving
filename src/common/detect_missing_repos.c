@@ -74,9 +74,9 @@ int check_for_missing_repos() {
 
     closedir(repo_dir);
     for (int i1 = 0; i1 < req_repo_count; i1++)
-        rds_free(req_repos[i1]);
+        free(req_repos[i1]);
     
-    rds_free(req_repos);
-    rds_free(local_repos);
+    free(req_repos);
+    free(local_repos);
     return missing_repos;
 }

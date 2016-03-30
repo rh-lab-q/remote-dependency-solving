@@ -34,7 +34,7 @@
 #include "../common/util.h"
 #include "../common/packages.h"
 #include "../common/errors.h"
-#include "../common/mem_management.h"
+#include "../common/util.h"
 
 
 int get_new_id(int socket, char **id, char *arch, char *release) {
@@ -353,11 +353,11 @@ int answer_process(int socket, int action) {
     rc = download(ans, install_pkgs, update_pkgs, erase_pkgs);
         
     parseEnd:
-        g_slist_free_full(install_pkgs, (GDestroyNotify) rds_free);
-        g_slist_free_full(update_pkgs, (GDestroyNotify) rds_free);
-        g_slist_free_full(erase_pkgs, (GDestroyNotify) rds_free);
+        g_slist_free(install_pkgs);
+        g_slist_free(update_pkgs);
+        g_slist_free(erase_pkgs);
     End:
-        rds_free(json);
+        free(json);
 
     return rc;
 }

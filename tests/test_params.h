@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "../src/common/params.h"
-#include "../src/common/mem_management.h"
+// #include "../src/common/mem_management.h"
 
 Suite* params_suite(void);
 

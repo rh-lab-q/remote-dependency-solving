@@ -4,7 +4,7 @@
 #include "client.h"
 #include "../common/repo_handler.h"
 #include "../common/errors.h"
-#include "../common/mem_management.h"
+#include "../common/util.h"
 #include "../common/cfg_parsing.h"
 
 
@@ -56,7 +56,6 @@ int main(int argc, char* argv[]) {
     /*******************************************************************/
     /* Setting up garbage collector and setting callback functions     */
     /*******************************************************************/
-    rds_gc_init();
     signal(SIGINT, rds_signal_handler);
     signal(SIGBUS, rds_signal_handler);
     signal(SIGSEGV, rds_signal_handler);
@@ -230,7 +229,6 @@ int main(int argc, char* argv[]) {
     end:
         rds_log(logSSDS, "End of client.\n\n");
         free_params_cl(params);
-        rds_gc_cleanup();
 
     return status;
 }

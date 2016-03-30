@@ -15,7 +15,7 @@ extern "C"{
 #include "../common/json_handler.h"
 #include "../common/solving.h"
 #include "../common/params.h"
-#include "../common/mem_management.h"
+#include "../common/util.h"
 #include "../../cmake/Config/version_conf.h"
 #include "../common/cfg_parsing.h"
 #include "../common/errors.h"

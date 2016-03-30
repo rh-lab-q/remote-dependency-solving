@@ -4,13 +4,13 @@
 
 START_TEST(test_missing_repos)
 {
-  rds_gc_init();
+//   rds_gc_init();
 
   clean_run(); //if this test keeps failing, maybe you have problems with required repositaries
   one_repo_missing();
   missing_file();
 
-  rds_gc_cleanup();
+//   rds_gc_cleanup();
 }
 END_TEST
 

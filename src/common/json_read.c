@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 #include "json_handler.h"
-#include "mem_management.h"
+#include "util.h"
 
 JsonRead* js_rd_init() {
     JsonRead* new;

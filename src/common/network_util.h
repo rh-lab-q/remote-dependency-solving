@@ -21,6 +21,8 @@
 #ifndef _NETWORK_UTIL_H
 #define _NETWORK_UTIL_H
 
+#include <sys/socket.h>
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -67,6 +69,24 @@ void secure_write(int socket, char* message, ssize_t length);
  * @return int         OK or error code
  */
 int client_connect(int *socket, char *server_address, long int comm_port);
+
+/**
+ * Open a socket.
+ * @param domain    Socket domain
+ * @param type      Type of socket
+ * @param protocol  Protocol to be used with the socket
+ * @return          Number of the new socket
+ */
+int rds_socket(int domain, int type, int protocol);
+
+/**
+ * Accept a connection with a new socket on specified address.
+ * @param socket        Number of socket to try to accept a new connection on.
+ * @param address       IP address
+ * @param address_len   Length of the IP address
+ * @return              Number of newly created socket. If the accept on the socket was not succesful, -1 is returned
+ */
+int rds_accept(int socket, struct sockaddr *restrict address, socklen_t *restrict address_len);
 
 #ifdef __cplusplus
 }

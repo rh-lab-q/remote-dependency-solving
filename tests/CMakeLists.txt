@@ -4,7 +4,7 @@ set (RDS_TEST_FILES
 	test_template.c
 	test_cfg_parsing.c
 	test_params.c
-	test_gc.c
+	#test_gc.c
 	test_missing_repos.c
 	)
 

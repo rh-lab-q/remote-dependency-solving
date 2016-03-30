@@ -74,7 +74,7 @@ int server_accept_connection(int comm_desc, int comm_addr_len) {
     }
 
     acceptEnd:
-        rds_close(socket);
+        close(socket);
         rds_log(logDEBUG, "End of communication with client.\n");
 
     return status;
@@ -135,7 +135,7 @@ int server_process(int socket, char *client_ip, int *client_end) {
                     break;
                 }
 
-                rds_free(comm_buffer);
+                free(comm_buffer);
                 bytes_written += bytes_read;
 
                 if(bytes_read < 0) {
@@ -186,7 +186,7 @@ int server_process(int socket, char *client_ip, int *client_end) {
                     break;
                 }
                 
-                rds_free(comm_buffer);
+                free(comm_buffer);
                 bytes_written += bytes_read;
 
                 if(bytes_read < 0) {
@@ -293,8 +293,8 @@ int server_process(int socket, char *client_ip, int *client_end) {
     }
     //
     processEnd:
-        rds_free(json_read);
-        rds_free(json_send);
+        free(json_read);
+        free(json_send);
         
     return status;
 }
