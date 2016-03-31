@@ -80,7 +80,7 @@ void resolve_dependency_file_path(char * ret_val, char** arch, char** release) {
 
     rds_log(logDEBUG, "Getting path string.\n");
     //composing path to @System.solv file
-    snprintf(ret_val, 100, "/var/cache/dnf/@System.solv");
+    snprintf(ret_val, 100, "/var/cache/dnf/x86_64/21/@System.solv");
     rds_log(logDEBUG, "Getting arch string.\n");
     *arch = machine->machine;
     *release = fedora_release;

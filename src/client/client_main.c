@@ -38,15 +38,14 @@
 // }
 
 int main(int argc, char* argv[]) {
-    printf("Client start\n");
     /*******************************************************************/
     /* Check root rights                                               */
     /*******************************************************************/
-//     uid_t uid = geteuid();
-//     if(uid != 0) {
-//         rds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
-//         return ROOT_ERROR;
-//     }
+    uid_t uid = geteuid();
+    if(uid != 0) {
+        rds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
+        return ROOT_ERROR;
+    }
 
     /*******************************************************************/
     /* Client return code variable                                     */
