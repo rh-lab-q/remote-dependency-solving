@@ -20,6 +20,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#include<syslog.h>
 
 #include <rpm/rpmlib.h>
 #include <rpm/rpmts.h>
@@ -37,23 +38,23 @@
 #include "../common/util.h"
 
 
-int get_new_id(int socket, char **id, char *arch, char *release) {
+int get_new_id(int socket, char **id, char *arch, char *release) {//TODO - implement this on server and then repair this function
     char *message;
     JsonCreate* json_gen = js_cr_init(GENERATE_ID);
 
-    rds_log(logDEBUG, "Inserted code %d into json.\n", GENERATE_ID);
-
     js_cr_gen_id(json_gen, arch, release);    // generate message for server
-    rds_log(logDEBUG, "Generated JSON for server with params: arch=%s, release=%s.\n", arch, release);
+    #ifdef DEBUG
+        printf("Generated JSON for server with params: arch=%s, release=%s.\n", arch, release);
+    #endif
 
-//     rds_log(logDEBUG, "Generating message string.\n");
     message = js_cr_to_string(json_gen);
-    rds_log(logDEBUG, "Message string generated: \t%s\n", message);
+    #ifdef DEBUG
+        printf("DEBUG: Json message for server generated in get_new_id:\n %s\n", message);
+    #endif
 
-    rds_log(logMESSAGE, "Sending initial message to server.\n");
-    secure_write(socket, message, strlen(message));
-    rds_log(logMESSAGE, "Message sent.\n");
-
+    secure_write(socket, message, strlen(message));//TODO - check if the write was successful
+    printf("The initial message was sent to the server. Plese wait for response.\n");
+    
     *id = NULL;
     //TODO: read answer from server
     js_cr_dispose(json_gen);
@@ -63,54 +64,61 @@ int get_new_id(int socket, char **id, char *arch, char *release) {
 
 int send_file(int socket, int type, char *path) {
     JsonCreate* json_msg = js_cr_init(type);
-
     char* msg_output;
 
     /***********************************************************/
     /* Sending file                                            */
     /***********************************************************/
-    rds_log(logDEBUG, "Path to file : %s\n",path);
+    #ifdef DEBUG
+        printf("DEBUG: Path to file in send_file: %s\n",path);
+    #endif
     FILE * f;
     f = fopen(path,"rb");
 
-    rds_log(logDEBUG, "Opening file.\n");
     if(f == NULL) {
-        rds_log(logERROR,"Error while opening file %s.\n", path);
+        syslog(LOG_ERR, "Error while opening file %s", path);
+        fprintf(stderr, "ERROR: An error occured while opening file %s\n", path);
         return FILE_ERROR;
     }
-
-    rds_log(logDEBUG, "Getting size of file.\n");
 
     fseek(f, 0, SEEK_END);
     ssize_t size = ftell(f);
     fseek(f, 0, SEEK_SET);
 
-    rds_log(logDEBUG, "Size of file is %d.\n", size);
+    #ifdef DEBUG
+        printf("DEBUG: Size of file in send_file: %d.\n", size);
+    #endif
+        
     js_cr_set_read_bytes(json_msg, (int) size);
     msg_output = js_cr_to_string(json_msg);
     secure_write(socket, msg_output, strlen(msg_output));
-    rds_log(logDEBUG, "Preparing variables.\n");
 
     char buffer[131072];
     size_t bytes_read = 0;
 
-    rds_log(logDEBUG, "Sending file.\n");
+    printf("INFO: Sending file %s to the server.\n", path);
     while((bytes_read = fread(buffer, 1, 131072, f)) != 0) {
         secure_write(socket, buffer, bytes_read);
-        rds_log(logDEBUG, "Data sent.\n");
     }
+    #ifdef DEBUG
+        printf("DEBUG: The file was successfully received by the server.\n");
+    #endif
+    
     js_cr_dispose(json_msg);
 
-    char *buff = sock_recv(socket);
+    char *buff;
+    JsonRead *json;
 
-    JsonRead *json = js_rd_init();
-
+    buff = sock_recv(socket);
+    json = js_rd_init();
     js_rd_parse(buff, json);
 
     int rc = js_rd_get_code(json);
 
     if(rc != ANSWER_OK) {
-        rds_log(logERROR, "Message from server: %s\n", js_rd_get_message(json));
+        char* msg=js_rd_get_message(json);
+        syslog(LOG_ERR, "Error from the server: %s", msg);
+        fprintf(stderr, "ERROR: An error occured on the server: %s\n", msg);
         rc = NETWORKING_ERROR;
     }
     else {
@@ -127,14 +135,18 @@ int compare_files(char *fileOne, char *fileTwo) {
     f2 = fopen(fileTwo,"r");
     int rc = OK;
     
-    rds_log(logDEBUG, "Opening files for compare.\n");
+    #ifdef DEBUG
+        printf("DEBUG: Opening files %s and %s for comparison in compare_files.\n", fileOne, fileTwo);
+    #endif
     if(f1 == NULL) {
-        rds_log(logERROR,"Error while opening file %s.\n", fileOne);
+        syslog(LOG_ERR, "Error while opening file %s.\n", fileOne);
+        fprintf(stderr,"Error while opening file %s.\n", fileOne);
         return FILE_ERROR;
     }
 
     if(f2 == NULL) {
-        rds_log(logERROR,"Error while opening file %s.\n", fileTwo);
+        syslog(LOG_ERR, "Error while opening file %s.\n", fileTwo);
+        fprintf(stderr,"Error while opening file %s.\n", fileTwo);
         return FILE_ERROR;
     }
 
@@ -148,10 +160,14 @@ int compare_files(char *fileOne, char *fileTwo) {
     }
 
     if(ch1 == ch2) {
-        rds_log(logDEBUG, "Files are identical.\n");
+        #ifdef DEBUG
+            printf("DEBUG: files in compare_files are identical.\n");
+        #endif
     }
     else {
-        rds_log(logDEBUG, "Files are different.\n");
+        #ifdef DEBUG
+            printf("DEBUG: files in compare_files differ.\n");
+        #endif
         rc = FILE_ERROR;
     }
 
@@ -166,15 +182,19 @@ int copy_file(char *source, char *destination) {
     s = fopen(source,"rb");
     d = fopen(destination,"wb");
 
-    rds_log(logDEBUG, "Opening files for copy.\n");
+    #ifdef DEBUG
+        printf("DEBUG: Opening files for copying in copy_file.\n");
+    #endif
     
     if(s == NULL) {
-        rds_log(logERROR,"Error while opening file %s.\n", source);
+        syslog(LOG_ERR, "Error while opening file %s.\n", s);
+        fprintf(stderr,"Error while opening file %s.\n", s);
         return FILE_ERROR;
     }
 
     if(d == NULL) {
-        rds_log(logERROR,"Error while opening file %s.\n", destination);
+        syslog(LOG_ERR, "Error while opening file %s.\n", d);
+        fprintf(stderr,"Error while opening file %s.\n", d);
         return FILE_ERROR;
     }
 
@@ -195,39 +215,30 @@ int send_repo(ParamOptsCl* params, char *arch, char *release, int socket, int ac
     LocalRepoInfo* local_repo;
     char* repo_output;
     
-    rds_log(logDEBUG, "Client repo info JSON creating.\n");
-
     json_gen = js_cr_init(action);
     local_repo = repo_parse_init();
     
-    rds_log(logDEBUG, "Local repo info initialized.\n");
-
     // parsing local repo
     if(!parse_default_repo(local_repo)) {
         return REPO_ERROR;
     }
-    rds_log(logDEBUG, "Local repo is parsed.\n");
 
     get_repo_urls(local_repo, json_gen, arch, release);
-    rds_log(logDEBUG, "Getting repo urls.\n");
 
-    rds_log(logDEBUG, "Loop thrue required packages.\n");
     for(int i = 0; i < params->pkg_count; i++) {
         char* pkg = (char*)g_slist_nth_data(params->pkgs, i);
         js_cr_add_package(json_gen, pkg);
-        rds_log(logDEBUG, "Added %s package as %d in order.\n", pkg, i+1);
     }
     
-    rds_log(logDEBUG, "Generating output message with repo info to server.\n");
     repo_output = js_cr_to_string(json_gen);
-    rds_log(logDEBUG, "Message generated.\n\n%s\n\n", repo_output);
 
     /***********************************************************/
     /* Sending repo info to server                             */
     /***********************************************************/
-    rds_log(logMESSAGE, "Sending message with repo info to server.\n");
+    #ifdef DEBUG
+        printf("DEBUG: Sending repo information to the server.\n");
+    #endif
     secure_write(socket, repo_output, strlen(repo_output));
-    rds_log(logDEBUG, "Message sent.\n");
 
     free(repo_output);
     js_cr_dispose(json_gen);
@@ -252,7 +263,9 @@ int check_repo(int socket, char **message) {
 }
 
 int answer_process(int socket, int action) {
-    rds_log(logMESSAGE, "Waiting for answer from server.\n");
+    #ifdef DEBUG
+        printf("DEBUG: Processing answer - waiting for response.\n");
+    #endif
 
     char *buf;
     JsonRead *json;
@@ -262,17 +275,17 @@ int answer_process(int socket, int action) {
     json = js_rd_init();
 
     if(buf == NULL) {
-        rds_log(logERROR, "Error while recieving data\n");
+        syslog(LOG_ERR, "Error while receiving data on a socket");
+        fprintf(stderr, "An error occured while receiving data on a socket.\n");
         rc = NETWORKING_ERROR;
         goto End;
     }
-    rds_log(logDEBUG, "Some answer has been delivered.\n\n%s\n\n", buf);
-
-    // parse response
-    rds_log(logDEBUG, "Parsing answer.\n");
+    #ifdef DEBUG
+        printf("DEBUG: Answer from the server was successfully received. Parsing.\n");
+    #endif
 
     if(!js_rd_parse(buf, json)) {
-        rds_log(logERROR, "Error while parsing answer from the server\n");
+        //TODO-print error in the function above
         rc = JSON_ERROR;
         goto End;
     }
@@ -280,17 +293,22 @@ int answer_process(int socket, int action) {
     rc = js_rd_get_code(json);
 
     if(rc == ANSWER_WARNING) {
-        rds_log(logWARNING,"%s\n", js_rd_get_message(json));
+        char* msg=js_rd_get_message(json);
+        syslog(LOG_WARNING, "A warning from server: %s", msg);
+        fprintf(stderr,"WARNING: Server issued a warning: %s\n", msg);
         goto End;//TODO - asi vymyslet co s warningama protoze warningem by to koncit nemuselo ten program
     }
 
     if(rc == ANSWER_ERROR) {
-        rds_log(logERROR,"%s\n", js_rd_get_message(json));
+        char* err=js_rd_get_message(json);
+        syslog(LOG_ERR, "An error from server: %s", err);
+        fprintf(stderr,"ERROR: An error occured on a server: %s\n", err);
         goto End;
     }
 
     if(rc == ANSWER_NO_DEP) {
-        rds_log(logERROR, "Answer no dep.\n");
+        syslog(LOG_NOTICE, "Dependency not found");
+        fprintf("INFO: The server was unable to solve dependecies.\n");
         goto End;
     }
 

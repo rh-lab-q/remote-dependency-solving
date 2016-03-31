@@ -27,6 +27,8 @@
 extern "C"{
 #endif
 
+//#define DEBUG
+    
 /**
  * Resolves path for @System.solv file depending on system version
  * @brief resolve_dependency_file_path
