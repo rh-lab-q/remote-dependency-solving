@@ -38,7 +38,8 @@
 #include "../common/util.h"
 
 
-int get_new_id(int socket, char **id, char *arch, char *release) {//TODO - implement this on server and then repair this function
+int get_new_id(int socket, char **id, char *arch, char *release) {
+    //TODO - implement this on server and then repair this function
     char *message;
     JsonCreate* json_gen = js_cr_init(GENERATE_ID);
 
