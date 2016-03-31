@@ -320,12 +320,17 @@ int answer_process(int socket, int action) {
     num_obsolete = js_rd_get_count(json, "obsolete"),
     num_unneeded; //to num_unneeded zatim nepouzijem protoze to hazi divny vysledky
 
-    printf("Number of packages to\n\tinstall: %d\n\tupdate: %d\n\terase: %d\n\tmaybe erase: %d\n", num_install, num_update, num_erase, num_obsolete);
-
     if(!num_install && !num_update && !num_erase && !num_obsolete) {
-        rds_log(logMESSAGE,"Nothing to do.\n");
+        printf("Nopackages were selected to be installed, updated or erased. Nothing to do.\n");
         goto End;
     }
+    else {
+        printf("Dependecies resolved.\n");
+        printf("================================================================================\n");
+        printf(" Package\t\tArch\t\tVersion\t\t\tRepository\t\tSize\n");
+        printf("================================================================================\n");
+    }
+        //TODO - think of a better way to say this ^^^^
 
     GSList 	*install_pkgs = js_rd_parse_answer("install", json),
         *update_pkgs = js_rd_parse_answer("upgrade", json),
@@ -334,38 +339,48 @@ int answer_process(int socket, int action) {
     rds_log(logMESSAGE, "Result from server:\n");
 
     if(num_install) {
-        printf("Packages for install\n");
+        printf("Installing:\n");
 
         for(guint i = 1; i < g_slist_length(install_pkgs); i++) {
             JsonPkg* pkg = (JsonPkg*)g_slist_nth_data(install_pkgs, i);
-            printf("\t%s\n", pkg->pkg_name);
+            printf(" %s\n", pkg->pkg_name);
         }
     }
 
     if(num_update) {
-        printf("Packages for update\n");
+        printf("Upgrading:\n");
 
         for(guint i = 1; i < g_slist_length(update_pkgs); i++)
         {
             JsonPkg* pkg = (JsonPkg*)g_slist_nth_data(update_pkgs, i);
-            printf("\t%s\n", pkg->pkg_name);
+            printf(" %s\n", pkg->pkg_name);
         }
     }
 
     if(num_erase) {
-        printf("Packages for erase\n");
+        printf("Erasing:\n");
 
         for(guint i = 1; i < g_slist_length(erase_pkgs); i++)
         {
             JsonPkg* pkg = (JsonPkg*)g_slist_nth_data(erase_pkgs, i);
-            printf("\t%s\n", pkg->pkg_name);
+            printf(" %s\n", pkg->pkg_name);
         }
     }			
 
-    int ans = question("Is it ok?",((!num_install && !num_update && num_erase)? YES_NO : YES_NO_DOWNLOAD));
+    printf("Transaction Summary\n");
+    printf("================================================================================\n");
+    if(num_install)
+        printf("Install  %d Packages\n", num_install);
+    if(num_update)
+        printf("Upgrade  %d Packages\n", num_update);
+    if(num_erase)
+        printf("Erase  %d Packages\n", num_erase);
+    
+    int ans = question("\nIs this ok [y/N]",((!num_install && !num_update && num_erase)? YES_NO : YES_NO_DOWNLOAD));
 
     if(ans == NO) {
-        rds_log(logMESSAGE,"Action interupted by user.\n");
+        syslog(LOG_NOTICE, "Operation aborted by user");
+        printf("Operation aborted.\n");
         goto parseEnd;
     }
 
@@ -389,8 +404,9 @@ int download(int answer, GSList *install, GSList *update, GSList *erase) {
     /***********************************************************/
     /* Downloading packages part                               */
     /***********************************************************/
-
-    rds_log(logDEBUG, "Begin downloading part.\n");
+    #ifdef DEBBUG
+        printf("DEBUG: Begin downloading part - download function.\n");
+    #endif
 
     // required variables for downloading
     gboolean return_status;
@@ -400,17 +416,14 @@ int download(int answer, GSList *install, GSList *update, GSList *erase) {
 
     for(guint i = 1; i < g_slist_length(install); i++) {
         JsonPkg* inst = (JsonPkg*)g_slist_nth_data(install, i);
-        rds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
-
-        rds_log(logDEBUG, "Downloading preparation.\n");
+        
+//         printf("Downloading Packages:\n");
+//         printf("(%d/%d): %s\n", i, g_slist_length(install), inst->pkg_name);
+        
         handler = lr_handle_init();
-        rds_log(logDEBUG, "Download handler initied.\n");
         lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
-        rds_log(logDEBUG, "Array of URLs is set.\n");
         lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
-        rds_log(logDEBUG, "Repo type is set.\n");
         lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
-        rds_log(logDEBUG, "Progress callback is set.\n");
 
         // Prepare list of target
         target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET,
@@ -421,17 +434,13 @@ int download(int answer, GSList *install, GSList *update, GSList *erase) {
 
     for(guint i = 1; i < g_slist_length(update); i++) {
         JsonPkg* inst = (JsonPkg*)g_slist_nth_data(update, i);
-        rds_log(logMESSAGE, "Downloading preparation for package: %s\n", inst->pkg_name);
+//         printf("Downloading Packages:\n");
+//         printf("(%d/%d): %s\n", i, g_slist_length(install), inst->pkg_name);
 
-        rds_log(logDEBUG, "Downloading preparation.\n");
         handler = lr_handle_init();
-        rds_log(logDEBUG, "Download handler initied.\n");
         lr_handle_setopt(handler, NULL, LRO_METALINKURL, inst->metalink);
-        rds_log(logDEBUG, "Array of URLs is set.\n");
         lr_handle_setopt(handler, NULL, LRO_REPOTYPE, LR_YUMREPO);
-        rds_log(logDEBUG, "Repo type is set.\n");
         lr_handle_setopt(handler, NULL, LRO_PROGRESSCB, progress_callback);
-        rds_log(logDEBUG, "Progress callback is set.\n");
 
         // Prepare list of target
         target = lr_packagetarget_new_v2(handler, inst->pkg_loc, DOWNLOAD_TARGET,
@@ -440,25 +449,28 @@ int download(int answer, GSList *install, GSList *update, GSList *erase) {
         update_list = g_slist_append(update_list, target);
     }
 
-    // Download all packages        
-    rds_log(logMESSAGE, "Downloading packages.\n");
-    return_status = lr_download_packages(install_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
+    // Download all packages
+    #ifdef DEBUG
+        printf("DEBUG: Downloading packages.\n");
+    #endif
+    return_status = lr_download_packages(install_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);//TODO - does this write anything to stdout??
 
     if(!return_status || error != NULL) {
-        rds_log(logERROR, "%d: %s\n", error->code, error->message);
+        syslog(LOG_ERR, "Error number: %d, error message: %s", error->code, error->message);
+        fprintf(stderr, "ERROR: An error occured while downloading packages.\n");
         rc = DOWNLOAD_ERROR;
     }
     else {
         return_status = lr_download_packages(update_list, LR_PACKAGEDOWNLOAD_FAILFAST, &error);
 
         if(!return_status || error != NULL){
-            rds_log(logERROR, "%d: %s\n", error->code, error->message);
+            syslog(LOG_ERR, "Error number: %d, error message: %s", error->code, error->message);
+            fprintf(stderr, "ERROR: An error occured while downloading packages.\n");
             rc = DOWNLOAD_ERROR;
         }
         else {
-            rds_log(logMESSAGE, "All packages were downloaded successfully.\n");
             if(answer == DOWNLOAD)
-                rds_log(logMESSAGE, "Packages are in %s.\n", DOWNLOAD_TARGET);
+                rds_log(logMESSAGE, "Packages are in %s.\n", DOWNLOAD_TARGET);//TODO - wtf?
             else
                 rc = rpm_process(install_list, update_list, erase);
         }
@@ -484,9 +496,8 @@ int rpm_process(GSList *install, GSList *update, GSList *erase) {
     ts = rpmtsCreate();
     rpmtsSetRootDir(ts, NULL);
 
-
+    printf("Running transaction\n");
     if(install != NULL) {
-        rds_log(logMESSAGE, "Installing packages.\n");
         for(GSList *elem = install; elem; elem = g_slist_next(elem)) {
             LrPackageTarget *target = (LrPackageTarget *)elem->data;
 
@@ -536,7 +547,7 @@ int rpm_process(GSList *install, GSList *update, GSList *erase) {
     nf |= INSTALL_LABEL | INSTALL_HASH;
     rpmtsSetNotifyCallback(ts, rpmShowProgress,(void *) nf);
 
-    rc = rpmtsRun(ts, NULL, flag);
+    rc = rpmtsRun(ts, NULL, flag);//TODO - does this write anything?
 
     rpmEnd:
     rpmtsClean(ts);
