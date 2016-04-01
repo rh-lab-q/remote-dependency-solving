@@ -27,7 +27,8 @@
 
 int parse_params_cl(int argc, char* argv[], ParamOptsCl* params) {
     if(argc==1) {
-        rds_log(logERROR, "No command provided. The program will terminate now.\n");
+        rds_log(logERROR, "No command provided. You need to give some command.\n");
+        print_commands_cl();
         return 2;
     }
 
@@ -36,7 +37,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params) {
         {"install", no_argument, &param_opt, PAR_INSTALL},
         {"chkdep", no_argument, &param_opt, PAR_CHK_DEP},
         {"update", no_argument, &param_opt, PAR_UPDATE},
-        {"erase", no_argument, &param_opt, PAR_ERASE},
+        {"remove", no_argument, &param_opt, PAR_ERASE},
         {"help", no_argument, 0, 'h'}
     };
 
@@ -162,3 +163,14 @@ void print_help_srv() {
         "-d\tDebug - turned off by default\n"
     );
 }
+
+void print_commands_cl()
+{
+    printf("./rds-client <commands> [<packages> ...]\n\n"
+            "List of main commands\n\n"
+            "install\n"
+            "remove\n"
+            "update\n"
+            "help\n");
+}
+

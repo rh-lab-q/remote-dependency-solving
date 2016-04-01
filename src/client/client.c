@@ -309,7 +309,7 @@ int answer_process(int socket, int action) {
 
     if(rc == ANSWER_NO_DEP) {
         syslog(LOG_NOTICE, "Dependency not found");
-        fprintf("INFO: The server was unable to solve dependecies.\n");
+        fprintf(stderr, "INFO: The server was unable to solve dependecies.\n");
         goto End;
     }
 

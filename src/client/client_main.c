@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
     /********************************************************************/
     /* Networking part - connecting to server                           */
     /********************************************************************/
-    printf("Info: Cotacting the server. This might take a while.\n");
+    printf("Info: Contacting the server. This might take a while.\n");
     int socket;
 
     status = client_connect(&socket, server_address, port);
