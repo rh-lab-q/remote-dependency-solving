@@ -100,7 +100,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params) {
 
 ParamOptsCl* init_params_cl() {
     ParamOptsCl* new;
-    
+
     new = (ParamOptsCl*)malloc(sizeof(ParamOptsCl));
     new->pkg_count = 0;
     new->command = -1;
@@ -117,22 +117,22 @@ void free_params_cl(ParamOptsCl* params) {
 
 void parse_params_srv(int argc, char* argv[]) {
     int opt;
-    
+
     while ((opt = getopt(argc, argv, "vhd")) != -1) {
         switch (opt) {
             case 'v':
                 set_verbose();
             break;
-            
+
             case 'h':
                 print_help_srv();
                 exit(EXIT_SUCCESS);
             break;
-            
+
             case 'd':
                 set_debug();
             break;
-            
+
             default: /* '?' */
                 print_help_srv();
                 exit(PARAMS_ERROR);
@@ -147,7 +147,7 @@ void print_help_cl() {
         "List of Commands\n\n"
         "--install\t\tResolve dependencies and install packages\n"
         "--update\t\tResolve dependencies and update packages\n"
-        "--erase\t\t\tErase packages\n"
+        "--remove\t\t\tRemove packages\n"
         "--chkdep\t\tOnly show required packages - do not install yet\n"
         "--help, -h\t\tDisplays help\n"
         "-v\t\t\tVerbose - turned off by default\n"
