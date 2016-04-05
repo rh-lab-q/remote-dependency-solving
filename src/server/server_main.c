@@ -19,6 +19,7 @@
  */
 
 #include "server.h"
+#include <syslog.h>
 
 
 int main(int argc, char* argv[]) {
@@ -34,8 +35,7 @@ int main(int argc, char* argv[]) {
 
     parse_params_srv(argc, argv);
 
-    rds_log(logSSDS, "Server started.\n");
-    rds_log(logDEBUG, "Params parsed.\n");
+    syslog(LOG_NOTICE, "Server started");
 
     status = server_init(&comm_desc, &comm_addr_len);
     if(status != OK) goto end;
@@ -44,7 +44,8 @@ int main(int argc, char* argv[]) {
         status = server_accept_connection(comm_desc, comm_addr_len);
         if(status == EXIT) goto end;
     }
-    
+
     end:
+        syslog(LOG_NOTICE, "Server ended. Check the return value for more information");
         return status;
 }
