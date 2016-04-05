@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <syslog.h>
 
 #include "cfg_parsing.h"
 #include "util.h"
@@ -7,24 +8,24 @@
 
 int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
 {
+#ifdef DEBUG
+    printf("DEBUG: read_cfg\n");
+#endif
     /*
     ** reads connection configuration from CFG file
     */
     char *address, *comm_port, *client_id;
     FILE* cfg_file;
-    
-    cfg_file = fopen(CFG_FILE, "r");
-    if (cfg_file == NULL) {
-        rds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
 
+    cfg_file = fopen(CFG_FILE, "r");
+    if (cfg_file == NULL)  //TODO - maybe change this so that it really reads some file and the loopback address should be in that file
+    {
         *ret_address = (char*)rds_malloc(10*sizeof(char));
         strncpy(*ret_address, "127.0.0.1\0", 10);
 
         *ret_comm_port = 2345;
         return 1;
     }
-
-    rds_log(logDEBUG, "Parsing the config file.\n");
 
     char fmstate = 'e';
     char act_c;
@@ -33,74 +34,80 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
     int client_id_parsed = 0;
     int comm_port_parsed = 0;
 
-    do {
+    do
+    {
         act_c = fgetc(cfg_file);
-        switch (fmstate) {
-            case 'e':
-                if ((act_c == '#') || (act_c == '[')) //comment
-                    fmstate = 'c';
-                else if (act_c == 'a') //address
-                    fmstate = 'a';
-                else if (act_c == 's') //address (alternative)
-                    fmstate = 's';
-                else if (act_c == 'p') //port
-                    fmstate = 'p';
-                else if (act_c == 'i') //id
-                    fmstate = 'i';
-                else fmstate = 'c'; //ignore invalid lines
+        switch (fmstate)
+        {
+        case 'e':
+            if ((act_c == '#') || (act_c == '[')) //comment
+                fmstate = 'c';
+            else if (act_c == 'a') //address
+                fmstate = 'a';
+            else if (act_c == 's') //address (alternative)
+                fmstate = 's';
+            else if (act_c == 'p') //port
+                fmstate = 'p';
+            else if (act_c == 'i') //id
+                fmstate = 'i';
+            else fmstate = 'c'; //ignore invalid lines
             break;
 
-            case 'c':
-                if (act_c == '\n')
-                    fmstate = 'e';
+        case 'c':
+            if (act_c == '\n')
+                fmstate = 'e';
             break;
 
-            case 'a':
-                compare(cfg_file, "address=", 7, &fmstate, &act_c);
-                
-                if (fmstate == 'a') {
-                    address = file_read_value(cfg_file, 0);
-                    *ret_address = address;
-                    address_parsed = 1;
-                    fmstate = 'e';
-                }
+        case 'a':
+            compare(cfg_file, "address=", 7, &fmstate, &act_c);
+
+            if (fmstate == 'a')
+            {
+                address = file_read_value(cfg_file, 0);
+                *ret_address = address;
+                address_parsed = 1;
+                fmstate = 'e';
+            }
             break;
 
-            case 's':
-                compare(cfg_file, "server=", 6, &fmstate, &act_c);
-                
-                if (fmstate == 's') {
-                    address = file_read_value(cfg_file, 0);
-                    *ret_address = address;
-                    address_parsed = 1;
-                    fmstate = 'e';
-                }
+        case 's':
+            compare(cfg_file, "server=", 6, &fmstate, &act_c);
+
+            if (fmstate == 's')
+            {
+                address = file_read_value(cfg_file, 0);
+                *ret_address = address;
+                address_parsed = 1;
+                fmstate = 'e';
+            }
             break;
 
-            case 'p':
-                compare(cfg_file, "port=", 4, &fmstate, &act_c);
-                
-                if (fmstate == 'p') {
-                    comm_port = file_read_value(cfg_file, 5);
-                    *ret_comm_port = strtol(comm_port, NULL, 10);
-                    free(comm_port);
-                    comm_port_parsed = 1;
-                    fmstate = 'e';
-                }
+        case 'p':
+            compare(cfg_file, "port=", 4, &fmstate, &act_c);
+
+            if (fmstate == 'p')
+            {
+                comm_port = file_read_value(cfg_file, 5);
+                *ret_comm_port = strtol(comm_port, NULL, 10);
+                free(comm_port);
+                comm_port_parsed = 1;
+                fmstate = 'e';
+            }
             break;
 
-            case 'i':
-                compare(cfg_file, "id=", 2, &fmstate, &act_c);
-                
-                if (fmstate == 'i') {
-                    client_id = file_read_value(cfg_file, 0);
-                    *ret_client_id = client_id;
-                    client_id_parsed = 1;
-                    fmstate = 'e';
-                }
+        case 'i':
+            compare(cfg_file, "id=", 2, &fmstate, &act_c);
+
+            if (fmstate == 'i')
+            {
+                client_id = file_read_value(cfg_file, 0);
+                *ret_client_id = client_id;
+                client_id_parsed = 1;
+                fmstate = 'e';
+            }
             break;
 
-            default:
+        default:
             break;
         }
     }
@@ -108,7 +115,8 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
 
     fclose(cfg_file);
 
-    if (address_parsed == 0) {
+    if (address_parsed == 0)
+    {
         *ret_address = (char*)rds_malloc(10*sizeof(char));
         strncpy(*ret_address, "127.0.0.1\0", 10);
     }
@@ -117,8 +125,7 @@ int read_cfg(char **ret_client_id, char** ret_address, long int* ret_comm_port)
     if (!comm_port_parsed)
         *ret_comm_port = 2345;
 
-    rds_log(logDEBUG, "server: %s, comm port: %ld\n", *ret_address, *ret_comm_port);
-
+//     rds_log(logDEBUG, "server: %s, comm port: %ld\n", *ret_address, *ret_comm_port);
     return 0;
 }
 
@@ -127,54 +134,56 @@ int read_srv_cfg(long int* ret_comm_port)
     /*
     * reads connection configuration from CFG file
     */
-
+#ifdef  DEBUG
+    printf("DEBUG: read_srv_cfg\n");
+#endif
     char *comm_port;
     FILE* cfg_file;
 
     cfg_file = fopen(CFG_FILE, "r");
-    if (cfg_file == NULL) {
-        rds_log(logDEBUG, "Could not open cfg file, using defaults.\n");
-
+    if (cfg_file == NULL)
+    {
         *ret_comm_port = 2345;
         return 1;
     }
-
-    rds_log(logDEBUG, "CFG file opened.\n");
 
     char fmstate = 'e';
     char act_c;
 
     int comm_port_parsed = 0;
 
-    do {
+    do
+    {
         act_c = fgetc(cfg_file);
-        switch (fmstate) {
-            case 'e':
-                if (act_c == '#') //comment
-                    fmstate = 'c';
-                else if (act_c == 'p') //port
-                    fmstate = 'p';
-                else fmstate = 'c'; //ignore invalid lines
+        switch (fmstate)
+        {
+        case 'e':
+            if (act_c == '#') //comment
+                fmstate = 'c';
+            else if (act_c == 'p') //port
+                fmstate = 'p';
+            else fmstate = 'c'; //ignore invalid lines
             break;
 
-            case 'c':
-                if (act_c == '\n')
-                    fmstate = 'e';
+        case 'c':
+            if (act_c == '\n')
+                fmstate = 'e';
             break;
 
-            case 'p':
-                compare(cfg_file, "port=", 4, &fmstate, &act_c);
-                
-                if (fmstate == 'p') {
-                    comm_port = file_read_value(cfg_file, 5);
-                    *ret_comm_port = strtol(comm_port, NULL, 10);
-                    free(comm_port);
-                    comm_port_parsed = 1;
-                    fmstate = 'e';
-                }
+        case 'p':
+            compare(cfg_file, "port=", 4, &fmstate, &act_c);
+
+            if (fmstate == 'p')
+            {
+                comm_port = file_read_value(cfg_file, 5);
+                *ret_comm_port = strtol(comm_port, NULL, 10);
+                free(comm_port);
+                comm_port_parsed = 1;
+                fmstate = 'e';
+            }
             break;
 
-            default:
+        default:
             break;
         }
     }
@@ -185,22 +194,23 @@ int read_srv_cfg(long int* ret_comm_port)
     if (!comm_port_parsed)
         *ret_comm_port = 2345;
 
-    rds_log(logDEBUG, "comm port: %ld\n", *ret_comm_port);
-
     return 0;
 }
 
 int write_to_cfg(char *name, char *value)
 {
+#ifdef DEBUG
+    printf("DEBUG: write_to_cfg\n");
+#endif
     FILE* cfg_file;
-    
+
     cfg_file = fopen(CFG_FILE, "r+");
-    if (cfg_file == NULL) {
-        rds_log(logDEBUG, "Conf file not found.\n");
+    if (cfg_file == NULL)
+    {
+        syslog(LOG_ERR, "Config file was not found");
+        fprintf(stderr, "Conf file not found.\n");
         return 1;
     }
-
-    rds_log(logDEBUG, "CFG file opened for write.\n");
 
     char fmstate = 'e';
     char *act_val;
@@ -217,59 +227,64 @@ int write_to_cfg(char *name, char *value)
     char act_c;
     int position;
 
-    do {
+    do
+    {
         act_c = fgetc(cfg_file);
-        switch (fmstate) {
-            case 'e':
-                if (act_c == name[0]) //desired value
-                    fmstate = 'v';
-                else fmstate = 'c'; //ignore invalid lines
+        switch (fmstate)
+        {
+        case 'e':
+            if (act_c == name[0]) //desired value
+                fmstate = 'v';
+            else fmstate = 'c'; //ignore invalid lines
             break;
 
-            case 'c':
-                if (act_c == '\n')
-                    fmstate = 'e';
+        case 'c':
+            if (act_c == '\n')
+                fmstate = 'e';
             break;
 
-            case 'v':
-                compare(cfg_file, name, len - 1, &fmstate, &act_c);
-                act_c = fgetc(cfg_file);
-                if (act_c != '=')
-                    fmstate = 'c';
-                if (fmstate == 'v') {
-                    already_exists = 1;
-                    fmstate = 'e';
-                    position = ftell(cfg_file);
-                }
+        case 'v':
+            compare(cfg_file, name, len - 1, &fmstate, &act_c);
+            act_c = fgetc(cfg_file);
+            if (act_c != '=')
+                fmstate = 'c';
+            if (fmstate == 'v')
+            {
+                already_exists = 1;
+                fmstate = 'e';
+                position = ftell(cfg_file);
+            }
             break;
 
-            default:
+        default:
             break;
         }
     }
     while (act_c != EOF);
 
-    if (already_exists == 1) {
-    //clone file with changed value
+    if (already_exists == 1)
+    {
+        //clone file with changed value
         char *tempcfg;
         FILE *new_file;
-        
+
         fseek(cfg_file, 0, SEEK_SET);
         tempcfg = (void*)rds_malloc((position + 1) * sizeof(char));
         fread(tempcfg, sizeof(char), position, cfg_file);
         tempcfg[position] = '\0';
-        
+
         new_file= fopen("../etc/rds-client.conf.tmp", "w");
         fwrite(tempcfg, sizeof(char), position, new_file);
         fwrite(value, sizeof(char), val_len, new_file);
 
-
-        do {
+        do
+        {
             act_c = fgetc(cfg_file);
         }
         while ((act_c != '\n') && (act_c != EOF));
-        
-        while (act_c != EOF) {
+
+        while (act_c != EOF)
+        {
             fputc(act_c, new_file);
             act_c = fgetc(cfg_file);
         }
@@ -277,27 +292,29 @@ int write_to_cfg(char *name, char *value)
         fclose(cfg_file);
         fclose(new_file);
 
-        if (remove(CFG_FILE) != 0) {
-            rds_log(logERROR, "cannot delete old conf. file\n");
+        if (remove(CFG_FILE) != 0)
+        {
+            syslog(LOG_ERR, "Unable to delete old config file");
+            fprintf(stderr, "ERROR: Unable to delete old config file\n");
             return 1;
         }
 
-        if (rename("../etc/ssds-client.conf.tmp", CFG_FILE) != 0) {
-            rds_log(logERROR, "cannot rename new conf. file\n");
+        if (rename("../etc/ssds-client.conf.tmp", CFG_FILE) != 0)
+        {
+            syslog(LOG_ERR, "Unable to rename new config file");
+            fprintf(stderr, "ERROR: Unable to rename new config file\n");
             return 1;
         }
 
-        rds_log(logDEBUG, "there is already [%s] in config file, updating its value\n", name);
         return 0;
     }
-    else {
+    else
+    {
         fseek(cfg_file, 0, SEEK_END);
         fwrite(name, sizeof(char), len, cfg_file);
         fwrite("=", sizeof(char), 1, cfg_file);
         fwrite(value, sizeof(char), val_len, cfg_file);
         fwrite("\n", sizeof(char), 1, cfg_file);
-
-        rds_log(logDEBUG, "[%s = %s] written to configuration file\n", name, value);
 
         fclose(cfg_file);
     }
@@ -306,6 +323,9 @@ int write_to_cfg(char *name, char *value)
 
 char* file_read_value(FILE* file, int max_length)
 {
+#ifdef DEBUG
+    printf("file_read_value\n");
+#endif
     /*
     ** reads value from file until EOL
     */
@@ -313,25 +333,26 @@ char* file_read_value(FILE* file, int max_length)
     char act_char;
     int value_lenght = 0;
     int allocated_lenght = 5;
-    
+
     value = (char*)rds_malloc(6*sizeof(char)); //5 + 1
     act_char = fgetc(file);
-    
-    while ((act_char != '\n') && (act_char != EOF)) {
-        if (value_lenght == allocated_lenght) {
+
+    while ((act_char != '\n') && (act_char != EOF))
+    {
+        if (value_lenght == allocated_lenght)
+        {
             allocated_lenght += 5;
             value = (char*)rds_realloc(value, (allocated_lenght + 1)*sizeof(char));
         }
         value[value_lenght++] = act_char;
         act_char = fgetc(file);
     }
-    
+
     value[value_lenght] = '\0';
-    if ((value_lenght >= max_length) & (max_length != 0)) {
-        rds_log(logDEBUG, "[%s] shortened to:\n", value);
+    if ((value_lenght >= max_length) & (max_length != 0))
+    {
         value[max_length - 1] = '\0';
         value = (char*)rds_realloc(value, (max_length)*sizeof(char));
-        rds_log(logDEBUG, "\t[%s] (max-length = %d)\n", value, max_length);
     }
     //rds_log(logDEBUG, "***read \"%s\" of lenght %d\n", value, value_lenght);
     return value;
@@ -340,7 +361,11 @@ char* file_read_value(FILE* file, int max_length)
 
 void compare(FILE* file, char* str, int len, char *state, char *act_c)
 {
-    for (int i1 = 1; i1 <= len; i1++) {
+#ifdef DEBUG
+    printf("compare\n");
+#endif
+    for (int i1 = 1; i1 <= len; i1++)
+    {
         if (*act_c != str[i1])
             *state = 'c';
         if (i1 < len)

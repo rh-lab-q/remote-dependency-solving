@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <signal.h>
+#include <syslog.h>
 
 #include "client.h"
 #include "../common/repo_handler.h"
@@ -7,10 +8,6 @@
 #include "../common/util.h"
 #include "../common/cfg_parsing.h"
 
-
-//#define VERSION_HAWKEY @HKY_22@
-//for debugging
-//#define DEBUG
 
 /* Client plan:
  *  check id (if NULL - ask for it from server by message) TODO: gen. ID on server and store it into cfg gile
@@ -38,12 +35,14 @@
 // }
 
 int main(int argc, char* argv[]) {
+    setlogmask (LOG_UPTO (LOG_NOTICE));
     /*******************************************************************/
     /* Check root rights                                               */
     /*******************************************************************/
     uid_t uid = geteuid();
     if(uid != 0) {
-        rds_log(logERROR, "This program has to be run under the root user otherwise no packages can be installed, erased or updated.\n");
+        syslog(LOG_ERR, "This program has to be run under the root user.");
+        printf("Error: This program has to be run under the root user.\n");
         return ROOT_ERROR;
     }
 
@@ -64,26 +63,23 @@ int main(int argc, char* argv[]) {
     /* Parsing parameters 					     */
     /*******************************************************************/
 
-    rds_log(logSSDS, "Client startup.\n");
+    syslog(LOG_NOTICE, "rds-client program was initiated");
 
     ParamOptsCl* params = init_params_cl();
-
-    
     if(parse_params_cl(argc, argv, params) != 0) {
         status = PARAMS_ERROR;
         goto end;
     }
     
-    rds_log(logDEBUG, "Client params initialized.\n");
-    rds_log(logDEBUG, "Client params parsed. Package count %d.\n", params->pkg_count);  
-    rds_log(logMESSAGE, "Client startup. Required package count %d.\n", params->pkg_count); 
-
+#ifdef DEBUG
+    printf("DEBUG: Parameters successfully parsed.\n");
+#endif
     if((params->pkg_count == 0) && (params->command == PAR_UPDATE))
         params->command = PAR_UPDATE_ALL;
+    
     /********************************************************************/
     /* Load configuration                                               */
     /********************************************************************/
-
     char *server_address, *id;
     long int port;
     read_cfg(&id, &server_address, &port);
@@ -102,20 +98,16 @@ int main(int argc, char* argv[]) {
     /********************************************************************/
     /* Networking part - connecting to server                           */
     /********************************************************************/
-    rds_log(logDEBUG, "Network part.\n");
-
+    printf("Info: Contacting the server. This might take a while.\n");
     int socket;
 
     status = client_connect(&socket, server_address, port);
 
     if(status != OK) goto end;
 
-//     rds_log(logDEBUG, "Communication socket: %d.\n", socket);
-
     /********************************************************************/
     /* Checking client ID                                               */
     /********************************************************************/
-
     if(id == NULL) {  //TODO - create request-response communication with server   
         status = get_new_id(socket, &id, arch, release);
         if(status != OK) goto end;
@@ -124,21 +116,21 @@ int main(int argc, char* argv[]) {
         if(status != OK) goto end;
         
         if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
-            rds_log(logWARNING, "Unable to make @System.solv backup.\n");
+            syslog(LOG_WARNING, "rds-client was unable to create @System.solv backup file");
 
         status = send_file(socket, SEND_YUM_CONF, pathToOriginalYum);
         if(status != OK) goto end;
         
         if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
-            rds_log(logWARNING, "Unable to make yum.conf backup.\n");
-
+            syslog(LOG_WARNING, "rds-client was unable to create yum.conf backup file");
     }
     else {
         if(compare_files(pathToOriginalSolv, pathToBackupSolv) != OK) {
             int ans = question("DNF install packages by themselves. We need to make initial steps again. If you don't want to use RDS call rds-client --disconnect. Do you agree to make initial steps again?", YES_NO);
 
             if(ans == NO) {
-                rds_log(logMESSAGE,"Action interupted by user.\n");
+                syslog(LOG_ERR, "Initial steps of rds-client declined by user");
+                fprintf(stderr, "Error: Initial steps of rds declined. The program cannot continue.\n");
                 goto end;
             }
 
@@ -146,14 +138,13 @@ int main(int argc, char* argv[]) {
             if(status != OK) goto end;
             
             if(copy_file(pathToOriginalSolv, pathToBackupSolv) != OK)
-                rds_log(logWARNING, "Unable to make @System.solv backup.\n");
-            
+                syslog(LOG_WARNING, "rds-client was unable to create @System.solv backup file");
         }
-
-        if( compare_files(pathToOriginalYum, pathToBackupYum) != OK ) {
-            int ans = question("New yum configuration will be sent to server. Do yout agree?", YES_NO);
+        if(compare_files(pathToOriginalYum, pathToBackupYum) != OK ) {
+            int ans = question("New yum configuration will be sent to server. Do you agree?", YES_NO);
             if(ans == NO){
-                rds_log(logMESSAGE,"Action interupted by user.\n");
+                syslog(LOG_ERR, "Sending of the new yum.conf to the server was declined");
+                fprintf(stderr, "Sending of the new yum.conf to the server was declined. The program cannot continue.\n");
                 goto end;
             }
 
@@ -161,7 +152,7 @@ int main(int argc, char* argv[]) {
             if(status != OK) goto end;
             
             if(copy_file(pathToOriginalYum, pathToBackupYum) != OK)
-                rds_log(logWARNING, "Unable to make yum.conf backup.\n");
+                syslog(LOG_WARNING, "rds-client was unable to create yum.conf backup file");
         }
     }
 
@@ -170,63 +161,81 @@ int main(int argc, char* argv[]) {
     switch(params->command)
     {
         case PAR_INSTALL: 
-            rds_log(logMESSAGE, "Installation of packages was selected.\n");
-
+            #ifdef DEBUG
+                printf("DEBUG: Switch for operation - INSTALL was chosen\n");
+            #endif
+                
             status = send_repo(params, arch, release, socket, GET_INSTALL);
             if(status != OK) break; 
 
-            if(check_repo(socket, &message) != ANSWER_OK)
-                rds_log(logWARNING,"%s\n", message);
+            if(check_repo(socket, &message) != ANSWER_OK) {
+                syslog(LOG_WARNING, "%s",message);
+                printf("Server warning: %s\n", message);
+            }
 
             status = answer_process(socket, GET_INSTALL);
         break;
 
         case PAR_UPDATE: 
-            rds_log(logMESSAGE, "Update of packages was selected.\n");
-            rds_log(logERROR, "Update option has not been implemented yet.\n");
+            #ifdef DEBUG
+                printf("DEBUG: Switch for operation - UPDATE was chosen\n");
+            #endif
 
             status = send_repo(params, arch, release, socket, GET_UPDATE);
             if(status != OK) break;
 
-            if(check_repo(socket, &message) != ANSWER_OK)
-                rds_log(logWARNING,"%s\n", message);
+            if(check_repo(socket, &message) != ANSWER_OK) {
+                syslog(LOG_WARNING, "%s",message);
+                printf("Server warning: %s\n", message);
+            }
 
             status = answer_process(socket, GET_UPDATE);
-
         break;
 
         case PAR_ERASE: 
-            rds_log(logMESSAGE, "Erase of packages was selected.\n");
+            #ifdef DEBUG
+                printf("DEBUG: Switch for operation - ERASE was chosen\n");
+            #endif
 
             status = send_repo(params, arch, release, socket, GET_ERASE);
             if(status != OK) break;
 
-            if(check_repo(socket, &message) != ANSWER_OK)
-                rds_log(logWARNING,"%s\n", message);
+            if(check_repo(socket, &message) != ANSWER_OK) {
+                syslog(LOG_WARNING, "%s",message);
+                printf("Server warning: %s\n", message);
+            }
 
             status = answer_process(socket, GET_ERASE);
-
         break;
 
         case PAR_CHK_DEP: 
-            rds_log(logMESSAGE, "Dependency check of packages was selected.\n");
-            rds_log(logERROR, "Dependency check option has not been implemented yet.\n");
+            #ifdef DEBUG
+                printf("DEBUG: Switch for operation - DEPENDENCY CHECK was chosen\n");
+            #endif
+                printf("Dependency check operation was not implemented yet.\n");
         break;
 
         case PAR_UPDATE_ALL:
-            rds_log(logMESSAGE, "Update all packages was initiated.\n");
+            #ifdef DEBUG
+                printf("DEBUG: Switch for operation - UPDATE ALL was chosen\n");
+            #endif
+            
             status = send_repo(params, arch, release, socket, GET_UPDATE_ALL);
             if(status != OK) break;
 
-            if(check_repo(socket, &message) != ANSWER_OK)
-                rds_log(logWARNING,"%s\n", message);
+            if(check_repo(socket, &message) != ANSWER_OK) {
+                syslog(LOG_WARNING, "%s",message);
+                printf("Server warning: %s\n", message);
+            }
 
             status = answer_process(socket, GET_UPDATE);
         break;
     } 
 
     end:
-        rds_log(logSSDS, "End of client.\n\n");
+        #ifdef DEBUG
+            printf("Client reached the end.\n");
+        #endif
         free_params_cl(params);
 
     return status;

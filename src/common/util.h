@@ -27,6 +27,8 @@
 extern "C"{
 #endif
 
+#define DEBUG
+
 /**
  * Resolves path for @System.solv file depending on system version
  * @brief resolve_dependency_file_path
@@ -34,7 +36,7 @@ extern "C"{
  * @param arch    return value of function
  * @param release return value of function
  */
-void resolve_dependency_file_path(char* ret_val, char** arch, char** release);
+int resolve_dependency_file_path(char* ret_val, char** arch, char** release);
 
 /**
  * Callback function for downloading packages
@@ -50,7 +52,7 @@ int progress_callback(void *data, double total, double downloaded);
  * @param data		void*
  * @param status	LrTransferStatus
  * @param msg		const char*
- * @return 		status	
+ * @return 		status
  */
 int end_callback(void *data, LrTransferStatus status, const char *msg);
 

@@ -27,7 +27,8 @@
 
 int parse_params_cl(int argc, char* argv[], ParamOptsCl* params) {
     if(argc==1) {
-        rds_log(logERROR, "No command provided. The program will terminate now.\n");
+        rds_log(logERROR, "No command provided. You need to give some command.\n");
+        print_commands_cl();
         return 2;
     }
 
@@ -36,7 +37,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params) {
         {"install", no_argument, &param_opt, PAR_INSTALL},
         {"chkdep", no_argument, &param_opt, PAR_CHK_DEP},
         {"update", no_argument, &param_opt, PAR_UPDATE},
-        {"erase", no_argument, &param_opt, PAR_ERASE},
+        {"remove", no_argument, &param_opt, PAR_ERASE},
         {"help", no_argument, 0, 'h'}
     };
 
@@ -99,7 +100,7 @@ int parse_params_cl(int argc, char* argv[], ParamOptsCl* params) {
 
 ParamOptsCl* init_params_cl() {
     ParamOptsCl* new;
-    
+
     new = (ParamOptsCl*)malloc(sizeof(ParamOptsCl));
     new->pkg_count = 0;
     new->command = -1;
@@ -116,22 +117,22 @@ void free_params_cl(ParamOptsCl* params) {
 
 void parse_params_srv(int argc, char* argv[]) {
     int opt;
-    
+
     while ((opt = getopt(argc, argv, "vhd")) != -1) {
         switch (opt) {
             case 'v':
                 set_verbose();
             break;
-            
+
             case 'h':
                 print_help_srv();
                 exit(EXIT_SUCCESS);
             break;
-            
+
             case 'd':
                 set_debug();
             break;
-            
+
             default: /* '?' */
                 print_help_srv();
                 exit(PARAMS_ERROR);
@@ -146,7 +147,7 @@ void print_help_cl() {
         "List of Commands\n\n"
         "--install\t\tResolve dependencies and install packages\n"
         "--update\t\tResolve dependencies and update packages\n"
-        "--erase\t\t\tErase packages\n"
+        "--remove\t\t\tRemove packages\n"
         "--chkdep\t\tOnly show required packages - do not install yet\n"
         "--help, -h\t\tDisplays help\n"
         "-v\t\t\tVerbose - turned off by default\n"
@@ -162,3 +163,14 @@ void print_help_srv() {
         "-d\tDebug - turned off by default\n"
     );
 }
+
+void print_commands_cl()
+{
+    printf("./rds-client <commands> [<packages> ...]\n\n"
+            "List of main commands\n\n"
+            "install\n"
+            "remove\n"
+            "update\n"
+            "help\n");
+}
+

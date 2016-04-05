@@ -92,6 +92,11 @@ void parse_params_srv(int argc,char* argv[]);
  */
 void print_help_srv();
 
+/**
+ * Prints available commands for usage available on client
+ */
+void print_commands_cl();
+
 #ifdef __cplusplus
 }
 #endif
