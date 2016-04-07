@@ -592,5 +592,10 @@ int question(char* question, int possibilities) {
         break;
     }
 
+    if(answer != NULL){
+
+        free(answer);
+    }
+    
     return status;
 }    
