@@ -528,15 +528,19 @@ int rpm_process(GSList *install, GSList *update, GSList *erase) {
 
 int question(char* question, int possibilities) {
     int status = NO, repeat = 1;
-    char answer;
+    char *answer = NULL, letter;
     switch(possibilities)
     {
         case YES_NO: 
             while(repeat) {
                 rds_log(logQUESTION, "%s\n[y/n]: ", question);
-                scanf("%c", &answer);
+                if(getline(&answer, &size, stdin) == -1){
+                   // TODO error message after log reimpmelentation
+                }else{
+                     letter = answer[0];
+                }
 
-                switch(answer)
+                switch(letter)
                 {
                     case 'y': 
                         status = YES;
@@ -549,7 +553,6 @@ int question(char* question, int possibilities) {
 
                     default: 
                         rds_log(logWARNING, "Unsupported answer. You should choose y for yes or n for no.\n");
-                        scanf("%c", &answer); //eliminating enter		
                     break;
                 }
             }
@@ -559,9 +562,13 @@ int question(char* question, int possibilities) {
             while(repeat)
             {
                 rds_log(logQUESTION, "%s\n[y/n/d]: ", question);
-                scanf("%c", &answer);
-
-                switch(answer)
+                if(getline(&answer, &size, stdin) == -1){
+                    // TODO error message after log reimpmelentation
+                }else{
+                    letter = answer[0];
+                }
+                
+                switch(letter)
                 {
                     case 'y': 
                     status = YES;
@@ -579,12 +586,16 @@ int question(char* question, int possibilities) {
 
                 default: 
                     rds_log(logWARNING, "Unsupported answer. You should choose y for yes, n for no or d for download only.\n");
-                    scanf("%c", &answer); //eliminating enter     
                 break;
                 }
             }
         break;
     }
 
+    if(answer != NULL){
+
+        free(answer);
+    }
+    
     return status;
 }    
