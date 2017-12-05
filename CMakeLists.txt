@@ -39,29 +39,12 @@ else (NOT JSON_FOUND)
 endif(NOT JSON_FOUND)
 
 #HAWKEY - 0.5.7
-PKG_CHECK_MODULES(HAWKEY hawkey REQUIRED)
-if(NOT HAWKEY_FOUND)
-	message(FATAL_ERROR "Library hawkey not found.")
-else (NOT HAWKEY_FOUND)
-          string(REGEX MATCH "[0-9]?$" HKY_REGEX_VERSION ${HAWKEY_VERSION})
-#			message("Hawkey version " ${HAWKEY_VERSION})
- 
-			if(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
-	            set(HKY_22 1)
-#				message("Hawkey version higher than 0.5.3")         
-			else(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
-				set(HKY_22 0)
-#				message("Hawkey version lower than 0.5.3")         
-#          math(EXPR HKY_NUM "${HKY_REGEX_VERSION}+0")
-#          if(${HKY_NUM} GREATER 3)#hawkey version is higher than 0.5.3
-
-#          else(${HKY_NUM} GREATER 3)#hawkey version is lower or equal to 0.5.3
-#            set(HKY_22 0)
-            endif(${HAWKEY_VERSION} VERSION_GREATER "0.5.3")
-          
-          add_definitions(-DVERSION_HAWKEY=${HKY_22})
+PKG_CHECK_MODULES(LIBDNF libdnf REQUIRED)
+if(NOT LIBDNF_FOUND)
+	message(FATAL_ERROR "Library libdnf not found.")
+else(NOT LIBDNF_FOUND)
 	include_directories(${HAWKEY_INCLUDE_DIRS})
-endif(NOT HAWKEY_FOUND)
+endif(NOT LIBDNF_FOUND)
 
 #LIBREPO
 PKG_CHECK_MODULES(LIBREPO librepo REQUIRED)
@@ -193,7 +176,7 @@ target_link_libraries(rds-client
 	${LIBREPO_LDFLAGS}
 	${CHECK_LDFLAGS})
 
-file(MAKE_DIRECTORY /tmp/ssds/)
-file(MAKE_DIRECTORY /var/cache/ssds/packages/)
+file(MAKE_DIRECTORY /tmp/rds/)
+#file(MAKE_DIRECTORY /var/cache/rds/packages/)
 enable_testing()
 add_subdirectory(tests)
